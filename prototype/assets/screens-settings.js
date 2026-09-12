@@ -190,9 +190,20 @@
   ui.act('brand-set', function (data, el) {
     var val = data.value !== undefined ? data.value : el.value;
     if (data.num) val = Number(val);
-    if (data.k === 'accent' && !/^#?[0-9a-f]{3}([0-9a-f]{3})?$/i.test(String(val).replace('#', '').length === 3 || String(val).replace('#', '').length === 6 ? val : '')) {
-      if (!/^#[0-9a-f]{6}$/i.test(val)) return;      // ignore half-typed hex
+
+    if (data.k === 'accent') {
+      // Normalise, and accept 3-digit shorthand since that is how people write
+      // hex by hand. A half-typed value is ignored rather than applied, or the
+      // whole app flashes through a garbage colour on the way to a valid one.
+      var hex = String(val).trim().replace(/^#/, '');
+      if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      if (!/^[0-9a-f]{6}$/i.test(hex)) {
+        ui.toast('That is not a hex colour. Try something like #d7262f.', 'warn');
+        return;
+      }
+      val = '#' + hex.toLowerCase();
     }
+
     var patch = {}; patch[data.k] = val;
     GD.brand.save(patch);
     ui.refresh();

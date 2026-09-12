@@ -737,10 +737,16 @@
   ui.act('book-slot', function (data) { bookDraft({ iso: data.iso, slot: data.time }); });
   ui.act('book-back', function () {
     var d = GD.store.pref('bookDraft') || {};
-    if (d.slot) delete d.slot, delete d.iso;
-    else if (d.provider_id) delete d.provider_id;
-    else delete d.service_id;
-    GD.store.pref('bookDraft', d); ui.refresh();
+    if (d.slot) {
+      delete d.slot;
+      delete d.iso;
+    } else if (d.provider_id) {
+      delete d.provider_id;
+    } else {
+      delete d.service_id;
+    }
+    GD.store.pref('bookDraft', d);
+    ui.refresh();
   });
   ui.act('book-waitlist', function () {
     var d = GD.store.pref('bookDraft') || {};

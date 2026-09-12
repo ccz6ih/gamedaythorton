@@ -141,7 +141,12 @@ img { max-width: 100%; }
   border-radius: var(--gd-r-lg); padding: var(--gd-5);
 }
 .card + .card { margin-top: var(--gd-4); }
+/* Flush cards let a list run edge to edge; the header keeps its padding so it
+   does not collide with the border. */
 .card.flush { padding: 0; overflow: hidden; }
+.card.flush > .card-head { padding: var(--gd-5) var(--gd-5) 0; }
+.card.flush > .table-scroll { padding: 0 0 var(--gd-2); }
+.card.flush > .note-band, .card.flush > p { margin: var(--gd-4) var(--gd-5); }
 .card.accent { border-color: var(--gd-accent-line); background:
   linear-gradient(160deg, var(--gd-accent-dim), transparent 60%), var(--gd-surface); }
 .card.warn { border-color: var(--gd-below); }

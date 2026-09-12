@@ -1060,9 +1060,10 @@
       var overdue = rows.filter(function (r) { return r.due.overdueDays > 0; });
       return '<div class="grid g3" style="margin-bottom:1.2rem">' +
         ui.stat({ label: 'Overdue', value: overdue.length, note: 'Clinical necessity and a revenue event at once' }) +
-        ui.stat({ label: 'Due soon', value: rows.length - overdue.length }) +
-        ui.stat({ label: 'Potential draws', value: fmt.money(rows.length * 0, { compact: true }) === '$0' ? rows.length : rows.length,
-          unit: 'visits' }) +
+        ui.stat({ label: 'Due soon', value: rows.length - overdue.length,
+          note: 'Within the next two weeks' }) +
+        ui.stat({ label: 'Longest overdue', value: overdue.length ? overdue[0].due.overdueDays : 0, unit: 'days',
+          note: overdue.length ? q.name(overdue[0].patient) : 'Nobody overdue' }) +
         '</div>' +
         ui.card({ flush: true, title: 'Who and why', body: '<div class="list">' + rows.map(function (r) {
           var od = r.due.overdueDays;

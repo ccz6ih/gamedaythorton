@@ -295,8 +295,11 @@
           (o.actData || '') + '>' + esc(o.actLabel) + '</button>' : '') + '</div>';
     },
 
+    /** `flush` removes the body padding so a list can run edge to edge. The
+        header keeps its own padding — see .card.flush > .card-head. */
     card: function (o) {
-      return '<section class="card' + (o.tone ? ' ' + o.tone : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + '>' +
+      return '<section class="card' + (o.tone ? ' ' + o.tone : '') + (o.flush ? ' flush' : '') + '"' +
+        (o.id ? ' id="' + o.id + '"' : '') + '>' +
         (o.title || o.aside ? '<div class="card-head"><div>' +
           (o.eyebrow ? '<div class="eyebrow' + (o.eyebrowQuiet ? ' quiet' : '') + '">' + esc(o.eyebrow) + '</div>' : '') +
           (o.title ? '<h2>' + esc(o.title) + '</h2>' : '') +

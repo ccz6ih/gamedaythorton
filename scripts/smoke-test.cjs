@@ -135,6 +135,35 @@ if (failures) {
 
 const GD = sandbox.GD;
 
+/* ---------------------------------------------------------------- wiring -- */
+/* A file that exists but is not referenced by index.html loads here and not in
+   the browser, which is the one class of bug this harness could otherwise hide. */
+
+console.log('\nWIRING');
+{
+  const html = fs.readFileSync(path.join(PROTO, 'index.html'), 'utf8');
+  const assetFiles = fs.readdirSync(A).filter(f => /\.(js|css)$/.test(f));
+  const unreferenced = assetFiles.filter(f => !html.includes(f));
+  if (unreferenced.length) bad('every asset is referenced by index.html',
+    new Error('not referenced: ' + unreferenced.join(', ')));
+  else ok('every asset is referenced by index.html', assetFiles.length + ' files');
+
+  const referenced = (html.match(/(?:src|href)="([^"]+\.(?:js|css))"/g) || [])
+    .map(m => m.replace(/.*="/, '').replace(/"$/, ''))
+    .filter(p => !/^https?:/.test(p));
+  const broken = referenced.filter(p => !fs.existsSync(path.join(PROTO, p)));
+  if (broken.length) bad('every reference in index.html resolves', new Error('missing: ' + broken.join(', ')));
+  else ok('every reference in index.html resolves', referenced.length + ' references');
+
+  // Load order is load-bearing: store before brand, brand before ui, screens
+  // after ui, boot last.
+  const order = ['store.js', 'charts.js', 'media.js', 'brand.js', 'ui.js', 'boot.js'];
+  const positions = order.map(f => ({ f, at: html.indexOf(f) }));
+  const misordered = positions.filter((p, i) => i > 0 && p.at < positions[i - 1].at);
+  if (misordered.length) bad('script load order', new Error('out of order: ' + misordered.map(m => m.f).join(', ')));
+  else ok('script load order', order.join(' → '));
+}
+
 /* ------------------------------------------------------------- data layer -- */
 
 console.log('\nDATA LAYER');
@@ -284,6 +313,28 @@ check('brand kit round-trips through export/import', () => {
 
 /* --------------------------------------------------------------- screens -- */
 
+/**
+ * Tag balance. Screens build HTML as strings, so an unclosed <section> is a real
+ * possibility and the render test will not notice — it only checks that a string
+ * came back. An unbalanced container silently swallows everything after it.
+ *
+ * Only non-void container tags, all of which this codebase closes explicitly.
+ */
+const CONTAINERS = ['div', 'section', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+  'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'button', 'label', 'select', 'textarea',
+  'figure', 'figcaption', 'svg', 'g', 'text', 'nav', 'h1', 'h2', 'h3', 'p', 'span', 'pre'];
+
+function tagBalance(html) {
+  const problems = [];
+  for (const tag of CONTAINERS) {
+    const open = (html.match(new RegExp('<' + tag + '(?=[\\s/>])', 'gi')) || [])
+      .length - (html.match(new RegExp('<' + tag + '\\b[^>]*/>', 'gi')) || []).length;
+    const close = (html.match(new RegExp('</' + tag + '>', 'gi')) || []).length;
+    if (open !== close) problems.push(tag + ' ' + open + '/' + close);
+  }
+  return problems;
+}
+
 console.log('\nSCREENS');
 const ROUTES = [
   ['staff/scoreboard', []], ['staff/today', []], ['staff/calendar', []], ['staff/checkout', []],
@@ -319,6 +370,10 @@ for (const [route, params] of ROUTES) {
       // Title and primary action are part of the screen contract.
       if (typeof parsed.spec.title === 'function') parsed.spec.title(parsed);
       if (parsed.spec.primary) parsed.spec.primary(parsed);
+
+      const unbalanced = tagBalance(html);
+      if (unbalanced.length) throw new Error('unbalanced tags (open/close): ' + unbalanced.join(', '));
+
       chars += html.length;
       rendered++;
     } catch (e) { err = e; break; }
