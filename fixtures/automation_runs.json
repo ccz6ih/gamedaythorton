@@ -59,7 +59,7 @@
     "triggered_at": "2026-09-09",
     "channel": "sms",
     "status": "logged_not_sent",
-    "payload_preview": "Gameday: you are due for a quick lab draw. Book here: [link]"
+    "payload_preview": "Gameday: you are due for a quick visit. Book here: [link]"
   },
   {
     "id": "auto_07",

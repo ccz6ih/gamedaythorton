@@ -156,7 +156,13 @@ function checkinSeries(patientId, weeks, opts) {
     if (w > weeks - gapWeeks) continue;         // recent silence
     if (w > 0 && rand() < 0.10) continue;       // real men skip weeks
     const t = Math.min(1, w / riseWeeks);
-    const eased = 1 - Math.pow(1 - t, 2);
+    // Smoothstep, not ease-out. An ease-out curve reaches ~85% of the total
+    // gain by week 6, which makes every patient look like he plateaued at
+    // month one. Real TRT response is sigmoid: little in weeks 1-3, most of
+    // the movement in the middle, flattening as levels reach steady state.
+    // This matters because the plateau detector reads these curves, and a
+    // front-loaded curve manufactures plateaus that are not in the story.
+    const eased = t * t * (3 - 2 * t);
     let base = start + (peak - start) * eased;
     if (decline && w > riseWeeks + 4) base -= (w - riseWeeks - 4) * 0.12;
     const row = {
@@ -640,14 +646,25 @@ const automationRuns = [
   { id: 'auto_03', clinic_id: CLINIC, rule_key: 'no_show_recovery', patient_id: 'p_09_noshow', triggered_at: weeksAgo(8), channel: 'sms', status: 'logged_not_sent', payload_preview: 'Gameday: we missed you today. Want to grab another time? [link]' },
   { id: 'auto_04', clinic_id: CLINIC, rule_key: 'no_checkin_21d', patient_id: 'p_04_doubter', triggered_at: daysAgo(2), channel: 'push', status: 'logged_not_sent', payload_preview: 'Gameday: you have an update.' },
   { id: 'auto_05', clinic_id: CLINIC, rule_key: 'payment_failed_retry', patient_id: 'p_12_failedpay', triggered_at: daysAgo(3), channel: 'email', status: 'logged_not_sent', payload_preview: 'Gameday: a billing item needs your attention.' },
-  { id: 'auto_06', clinic_id: CLINIC, rule_key: 'due_for_labs', patient_id: 'p_06_psa', triggered_at: daysAgo(5), channel: 'sms', status: 'logged_not_sent', payload_preview: 'Gameday: you are due for a quick lab draw. Book here: [link]' },
+  { id: 'auto_06', clinic_id: CLINIC, rule_key: 'due_for_labs', patient_id: 'p_06_psa', triggered_at: daysAgo(5), channel: 'sms', status: 'logged_not_sent', payload_preview: 'Gameday: you are due for a quick visit. Book here: [link]' },
   { id: 'auto_07', clinic_id: CLINIC, rule_key: 'month_3_progress', patient_id: 'p_08_paused', triggered_at: weeksAgo(1), channel: 'push', status: 'logged_not_sent', payload_preview: 'Gameday: you have an update.' },
   { id: 'auto_08', clinic_id: CLINIC, rule_key: 'missed_call_textback', patient_id: null, triggered_at: daysAgo(1), channel: 'sms', status: 'logged_not_sent', latency_seconds: 22, payload_preview: 'Sorry we missed your call — this is Gameday Thornton. Can we help you book? [link]' }
 ];
 
-// Notification-preview discipline (P35): every patient-facing message above must
-// pass this. Clinical content in a lock-screen preview is the whole risk.
-const bannedPreviewTerms = ['testosterone', 'erectile', 'ED', 'hematocrit', 'PSA', 'results are ready', 'lab result'];
+// Notification-preview discipline (P35). Every patient-facing preview string is
+// checked against this list, matched on word boundaries (see store.js ->
+// previewSafe). A lock-screen preview is readable by anyone holding the phone,
+// so it may say that something needs attention and nothing about what.
+//
+// The bar is deliberately strict: "your lab results are ready" and "time for
+// your injection" both disclose that the recipient is on therapy, which is the
+// exact disclosure the whole privacy layer exists to prevent.
+const bannedPreviewTerms = [
+  'testosterone', 'trt', 'erectile', 'ed', 'hematocrit', 'psa', 'estradiol',
+  'lab', 'labs', 'results are ready', 'lab result', 'blood draw',
+  'dose', 'injection', 'prescription', 'refill', 'glp-1', 'semaglutide',
+  'tirzepatide', 'peptide', 'libido', 'hormone'
+];
 
 // ---------- front-desk queues ----------
 const missedCalls = [

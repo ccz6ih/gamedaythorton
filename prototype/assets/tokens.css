@@ -1,0 +1,150 @@
+/* ==========================================================================
+   tokens.css — the brandable layer
+   --------------------------------------------------------------------------
+   Every value a client can change lives here and ONLY here. The Brand Kit
+   editor (PRESS BOX -> Settings -> Brand Kit) writes these same custom
+   properties onto <html> at runtime, so rebranding the whole product is a
+   token swap and never a code change.
+
+   If you find yourself writing a literal colour, radius, or font stack in
+   app.css or a screen file, it belongs here instead. See docs/15-branding.md.
+   ========================================================================== */
+
+:root {
+  /* --- Brand-controlled. The Brand Kit overrides these five. ------------- */
+  --brand-accent:        #d7262f;   /* CONFIRM against the franchise brand kit */
+  --brand-accent-ink:    #ffffff;   /* text that sits on the accent */
+  --brand-hue-shift:     0deg;      /* tints surfaces toward the brand */
+  --brand-radius:        10px;      /* 0 = hard corporate, 16 = soft consumer */
+  --brand-font:          "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --brand-display-font:  var(--brand-font);
+  --brand-logo-height:   28px;
+
+  /* --- Derived accent states -------------------------------------------- */
+  --gd-accent:        var(--brand-accent);
+  --gd-accent-hover:  color-mix(in srgb, var(--brand-accent) 82%, white);
+  --gd-accent-press:  color-mix(in srgb, var(--brand-accent) 82%, black);
+  --gd-accent-dim:    color-mix(in srgb, var(--brand-accent) 14%, transparent);
+  --gd-accent-line:   color-mix(in srgb, var(--brand-accent) 38%, transparent);
+
+  /* --- Dark surfaces (default). The clinics are dark rooms and the real
+         usage context is a phone at 11pm. --------------------------------- */
+  --gd-bg:             #141414;
+  --gd-surface:        #1c1c1c;
+  --gd-surface-raised: #242424;
+  --gd-surface-sunken: #101010;
+  --gd-border:         #323232;
+  --gd-border-strong:  #464646;
+
+  --gd-text:       #f5f5f5;
+  --gd-text-muted: #a0a0a0;
+  --gd-text-dim:   #6e6e6e;
+
+  /* --- Clinical semantics -----------------------------------------------
+     Never colour alone. Every one of these is paired with a label or icon in
+     the components: ~8% of men are colour-vision deficient and this is an
+     all-male patient population. */
+  --gd-in-range:  #3fa96b;
+  --gd-below:     #e0a33a;
+  --gd-above:     #e0a33a;
+  --gd-critical:  #e2434c;
+  --gd-improving: #4a9fd8;
+  --gd-flat:      #8a8a8a;
+
+  /* --- Type scale -------------------------------------------------------- */
+  --gd-font:     var(--brand-font);
+  --gd-font-num: var(--brand-font);
+
+  --gd-step--2: clamp(0.7rem, 0.68rem + 0.1vw, 0.76rem);
+  --gd-step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --gd-step-0:  clamp(0.95rem, 0.92rem + 0.2vw, 1.05rem);
+  --gd-step-1:  clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --gd-step-2:  clamp(1.6rem, 1.4rem + 1vw, 2.2rem);
+  --gd-step-3:  clamp(2.1rem, 1.7rem + 2vw, 3.2rem);
+
+  /* --- Space, 4px base --------------------------------------------------- */
+  --gd-1: 0.25rem; --gd-2: 0.5rem;  --gd-3: 0.75rem; --gd-4: 1rem;
+  --gd-5: 1.25rem; --gd-6: 1.5rem;  --gd-8: 2rem;    --gd-10: 2.5rem;
+  --gd-12: 3rem;   --gd-16: 4rem;
+
+  /* --- Radius, derived from one brand knob ------------------------------- */
+  --gd-r-sm:   calc(var(--brand-radius) * 0.6);
+  --gd-r-md:   var(--brand-radius);
+  --gd-r-lg:   calc(var(--brand-radius) * 1.6);
+  --gd-r-full: 999px;
+
+  /* --- Motion. Deliberately small: inside the portal, fast IS the feeling.
+         See docs/06-architecture.md, "Animation discipline". --------------- */
+  --gd-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --gd-fast: 120ms;
+  --gd-med:  220ms;
+
+  --gd-shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+  --gd-ring:   0 0 0 3px var(--gd-accent-dim);
+}
+
+/* --------------------------------------------------------------------------
+   Light surfaces. Offered because the front desk works under fluorescent
+   lights at a counter, where the dark portal genuinely is harder to read.
+   The patient app stays dark. Brand Kit -> Appearance controls this.
+   -------------------------------------------------------------------------- */
+:root[data-surface="light"] {
+  --gd-bg:             #f4f4f5;
+  --gd-surface:        #ffffff;
+  --gd-surface-raised: #fafafa;
+  --gd-surface-sunken: #ebebed;
+  --gd-border:         #dcdcdf;
+  --gd-border-strong:  #bfbfc4;
+
+  --gd-text:       #17171a;
+  --gd-text-muted: #5c5c63;
+  --gd-text-dim:   #8a8a93;
+
+  --gd-in-range:  #1f7a47;
+  --gd-below:     #9a6a10;
+  --gd-above:     #9a6a10;
+  --gd-critical:  #c0242c;
+  --gd-improving: #1f6f9e;
+  --gd-flat:      #6b6b72;
+
+  --gd-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.07);
+}
+
+/* Respect the OS setting when the client picks "Auto". */
+@media (prefers-color-scheme: light) {
+  :root[data-surface="auto"] {
+    --gd-bg:#f4f4f5; --gd-surface:#ffffff; --gd-surface-raised:#fafafa;
+    --gd-surface-sunken:#ebebed; --gd-border:#dcdcdf; --gd-border-strong:#bfbfc4;
+    --gd-text:#17171a; --gd-text-muted:#5c5c63; --gd-text-dim:#8a8a93;
+    --gd-in-range:#1f7a47; --gd-below:#9a6a10; --gd-above:#9a6a10;
+    --gd-critical:#c0242c; --gd-improving:#1f6f9e; --gd-flat:#6b6b72;
+    --gd-shadow:0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.07);
+  }
+}
+
+/* Patient surfaces stay dark regardless of the console setting. */
+[data-app="patient"] {
+  --gd-bg:             #141414;
+  --gd-surface:        #1c1c1c;
+  --gd-surface-raised: #242424;
+  --gd-surface-sunken: #101010;
+  --gd-border:         #323232;
+  --gd-border-strong:  #464646;
+  --gd-text:       #f5f5f5;
+  --gd-text-muted: #a0a0a0;
+  --gd-text-dim:   #6e6e6e;
+  --gd-in-range:  #3fa96b;
+  --gd-below:     #e0a33a;
+  --gd-above:     #e0a33a;
+  --gd-critical:  #e2434c;
+  --gd-improving: #4a9fd8;
+  --gd-flat:      #8a8a8a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --gd-fast: 0ms; --gd-med: 0ms; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
