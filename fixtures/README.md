@@ -28,20 +28,46 @@ feedback comes from edge cases, so the roster is built around the awkward ones.
 | `p_11_hairloss` | Finasteride + PRP, 6-month photo series | Game Film, ghost-overlay compare |
 | `p_12_failedpay` | Active but card declined twice | Involuntary churn, retry sequence |
 
-## Files to build
+## Files
 
-```
-patients.json           roster above, with demographics
-appointments.json       past + future, incl. no-show and cancellation
-lab_panels.json         multi-draw histories with realistic drift
-checkins.json           weekly series, incl. gaps for p_04 and p_07
-protocols.json          with protocol_change records for dose markers
-photos/                 generated placeholder images, correct pose_keys
-memberships.json        active, paused, cancelled, failed payment
-leads.json              all 16 acquisition sources represented
-services.json           seeded from docs/01-audit-findings.md
-providers.json          invented clinicians, placeholder headshots
-```
+**All generated. Do not hand-edit any of them** — edit
+`scripts/generate-fixtures.cjs` and re-run `node scripts/generate-fixtures.cjs`. A
+hand-edit is destroyed silently on the next generation, and nobody will work out why the
+demo changed.
+
+The generator is deterministic (seeded `mulberry32`), so the roster comes back identical
+every time.
+
+| File | Contents |
+|---|---|
+| `clinic.json` | Clinic record, hours, and the visit-facts copy behind the pre-visit card |
+| `patients.json` | The roster above, with demographics and privacy flags |
+| `providers.json` / `staff.json` | Invented clinicians and staff accounts |
+| `services.json` | 27 services seeded from `docs/01-audit-findings.md` |
+| `plans.json` | Three membership tiers — **placeholder pricing** |
+| `appointments.json` | Story appointments plus two weeks of filler so the calendar is legible |
+| `analytes.json` | 14 analytes with reference **and** target ranges, all provisional |
+| `lab_panels.json` / `lab_results.json` | Multi-draw histories with plausible drift |
+| `checkins.json` | Weekly series with gaps, noise, and two free-text notes |
+| `protocols.json` / `protocol_items.json` / `protocol_changes.json` | Protocols and the dose-change records that plot Stat Sheet markers |
+| `memberships.json` / `payments.json` | Active, paused, cancelled, failed payment |
+| `leads.json` | All 16 acquisition sources, with TCPA consent evidence |
+| `intake_template.json` / `intake_submissions.json` | Versioned template, one complete and one partial submission |
+| `message_threads.json` / `messages.json` | Five threads incl. the doubter's cancellation signal |
+| `photo_series.json` / `photos.json` | Series **metadata only** — no image bytes ship in this repo |
+| `body_comp.json` | InBody-style series for the weight-loss and TRT patients |
+| `inventory_items.json` / `inventory_lots.json` | Lots, expiry, Schedule III marking |
+| `automation_runs.json` | Message log — every preview passes the no-clinical-content check |
+| `missed_calls.json` / `waitlist.json` / `tasks.json` | Front-desk queues |
+
+`prototype/demo-data.js` bundles all of it into one file the prototype can load over
+`file://` with no server.
+
+### No image bytes, ever
+
+`photos.json` carries metadata only. Placeholders are generated as inline SVG at render
+time, visibly watermarked `PLACEHOLDER`. A placeholder that could be mistaken for a patient
+photo is worse than none. See `docs/16-media-pipeline.md`.
 
 ## Realism rules
 
@@ -58,8 +84,29 @@ Fake data that behaves unrealistically produces unrealistic feedback.
 - Include at least one plausible free-text check-in note that a provider would want to
   act on — it proves someone has to be reading that field
 
+### The response curve is part of the analysis
+
+The check-in generator uses **smoothstep**, not ease-out. This is not cosmetic. An ease-out
+curve puts ~85% of the total gain in the first six weeks, which makes every patient look
+like he plateaued at month one — and the plateau detector in `store.js` reads these curves,
+so a front-loaded generator manufactures plateaus that are not in the story and makes a
+real feature look broken.
+
+Real TRT response is sigmoid: little in weeks 1–3, most of the movement in the middle,
+flattening as levels reach steady state. If you change this curve, re-run the smoke test —
+it asserts the doubter shows a ~6-week plateau while still being up from baseline on all
+six dimensions.
+
 ## Ranges
 
 Use clinically plausible placeholder ranges until the real clinic values arrive from
 `docs/11-discovery-questions.md` §3. **Mark every placeholder range in the data as
 `"provisional": true`** so nothing assumed gets carried into production unnoticed.
+
+The smoke test enforces this: every analyte must carry `provisional: true`, and the UI
+surfaces it wherever a range is shown. A provider who spots an assumed threshold presented
+as fact loses confidence in the entire demo, and they are right to.
+
+Provisional values currently in play, all invented: hematocrit ceiling 52%, PSA velocity
+0.75 ng/mL/yr, target total T 600–900 ng/dL, 7-week initial recheck then quarterly, and
+every price in `plans.json` and `services.json`.

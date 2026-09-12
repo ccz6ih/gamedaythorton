@@ -5,11 +5,26 @@ Phase C before the owner has told us what Phase B got wrong.
 
 ```
 PHASE 0   Discovery                    ~1 week      [GATE 0: franchise clearance]
-PHASE A   Clickable pilot              2-3 weeks    [GATE A: owner/staff feedback]
+PHASE A   Clickable pilot              2-3 weeks    [GATE A: owner/staff feedback]   BUILT
 PHASE B   Functional pilot             4-6 weeks    [GATE B: go/no-go on production]
-PHASE C   Compliance + production       6-8 weeks    [GATE C: first real patient]
-PHASE D   Depth + multi-tenant          ongoing
+PHASE C   Compliance + production      6-8 weeks    [GATE C: first real patient]
+CUTOVER   Replace GlossGenius          2-4 weeks    [GATE CUT: decommission]
+PHASE D   Depth + multi-tenant         ongoing
 ```
+
+**CUTOVER was added after the brief clarified that this replaces GlossGenius rather than
+filling a vacuum.** It sits between C and D rather than taking a letter, because the lettered
+phases are referenced throughout the other docs and renumbering them would create more
+confusion than it removes.
+
+It is not optional and it is not a launch — it is a migration with a rollback. Skipping it is
+how replacement projects fail: the missing workflow gets discovered the week after the old
+subscription was cancelled. See `12-glossgenius-parity.md` § Cutover and `18-decisions.md`
+ADR-011.
+
+The blocker with the longest lead time is the payment-credential migration. If members have
+to re-enter cards, that is a churn event and needs to be planned, announced, and staffed.
+Find out early.
 
 ---
 
@@ -34,10 +49,18 @@ ask later.
 
 ---
 
-## PHASE A — Clickable pilot (2–3 weeks)
+## PHASE A — Clickable pilot (2–3 weeks) — **BUILT**
 
 **Goal:** something the owner and staff click through and react to. Not a product — a
 feedback instrument. Synthetic data, no real sending, no real payments.
+
+**Status: built and passing.** 27 screens in `prototype/`, running on the 12-patient
+synthetic roster, brandable by the client, accepting real images for clinicians, the clinic
+and patients. Run it per `prototype/README.md`. Remaining finishing tasks — calendar day
+view, ungated symptom self-assessment, the week-12 milestone screen, print/export — are
+Stage A in `docs/13-build-sequence.md`.
+
+Everything below was the plan; it is now the inventory of what exists.
 
 **Patient app (GAMEPLAN)**
 - Booking flow end to end: service -> provider -> slot -> confirm (P01, P02, P03, P05)
@@ -131,6 +154,30 @@ This is where HIPAA lands. Work the full checklist in `06-architecture.md`. High
 ### GATE C — first real patient
 Sign-off checklist complete, legal review of the controlled-substance log, staff
 trained. Only then does a real name enter the system.
+
+---
+
+## CUTOVER — replacing GlossGenius (2–4 weeks)
+
+Only after Gate C. Work `12-glossgenius-parity.md` § Cutover in order.
+
+```
+1. PARALLEL        Both live. GlossGenius is still the system of record.
+2. CUTOVER         Client list imported. New bookings here; existing
+                   GlossGenius appointments honoured until they drain.
+3. READ-ONLY TAIL  GlossGenius kept paid and readable for at least one
+                   billing cycle. Export everything before it ends.
+4. DECOMMISSION    Only after a tested export is verified restorable.
+```
+
+**Blockers to resolve before Phase C ends, not during cutover:** client-list export
+(including notes and photos), outstanding gift cards and prepaid series, future appointments
+already booked, **payment credentials**, and record-retention obligations on anything that
+functioned as a clinical record.
+
+### GATE CUT — decommission
+A tested, verified-restorable export exists. Gift cards and packages reconciled. No workflow
+has surfaced in a month of live use that only the old system could do. Only then cancel it.
 
 ---
 

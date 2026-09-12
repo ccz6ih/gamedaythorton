@@ -9,8 +9,18 @@ Gameday Men's Health franchise in Thornton, CO. Built by Craig Carda / The Moder
 Evolution. The corporate Webflow site is out of scope and unreachable — we build a
 separately owned property.
 
+**This replaces GlossGenius**, which runs the clinic's front desk today. That raises the
+stakes: a portal nobody adopts is a disappointment, but a replacement for the system that
+runs the front desk, missing one thing they use daily, is an outage. Every feature they
+depend on is mapped in `docs/12-glossgenius-parity.md`, including the cutover plan and the
+things we have not verified yet.
+
 Read in order: `README.md`, `docs/00-brief.md`, `docs/04-feature-backlog.md`,
 `docs/06-architecture.md`. Then the doc relevant to your task.
+
+**Before changing code, read `docs/17-agent-playbook.md`.** It has the rules of
+engagement, the conventions, and the mistakes already made here. Pick tasks from
+`docs/13-build-sequence.md`.
 
 ## Non-negotiable rules
 
@@ -52,12 +62,39 @@ clinically plain.
 
 ## Stack
 
-Next.js App Router + TypeScript · Supabase (Postgres, auth, storage) · Recharts ·
-GSAP on the marketing/booking funnel only, near-zero inside the portal · Stripe test
-mode · Tailwind with the tokens in `docs/07-design-system.md`.
+**Production (Phase B+):** Next.js App Router + TypeScript · Supabase (Postgres, auth,
+storage) · Recharts · GSAP on the marketing/booking funnel only, near-zero inside the
+portal · Stripe test mode · Tailwind with the tokens in `docs/07-design-system.md`.
+
+**The Phase A pilot in `prototype/` is deliberately none of that** — a dependency-free
+static app that runs from a double-clicked `file://` URL, so it can be demoed on a clinic
+iPad with no install and no build step that can fail five minutes before a meeting. Route
+names map 1:1 onto App Router paths so the port is mechanical. Reasoning and consequences
+in `docs/18-decisions.md` ADR-001.
 
 Dark theme by default — the clinics are dark rooms and the real usage context is a phone
-at 11pm.
+at 11pm. The staff console can be switched to light (the front desk works under
+fluorescent lights); the patient app cannot.
+
+## Working on the pilot
+
+```
+node scripts/generate-fixtures.cjs   # regenerate the dataset (deterministic)
+node scripts/smoke-test.cjs          # 69 checks: all 27 screens x all 12 patients
+node scripts/serve.cjs               # optional http origin, http://localhost:4173
+```
+
+`fixtures/*.json` and `prototype/demo-data.js` are **generated**. Edit
+`scripts/generate-fixtures.cjs` and re-run it; a hand-edit is destroyed silently on the
+next generation.
+
+The smoke test is necessary and not sufficient — it cannot see layout. Always click
+through the change in a real browser, at 400px too, and against a patient the change was
+*not* written for.
+
+Never hard-code a colour, radius, or font outside `prototype/assets/tokens.css`, and never
+hard-code a themed noun — call `GD.brand.word()`. Every derived metric belongs in
+`store.js` under `GD.q`, defined exactly once.
 
 ## Craig's working preferences
 
@@ -71,12 +108,25 @@ at 11pm.
 
 ## Current status
 
-Docs complete. Next: `/fixtures` synthetic dataset, then the Phase A clickable
-prototype. See `docs/08-roadmap.md` for phase contents and gates.
+Docs complete. Synthetic dataset built. **Phase A clickable pilot built** — 27 screens,
+brandable, accepts real images for practitioners, the clinic, and patients.
+
+Next: the Stage A finishing tasks in `docs/13-build-sequence.md`, then the Gate A feedback
+session per `docs/10-demo-script.md`. **Gate A output replaces our phase ordering** — do
+not start Phase B from the build sequence before that session has happened.
 
 ## Open blockers
 
 - **Franchise agreement unread** — may forbid an independent patient system. Gate 0
+- **GlossGenius account not seen.** Every "today" column in the parity matrix is inferred
+  rather than observed. One morning watching the front desk resolves it, and it is the
+  highest-value hour available in this project
+- **Payment-credential migration unknown.** If members have to re-enter cards at cutover,
+  that is a churn event that has to be planned, announced, and staffed — not discovered.
+  `docs/18-decisions.md` ADR-011
 - EMR / charting system unknown — build for manual structured lab entry first
 - Real clinical target ranges and safety thresholds unknown — do not ship assumed
-  values; see `docs/11-discovery-questions.md` §3
+  values; see `docs/11-discovery-questions.md` §3. Everything currently in the dataset is
+  marked `provisional: true` and says so in the UI
+- **The plateau copy on the patient Stat Sheet needs provider sign-off.** It is the one
+  place the pilot says something quasi-clinical to a patient. ADR-009

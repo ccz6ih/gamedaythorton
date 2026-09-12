@@ -106,7 +106,37 @@ Answers go inline. Anything still blank at Gate B is a risk carried into product
       is empty — we need these regardless)*
 - [ ] Any existing Google Workspace / IT setup to integrate with?
 
-## 10. Risk & appetite
+## 10. Current platform — GlossGenius (added; see `12-glossgenius-parity.md`)
+
+The clinic runs on GlossGenius today and this build replaces it. **We have not seen the
+account**, so every "today" claim in the parity matrix is inferred rather than observed.
+
+- [ ] **Sit with the front desk for one morning and watch.** Note every click and every
+      workaround. Workarounds are requirements. *This is the highest-value hour available
+      in this project*
+- [ ] Which features are used daily, weekly, never?
+- [ ] Monthly cost and contract term?
+- [ ] **Will GlossGenius sign a BAA?** Ask them directly, in writing
+- [ ] What clinical information currently lives in client notes?
+- [ ] Can the client list be exported? With notes? **With photos?** What format?
+- [ ] How many future appointments sit on the calendar at any time?
+- [ ] Gift cards, packages, or prepaid series sold? Any outstanding? *(These are real
+      liabilities that must be honoured across a cutover)*
+- [ ] Is recurring membership billing run through GlossGenius or separately?
+- [ ] **Which payment processor sits underneath it?** *(This single answer decides whether
+      every member has to re-enter a card at cutover — which is a churn event, not a
+      technical detail. See ADR-011)*
+- [ ] Which card reader hardware? Owned or leased?
+- [ ] Does anyone rely on Google Calendar sync?
+- [ ] Are email or SMS campaigns actually being sent, or is the feature dormant?
+- [ ] Who administers the account? Who holds the password?
+- [ ] **What does the owner like about it?** Ask genuinely. Whatever he names is a hard
+      requirement, and it is far cheaper to hear now than at Gate B
+- [ ] What makes staff swear at it? Those are the features to beat
+- [ ] What are the record-retention obligations on anything in there that functioned as a
+      clinical record? *(Ask counsel before deleting anything)*
+
+## 11. Risk & appetite
 
 - [ ] Budget range for Phases A–C?
 - [ ] Timeline expectation?
