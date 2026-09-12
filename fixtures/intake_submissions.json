@@ -1,0 +1,44 @@
+[
+  {
+    "id": "intk_p_02",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_02_firstvisit",
+    "appointment_id": "apt_02",
+    "template_version": "v1.0",
+    "submitted_at": "2026-09-13",
+    "signed_at": "2026-09-13",
+    "signature_ref": "sig_synthetic_02",
+    "percent_complete": 100,
+    "answers": {
+      "primary_concern": [
+        "Low energy / fatigue",
+        "Low libido or sexual function"
+      ],
+      "duration": "1–3 years",
+      "conditions": [
+        "High cholesterol"
+      ],
+      "exercise": "3–4 days",
+      "alcohol": "4–7 drinks",
+      "tobacco": "Never",
+      "sleep_hours": "5–6",
+      "adam_score": 7
+    }
+  },
+  {
+    "id": "intk_p_01",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_01_new",
+    "appointment_id": "apt_01",
+    "template_version": "v1.0",
+    "submitted_at": null,
+    "signed_at": null,
+    "signature_ref": null,
+    "percent_complete": 30,
+    "answers": {
+      "primary_concern": [
+        "Low energy / fatigue"
+      ]
+    }
+  }
+]

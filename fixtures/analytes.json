@@ -1,0 +1,159 @@
+[
+  {
+    "key": "total_testosterone",
+    "label": "Total Testosterone",
+    "unit": "ng/dL",
+    "refLow": 264,
+    "refHigh": 916,
+    "targetLow": 600,
+    "targetHigh": 900,
+    "higherBetter": true,
+    "provisional": true
+  },
+  {
+    "key": "free_testosterone",
+    "label": "Free Testosterone",
+    "unit": "pg/mL",
+    "refLow": 8.7,
+    "refHigh": 25.1,
+    "targetLow": 15,
+    "targetHigh": 25,
+    "higherBetter": true,
+    "provisional": true
+  },
+  {
+    "key": "shbg",
+    "label": "SHBG",
+    "unit": "nmol/L",
+    "refLow": 16.5,
+    "refHigh": 55.9,
+    "targetLow": 20,
+    "targetHigh": 45,
+    "higherBetter": null,
+    "provisional": true
+  },
+  {
+    "key": "estradiol_sensitive",
+    "label": "Estradiol (sensitive)",
+    "unit": "pg/mL",
+    "refLow": 8,
+    "refHigh": 43,
+    "targetLow": 20,
+    "targetHigh": 35,
+    "higherBetter": null,
+    "provisional": true
+  },
+  {
+    "key": "hematocrit",
+    "label": "Hematocrit",
+    "unit": "%",
+    "refLow": 38.3,
+    "refHigh": 48.6,
+    "targetLow": 40,
+    "targetHigh": 50,
+    "ceiling": 52,
+    "higherBetter": null,
+    "safety": true,
+    "provisional": true
+  },
+  {
+    "key": "hemoglobin",
+    "label": "Hemoglobin",
+    "unit": "g/dL",
+    "refLow": 13.2,
+    "refHigh": 16.6,
+    "targetLow": 14,
+    "targetHigh": 17,
+    "higherBetter": null,
+    "provisional": true
+  },
+  {
+    "key": "psa",
+    "label": "PSA",
+    "unit": "ng/mL",
+    "refLow": 0,
+    "refHigh": 4,
+    "targetLow": 0,
+    "targetHigh": 2.5,
+    "higherBetter": false,
+    "safety": true,
+    "provisional": true
+  },
+  {
+    "key": "lh",
+    "label": "LH",
+    "unit": "IU/L",
+    "refLow": 1.7,
+    "refHigh": 8.6,
+    "targetLow": 1.7,
+    "targetHigh": 8.6,
+    "higherBetter": null,
+    "provisional": true
+  },
+  {
+    "key": "tsh",
+    "label": "TSH",
+    "unit": "mIU/L",
+    "refLow": 0.45,
+    "refHigh": 4.5,
+    "targetLow": 0.5,
+    "targetHigh": 2.5,
+    "higherBetter": null,
+    "provisional": true
+  },
+  {
+    "key": "a1c",
+    "label": "Hemoglobin A1c",
+    "unit": "%",
+    "refLow": 4,
+    "refHigh": 5.6,
+    "targetLow": 4.5,
+    "targetHigh": 5.4,
+    "higherBetter": false,
+    "provisional": true
+  },
+  {
+    "key": "ldl",
+    "label": "LDL Cholesterol",
+    "unit": "mg/dL",
+    "refLow": 0,
+    "refHigh": 99,
+    "targetLow": 0,
+    "targetHigh": 99,
+    "higherBetter": false,
+    "provisional": true
+  },
+  {
+    "key": "hdl",
+    "label": "HDL Cholesterol",
+    "unit": "mg/dL",
+    "refLow": 40,
+    "refHigh": 90,
+    "targetLow": 50,
+    "targetHigh": 90,
+    "higherBetter": true,
+    "provisional": true
+  },
+  {
+    "key": "triglycerides",
+    "label": "Triglycerides",
+    "unit": "mg/dL",
+    "refLow": 0,
+    "refHigh": 149,
+    "targetLow": 0,
+    "targetHigh": 120,
+    "higherBetter": false,
+    "provisional": true
+  },
+  {
+    "key": "vitamin_d",
+    "label": "Vitamin D, 25-OH",
+    "unit": "ng/mL",
+    "refLow": 30,
+    "refHigh": 100,
+    "targetLow": 50,
+    "targetHigh": 80,
+    "higherBetter": true,
+    "provisional": true
+  }
+]

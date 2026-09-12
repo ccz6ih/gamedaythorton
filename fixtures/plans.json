@@ -1,0 +1,43 @@
+[
+  {
+    "id": "plan_core",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Core Membership",
+    "price_cents": 24900,
+    "interval": "month",
+    "provisional_price": true,
+    "includes": [
+      "Provider visits",
+      "Protocol management",
+      "Quarterly monitoring labs",
+      "Weekly check-ins + Stat Sheet"
+    ]
+  },
+  {
+    "id": "plan_performance",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Performance Membership",
+    "price_cents": 34900,
+    "interval": "month",
+    "provisional_price": true,
+    "includes": [
+      "Everything in Core",
+      "Monthly vitamin injections",
+      "Body composition scans",
+      "Priority scheduling"
+    ]
+  },
+  {
+    "id": "plan_metabolic",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Metabolic Membership",
+    "price_cents": 39900,
+    "interval": "month",
+    "provisional_price": true,
+    "includes": [
+      "GLP-1 or tirzepatide management",
+      "Monthly titration visits",
+      "Body composition scans"
+    ]
+  }
+]

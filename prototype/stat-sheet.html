@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stat Sheet — GAMEPLAN (Pilot)</title>
+<style>
+:root{
+  --gd-bg:#141414; --gd-surface:#1c1c1c; --gd-surface-raised:#242424; --gd-border:#323232;
+  --gd-text:#f5f5f5; --gd-text-muted:#a0a0a0; --gd-text-dim:#6e6e6e;
+  --gd-accent:#d7262f; --gd-accent-hover:#ef3b44; --gd-accent-dim:rgba(215,38,47,.14);
+  --gd-in-range:#3fa96b; --gd-warn:#e0a33a; --gd-critical:#d7262f; --gd-improving:#4a9fd8;
+  --gd-font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --gd-r-sm:6px; --gd-r-md:10px; --gd-r-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--gd-bg);color:var(--gd-text);font-family:var(--gd-font);
+  -webkit-font-smoothing:antialiased;padding-bottom:4rem}
+.num{font-variant-numeric:tabular-nums}
+
+.pilot-banner{background:var(--gd-accent);color:#fff;text-align:center;
+  padding:.45rem 1rem;font-size:.72rem;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;position:sticky;top:0;z-index:50}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 1.25rem}
+
+header.pt{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;padding:2rem 0 1.25rem}
+.eyebrow{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gd-accent);font-weight:700;margin-bottom:.4rem}
+h1{font-size:clamp(1.9rem,1.4rem+2vw,2.9rem);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.sub{color:var(--gd-text-muted);font-size:.92rem;margin-top:.45rem}
+.season{background:var(--gd-surface-raised);border:1px solid var(--gd-border);
+  border-radius:var(--gd-r-md);padding:.7rem 1rem;min-width:190px}
+.season .lab{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gd-text-dim)}
+.season .val{font-size:1.15rem;font-weight:700;margin-top:.15rem}
+.season .bar{height:5px;background:#2c2c2c;border-radius:99px;margin-top:.6rem;overflow:hidden}
+.season .bar>i{display:block;height:100%;background:var(--gd-accent);border-radius:99px}
+
+/* Then vs Now — the contrast band. The whole product thesis in one row. */
+.contrast{background:linear-gradient(135deg,#1f1f1f,#191919);
+  border:1px solid var(--gd-border);border-radius:var(--gd-r-lg);
+  padding:1.5rem;margin:.5rem 0 2rem}
+.contrast h2{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gd-text-dim);font-weight:700;margin-bottom:1.1rem}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
+.cell{background:var(--gd-surface);border:1px solid var(--gd-border);
+  border-radius:var(--gd-r-md);padding:.95rem}
+.cell .name{font-size:.78rem;color:var(--gd-text-muted);margin-bottom:.55rem}
+.cell .row{display:flex;align-items:baseline;gap:.5rem}
+.cell .then{font-size:1.15rem;font-weight:600;color:var(--gd-text-dim)}
+.cell .arrow{color:var(--gd-text-dim);font-size:.9rem}
+.cell .now{font-size:1.9rem;font-weight:800;line-height:1}
+.up{color:var(--gd-in-range)}
+.cell .delta{font-size:.74rem;margin-top:.4rem;color:var(--gd-in-range);font-weight:600}
+
+.panel{background:var(--gd-surface);border:1px solid var(--gd-border);
+  border-radius:var(--gd-r-lg);padding:1.4rem;margin-bottom:1.75rem}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;
+  gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.panel-head h3{font-size:1.05rem;font-weight:700}
+.panel-head p{font-size:.82rem;color:var(--gd-text-muted);margin-top:.25rem;max-width:52ch}
+
+.legend{display:flex;flex-wrap:wrap;gap:.45rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.74rem;
+  background:var(--gd-surface-raised);border:1px solid var(--gd-border);
+  border-radius:99px;padding:.28rem .65rem;cursor:pointer;user-select:none;
+  transition:opacity .14s,border-color .14s}
+.chip.off{opacity:.32}
+.chip i{width:9px;height:9px;border-radius:99px;display:block}
+
+.chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg{display:block;width:100%;min-width:560px;height:auto}
+.grid-line{stroke:#292929;stroke-width:1}
+.axis-txt{fill:var(--gd-text-dim);font-size:11px;font-family:var(--gd-font)}
+.lab-tick{stroke:var(--gd-improving);stroke-width:1;stroke-dasharray:3 3;opacity:.65}
+.dose-line{stroke:var(--gd-accent);stroke-width:1.5;stroke-dasharray:4 3;opacity:.8}
+.marker-txt{fill:var(--gd-text-muted);font-size:10px;font-family:var(--gd-font)}
+.baseline-band{fill:#ffffff;opacity:.035}
+
+.foot-note{font-size:.78rem;color:var(--gd-text-dim);margin-top:.9rem;line-height:1.5}
+
+/* Lab cards */
+.labs{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:.9rem}
+.labcard{background:var(--gd-surface-raised);border:1px solid var(--gd-border);
+  border-radius:var(--gd-r-md);padding:1rem}
+.labcard.flagged{border-color:var(--gd-warn)}
+.labcard .lname{font-size:.79rem;color:var(--gd-text-muted);display:flex;
+  justify-content:space-between;align-items:center;gap:.5rem}
+.badge{font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+  padding:.16rem .42rem;border-radius:4px}
+.badge.ok{background:rgba(63,169,107,.16);color:var(--gd-in-range)}
+.badge.warn{background:rgba(224,163,58,.16);color:var(--gd-warn)}
+.labcard .lval{font-size:1.75rem;font-weight:800;margin:.4rem 0 .1rem;line-height:1}
+.labcard .lval small{font-size:.8rem;font-weight:600;color:var(--gd-text-muted);margin-left:.25rem}
+.labcard .lprev{font-size:.74rem;color:var(--gd-text-muted)}
+.rangebar{position:relative;height:8px;background:#2c2c2c;border-radius:99px;margin:.85rem 0 .4rem}
+.rangebar .target{position:absolute;top:0;bottom:0;background:rgba(63,169,107,.3);border-radius:99px}
+.rangebar .dot{position:absolute;top:50%;width:12px;height:12px;border-radius:99px;
+  background:var(--gd-text);border:2px solid var(--gd-bg);transform:translate(-50%,-50%)}
+.rangebar .dot.warn{background:var(--gd-warn)}
+.rangelabels{display:flex;justify-content:space-between;font-size:.66rem;color:var(--gd-text-dim)}
+.plain{font-size:.79rem;color:var(--gd-text-muted);margin-top:.6rem;line-height:1.45}
+
+.provisional{font-size:.7rem;color:var(--gd-warn);margin-top:1rem;
+  border-top:1px solid var(--gd-border);padding-top:.8rem}
+.err{background:var(--gd-surface);border:1px solid var(--gd-accent);
+  border-radius:var(--gd-r-md);padding:1.5rem;margin-top:2rem;line-height:1.6;font-size:.9rem}
+code{background:#000;padding:.15rem .4rem;border-radius:4px;font-size:.85em}
+</style>
+</head>
+<body>
+
+<div class="pilot-banner">Pilot — Synthetic Data Only — Not for Real Patients</div>
+
+<div class="wrap" id="app"></div>
+
+<script src="demo-data.js" onerror="window.__gdMissing=true"></script>
+<script>
+(function(){
+  var app = document.getElementById('app');
+
+  if (!window.GD_DEMO) {
+    app.innerHTML = '<div class="err"><strong>Demo data not loaded.</strong><br><br>'
+      + 'Run <code>node scripts/generate-fixtures.cjs</code> from the project root, '
+      + 'then reload this page. It writes <code>prototype/demo-data.js</code>.</div>';
+    return;
+  }
+
+  var D = window.GD_DEMO;
+  var PATIENT_ID = 'p_04_doubter';   // the month-4 doubter — the demo patient
+
+  var patient  = D.patients.find(function(p){ return p.id === PATIENT_ID; });
+  var checkins = D.checkins.filter(function(c){ return c.patient_id === PATIENT_ID; })
+                           .sort(function(a,b){ return a.week_index - b.week_index; });
+  var panels   = D.lab_panels.filter(function(p){ return p.patient_id === PATIENT_ID; })
+                             .sort(function(a,b){ return a.drawn_at < b.drawn_at ? -1 : 1; });
+  var changes  = D.protocol_changes.filter(function(c){ return c.patient_id === PATIENT_ID; })
+                                   .sort(function(a,b){ return a.changed_at < b.changed_at ? -1 : 1; });
+
+  var DIMS = [
+    { key:'energy',           label:'Energy',  color:'#d7262f' },
+    { key:'libido',           label:'Libido',  color:'#e0a33a' },
+    { key:'sleep_quality',    label:'Sleep',   color:'#4a9fd8' },
+    { key:'mood',             label:'Mood',    color:'#3fa96b' },
+    { key:'gym_performance',  label:'Gym',     color:'#b06fd4' },
+    { key:'mental_clarity',   label:'Clarity', color:'#57c4c0' }
+  ];
+  var active = {};
+  DIMS.forEach(function(d){ active[d.key] = true; });
+
+  var totalWeeks = patient.weeks_on_therapy;
+  var SEASON = 12;
+  var seasonNum = Math.floor(totalWeeks / SEASON) + 1;
+  var seasonWeek = (totalWeeks % SEASON) + 1;
+
+  function avg(c){
+    return DIMS.reduce(function(s,d){ return s + c[d.key]; }, 0) / DIMS.length;
+  }
+  function weekIndexOf(dateStr){
+    var end = new Date(D.generated_at).getTime();
+    var t   = new Date(dateStr + 'T00:00:00Z').getTime();
+    return totalWeeks - Math.round((end - t) / (7 * 864e5));
+  }
+  function daysSince(dateStr){
+    return Math.round((new Date(D.generated_at) - new Date(dateStr + 'T00:00:00Z')) / 864e5);
+  }
+
+  var first = checkins[0], last = checkins[checkins.length - 1];
+
+  // ---------- header + contrast band ----------
+  var html = ''
+    + '<header class="pt"><div>'
+    +   '<div class="eyebrow">Stat Sheet</div>'
+    +   '<h1>' + patient.first_name + '\u2019s progress</h1>'
+    +   '<p class="sub">' + totalWeeks + ' weeks on your Game Plan \u00b7 started '
+    +     new Date(patient.therapy_start_date + 'T00:00:00Z')
+          .toLocaleDateString('en-US',{month:'long', day:'numeric', year:'numeric'})
+    +   '</p>'
+    + '</div>'
+    + '<div class="season">'
+    +   '<div class="lab">Season ' + seasonNum + '</div>'
+    +   '<div class="val num">Week ' + seasonWeek + ' of ' + SEASON + '</div>'
+    +   '<div class="bar"><i style="width:' + Math.round(seasonWeek / SEASON * 100) + '%"></i></div>'
+    + '</div></header>';
+
+  html += '<section class="contrast"><h2>Where you started vs. where you are</h2><div class="cgrid">';
+  DIMS.forEach(function(d){
+    var then = first[d.key], now = last[d.key], delta = now - then;
+    html += '<div class="cell">'
+      + '<div class="name">' + d.label + '</div>'
+      + '<div class="row"><span class="then num">' + then + '</span>'
+      + '<span class="arrow">\u2192</span>'
+      + '<span class="now num' + (delta > 0 ? ' up' : '') + '">' + now + '</span></div>'
+      + (delta > 0 ? '<div class="delta">+' + delta + ' points since week 1</div>'
+                   : '<div class="delta" style="color:var(--gd-text-dim)">no change</div>')
+      + '</div>';
+  });
+  html += '</div></section>';
+
+  // ---------- chart panel ----------
+  html += '<section class="panel">'
+    + '<div class="panel-head"><div>'
+    +   '<h3>Your scores over time</h3>'
+    +   '<p>Every weekly check-in, with your lab draws and dose changes marked on the same '
+    +     'timeline \u2014 so you can see what changed and when.</p>'
+    + '</div><div class="legend" id="legend"></div></div>'
+    + '<div class="chart-scroll"><div id="chart"></div></div>'
+    + '<p class="foot-note" id="chartnote"></p>'
+    + '</section>';
+
+  // ---------- lab cards ----------
+  var latest = panels[panels.length - 1], prev = panels[panels.length - 2];
+  var SHOW = ['total_testosterone','free_testosterone','estradiol_sensitive','hematocrit','psa','a1c'];
+
+  html += '<section class="panel">'
+    + '<div class="panel-head"><div>'
+    +   '<h3>Latest lab work</h3>'
+    +   '<p>Drawn ' + daysSince(latest.drawn_at) + ' days ago. The green band is the range '
+    +     'your provider is aiming for, which is narrower than the lab\u2019s normal range.</p>'
+    + '</div></div><div class="labs">';
+
+  SHOW.forEach(function(key){
+    var a = D.analytes.find(function(x){ return x.key === key; });
+    var r = D.lab_results.find(function(x){ return x.panel_id === latest.id && x.analyte === key; });
+    if (!r) return;
+    var p = prev ? D.lab_results.find(function(x){ return x.panel_id === prev.id && x.analyte === key; }) : null;
+
+    var lo = a.refLow, hi = a.refHigh;
+    var span = (hi - lo) || 1;
+    var pad = span * 0.18;
+    var scaleLo = lo - pad, scaleHi = hi + pad, scaleSpan = scaleHi - scaleLo;
+    var pct = function(v){ return Math.max(2, Math.min(98, (v - scaleLo) / scaleSpan * 100)); };
+
+    var isWarn = ['above_ref','below_ref','critical','above_target'].indexOf(r.flag) > -1;
+
+    var arrow;
+    if (p) {
+      var diff = r.value_numeric - p.value_numeric;
+      if (Math.abs(diff) > 0.001) {
+        arrow = (diff > 0 ? '\u2191 ' : '\u2193 ') + Math.abs(Math.round(diff * 10) / 10)
+              + ' since your last draw';
+      } else { arrow = 'unchanged since your last draw'; }
+    } else { arrow = 'first measurement'; }
+
+    // Plain-language reads must agree with the badge. Never tell a man he is fine
+    // next to a flag that says otherwise.
+    var COPY = {
+      total_testosterone: { ok:'This is the headline number. You\u2019re inside the target range your provider set.',
+                            warn:'This sits outside your target range. Your provider will review it at your next visit.' },
+      free_testosterone:  { ok:'The portion actually available to your body to use. In target.',
+                            warn:'Outside target range \u2014 flagged for your provider to review.' },
+      estradiol_sensitive:{ ok:'Estrogen. It rises alongside testosterone \u2014 yours is balanced where we want it.',
+                            warn:'Estrogen rises alongside testosterone. Yours is above target, which your provider will look at.' },
+      hematocrit:         { ok:'How thick your blood is. We watch this closely on testosterone therapy \u2014 yours is in range.',
+                            warn:'How thick your blood is. This is the number we monitor most closely on testosterone therapy, and yours has edged above the lab\u2019s normal range. Not an emergency \u2014 your provider tracks the trend and has options if it keeps climbing.' },
+      psa:                { ok:'A prostate marker. We track it every draw as a routine safety check. Stable.',
+                            warn:'A prostate marker we track every draw. Yours has moved enough that your provider wants to look at it.' },
+      a1c:                { ok:'Your average blood sugar over about three months. Down from where you started.',
+                            warn:'Your average blood sugar over about three months. Above target \u2014 worth discussing.' }
+    }[key];
+    var plain = COPY ? (isWarn ? COPY.warn : COPY.ok) : '';
+
+    html += '<div class="labcard' + (isWarn ? ' flagged' : '') + '">'
+      + '<div class="lname"><span>' + a.label + '</span>'
+      + '<span class="badge ' + (isWarn ? 'warn' : 'ok') + '">'
+      + (isWarn ? 'Watch' : 'In target') + '</span></div>'
+      + '<div class="lval num">' + r.value_numeric + '<small>' + a.unit + '</small></div>'
+      + '<div class="lprev">' + arrow + '</div>'
+      + '<div class="rangebar">'
+      +   '<div class="target" style="left:' + pct(a.targetLow) + '%;right:'
+      +     (100 - pct(a.targetHigh)) + '%"></div>'
+      +   '<div class="dot' + (isWarn ? ' warn' : '') + '" style="left:'
+      +     pct(r.value_numeric) + '%"></div>'
+      + '</div>'
+      + '<div class="rangelabels"><span>' + a.refLow + '</span><span>' + a.refHigh + '</span></div>'
+      + '<p class="plain">' + plain + '</p>'
+      + '</div>';
+  });
+
+  html += '</div><p class="provisional">\u26a0 Target ranges shown are provisional placeholders. '
+    + 'Replace with Gameday Thornton\u2019s actual clinical targets before any real use '
+    + '(docs/11-discovery-questions.md \u00a73).</p></section>';
+
+  app.innerHTML = html;
+
+  // ---------- legend ----------
+  var legend = document.getElementById('legend');
+  DIMS.forEach(function(d){
+    var el = document.createElement('span');
+    el.className = 'chip';
+    el.innerHTML = '<i style="background:' + d.color + '"></i>' + d.label;
+    el.onclick = function(){
+      active[d.key] = !active[d.key];
+      el.classList.toggle('off', !active[d.key]);
+      draw();
+    };
+    legend.appendChild(el);
+  });
+
+  // ---------- chart ----------
+  function draw(){
+    var W = 900, H = 380, M = { t: 26, r: 18, b: 42, l: 34 };
+    var iw = W - M.l - M.r, ih = H - M.t - M.b;
+    var maxW = totalWeeks;
+
+    var x = function(w){ return M.l + (w / maxW) * iw; };
+    var y = function(v){ return M.t + ih - ((v - 1) / 9) * ih; };
+
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" '
+          + 'aria-label="Weekly check-in scores over time">';
+
+    // baseline reference band — always visible, this is the contrast anchor
+    var b = avg(first);
+    s += '<rect class="baseline-band" x="' + M.l + '" y="' + y(b) + '" width="' + iw
+       + '" height="' + (M.t + ih - y(b)) + '"/>';
+
+    for (var v = 1; v <= 10; v += 3) {
+      s += '<line class="grid-line" x1="' + M.l + '" y1="' + y(v) + '" x2="' + (W - M.r)
+         + '" y2="' + y(v) + '"/>'
+         + '<text class="axis-txt" x="' + (M.l - 9) + '" y="' + (y(v) + 4)
+         + '" text-anchor="end">' + v + '</text>';
+    }
+
+    // lab draw ticks
+    panels.forEach(function(p){
+      var w = weekIndexOf(p.drawn_at);
+      if (w < 0 || w > maxW) return;
+      s += '<line class="lab-tick" x1="' + x(w) + '" y1="' + M.t + '" x2="' + x(w)
+         + '" y2="' + (M.t + ih) + '"/>'
+         + '<text class="marker-txt" x="' + (x(w) + 4) + '" y="' + (M.t + 11) + '">Labs</text>';
+    });
+
+    // dose change markers
+    changes.forEach(function(c){
+      var w = weekIndexOf(c.changed_at);
+      if (w < 0 || w > maxW) return;
+      s += '<line class="dose-line" x1="' + x(w) + '" y1="' + M.t + '" x2="' + x(w)
+         + '" y2="' + (M.t + ih) + '"/>'
+         + '<text class="marker-txt" x="' + (x(w) + 4) + '" y="' + (M.t + ih - 6)
+         + '" fill="#d7262f">' + c.new_value + '</text>';
+    });
+
+    // score lines
+    DIMS.forEach(function(d){
+      if (!active[d.key]) return;
+      var pts = checkins.map(function(c){ return x(c.week_index) + ',' + y(c[d.key]); }).join(' ');
+      s += '<polyline points="' + pts + '" fill="none" stroke="' + d.color
+         + '" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity=".92"/>';
+      checkins.forEach(function(c){
+        s += '<circle cx="' + x(c.week_index) + '" cy="' + y(c[d.key]) + '" r="2.6" fill="'
+           + d.color + '"/>';
+      });
+    });
+
+    // gap shading — the three weeks of silence
+    var lastW = last.week_index;
+    if (lastW < maxW) {
+      s += '<rect x="' + x(lastW) + '" y="' + M.t + '" width="' + (x(maxW) - x(lastW))
+         + '" height="' + ih + '" fill="#d7262f" opacity=".07"/>'
+         + '<text class="marker-txt" x="' + (x(lastW) + 6) + '" y="' + (M.t + ih / 2)
+         + '" fill="#a0a0a0">No check-ins</text>';
+    }
+
+    for (var w2 = 0; w2 <= maxW; w2 += 3) {
+      s += '<text class="axis-txt" x="' + x(w2) + '" y="' + (H - 16)
+         + '" text-anchor="middle">wk ' + w2 + '</text>';
+    }
+
+    s += '</svg>';
+    document.getElementById('chart').innerHTML = s;
+  }
+
+  draw();
+
+  document.getElementById('chartnote').innerHTML =
+    'Shaded band marks your week-1 baseline. Dashed red lines are dose changes; '
+    + 'dotted blue lines are lab draws. Your last check-in was '
+    + daysSince(last.week_of) + ' days ago.';
+})();
+</script>
+</body>
+</html>

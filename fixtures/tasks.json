@@ -1,0 +1,68 @@
+[
+  {
+    "id": "task_01",
+    "clinic_id": "clinic_thornton_co",
+    "title": "Review hematocrit 52.6 — Vaughn Iselin",
+    "patient_id": "p_05_safety",
+    "assigned_to": "stf_prov_01",
+    "due": "2026-09-14",
+    "priority": "high",
+    "source": "safety_queue",
+    "done": false
+  },
+  {
+    "id": "task_02",
+    "clinic_id": "clinic_thornton_co",
+    "title": "PSA velocity discussion — Errol Bratcher",
+    "patient_id": "p_06_psa",
+    "assigned_to": "stf_prov_01",
+    "due": "2026-09-19",
+    "priority": "high",
+    "source": "safety_queue",
+    "done": false
+  },
+  {
+    "id": "task_03",
+    "clinic_id": "clinic_thornton_co",
+    "title": "No check-in 3 weeks — call Gregory Sunderman",
+    "patient_id": "p_04_doubter",
+    "assigned_to": "stf_front",
+    "due": "2026-09-14",
+    "priority": "high",
+    "source": "at_risk",
+    "done": false
+  },
+  {
+    "id": "task_04",
+    "clinic_id": "clinic_thornton_co",
+    "title": "Chase intake — Aaron Petrak, visit tomorrow",
+    "patient_id": "p_01_new",
+    "assigned_to": "stf_front",
+    "due": "2026-09-14",
+    "priority": "med",
+    "source": "intake_incomplete",
+    "done": false
+  },
+  {
+    "id": "task_05",
+    "clinic_id": "clinic_thornton_co",
+    "title": "Card declined twice — Brady Hollifield",
+    "patient_id": "p_12_failedpay",
+    "assigned_to": "stf_front",
+    "due": "2026-09-15",
+    "priority": "med",
+    "source": "payment_failed",
+    "done": false
+  },
+  {
+    "id": "task_06",
+    "clinic_id": "clinic_thornton_co",
+    "title": "Pause ends in 4 weeks — Leland Ashcraft",
+    "patient_id": "p_08_paused",
+    "assigned_to": "stf_front",
+    "due": "2026-10-12",
+    "priority": "low",
+    "source": "membership",
+    "done": false
+  }
+]

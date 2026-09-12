@@ -1,0 +1,85 @@
+[
+  {
+    "id": "auto_01",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "speed_to_lead",
+    "patient_id": null,
+    "lead_id": "lead_11",
+    "triggered_at": "2026-09-14",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "latency_seconds": 41,
+    "payload_preview": "Thanks for reaching out to Gameday Thornton. Here is a link to pick a time that works: [link]. Reply STOP to opt out."
+  },
+  {
+    "id": "auto_02",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "intake_incomplete_t24",
+    "patient_id": "p_01_new",
+    "triggered_at": "2026-09-14",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: you have one item to finish before tomorrow. [link]"
+  },
+  {
+    "id": "auto_03",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "no_show_recovery",
+    "patient_id": "p_09_noshow",
+    "triggered_at": "2026-07-20",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: we missed you today. Want to grab another time? [link]"
+  },
+  {
+    "id": "auto_04",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "no_checkin_21d",
+    "patient_id": "p_04_doubter",
+    "triggered_at": "2026-09-12",
+    "channel": "push",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: you have an update."
+  },
+  {
+    "id": "auto_05",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "payment_failed_retry",
+    "patient_id": "p_12_failedpay",
+    "triggered_at": "2026-09-11",
+    "channel": "email",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: a billing item needs your attention."
+  },
+  {
+    "id": "auto_06",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "due_for_labs",
+    "patient_id": "p_06_psa",
+    "triggered_at": "2026-09-09",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: you are due for a quick lab draw. Book here: [link]"
+  },
+  {
+    "id": "auto_07",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "month_3_progress",
+    "patient_id": "p_08_paused",
+    "triggered_at": "2026-09-07",
+    "channel": "push",
+    "status": "logged_not_sent",
+    "payload_preview": "Gameday: you have an update."
+  },
+  {
+    "id": "auto_08",
+    "clinic_id": "clinic_thornton_co",
+    "rule_key": "missed_call_textback",
+    "patient_id": null,
+    "triggered_at": "2026-09-13",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "latency_seconds": 22,
+    "payload_preview": "Sorry we missed your call — this is Gameday Thornton. Can we help you book? [link]"
+  }
+]

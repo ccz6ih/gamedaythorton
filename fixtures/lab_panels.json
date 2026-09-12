@@ -1,0 +1,212 @@
+[
+  {
+    "id": "lp_p_04_doubter_w18",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "drawn_at": "2026-05-11",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline draw at first visit."
+  },
+  {
+    "id": "lp_p_04_doubter_w11",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "drawn_at": "2026-06-29",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Week 7 recheck. Dose increased to 120mg weekly."
+  },
+  {
+    "id": "lp_p_04_doubter_w2",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "drawn_at": "2026-08-31",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Quarterly monitoring."
+  },
+  {
+    "id": "lp_p_03_enthusiast_w9",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "drawn_at": "2026-07-13",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline."
+  },
+  {
+    "id": "lp_p_03_enthusiast_w1",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "drawn_at": "2026-09-07",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Week 8 recheck."
+  },
+  {
+    "id": "lp_p_05_safety_w22",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_05_safety",
+    "drawn_at": "2026-04-13",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline. Note starting hematocrit at upper-normal."
+  },
+  {
+    "id": "lp_p_05_safety_w14",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_05_safety",
+    "drawn_at": "2026-06-08",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Week 8 recheck. Hematocrit rising."
+  },
+  {
+    "id": "lp_p_05_safety_w3",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_05_safety",
+    "drawn_at": "2026-08-24",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "FLAG: hematocrit above ceiling. Provider review required."
+  },
+  {
+    "id": "lp_p_06_psa_w35",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_06_psa",
+    "drawn_at": "2026-01-12",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline."
+  },
+  {
+    "id": "lp_p_06_psa_w22",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_06_psa",
+    "drawn_at": "2026-04-13",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Recheck."
+  },
+  {
+    "id": "lp_p_06_psa_w9",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_06_psa",
+    "drawn_at": "2026-07-13",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "FLAG: PSA velocity elevated. Urology referral discussion."
+  },
+  {
+    "id": "lp_p_07_churned_w26",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_07_churned",
+    "drawn_at": "2026-03-16",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline."
+  },
+  {
+    "id": "lp_p_07_churned_w18",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_07_churned",
+    "drawn_at": "2026-05-11",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Recheck. Patient reported minimal subjective change."
+  },
+  {
+    "id": "lp_p_08_paused_w13",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_08_paused",
+    "drawn_at": "2026-06-15",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline."
+  },
+  {
+    "id": "lp_p_08_paused_w5",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_08_paused",
+    "drawn_at": "2026-08-10",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Recheck."
+  },
+  {
+    "id": "lp_p_09_noshow_w6",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_09_noshow",
+    "drawn_at": "2026-08-03",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline (after rescheduled no-show)."
+  },
+  {
+    "id": "lp_p_10_weightloss_w14",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "drawn_at": "2026-06-08",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline. Metabolic focus."
+  },
+  {
+    "id": "lp_p_10_weightloss_w2",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "drawn_at": "2026-08-31",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "A1c and lipids substantially improved on GLP-1."
+  },
+  {
+    "id": "lp_p_11_hairloss_w26",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_11_hairloss",
+    "drawn_at": "2026-03-16",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline. Hair restoration focus."
+  },
+  {
+    "id": "lp_p_12_failedpay_w11",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_12_failedpay",
+    "drawn_at": "2026-06-29",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Baseline."
+  },
+  {
+    "id": "lp_p_12_failedpay_w3",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_12_failedpay",
+    "drawn_at": "2026-08-24",
+    "source": "in_clinic",
+    "entered_by": "stf_prov_01",
+    "document_ref": null,
+    "note": "Recheck."
+  }
+]

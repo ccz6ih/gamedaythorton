@@ -1,0 +1,30 @@
+[
+  {
+    "id": "wl_01",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "service_id": "svc_followup",
+    "preferred_window": "Weekday mornings",
+    "added_at": "2026-09-11",
+    "status": "waiting"
+  },
+  {
+    "id": "wl_02",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": null,
+    "patient_display": "J. Pilcher",
+    "service_id": "svc_consult",
+    "preferred_window": "Any afternoon this week",
+    "added_at": "2026-09-13",
+    "status": "waiting"
+  },
+  {
+    "id": "wl_03",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "service_id": "svc_bodycomp",
+    "preferred_window": "Friday",
+    "added_at": "2026-09-12",
+    "status": "waiting"
+  }
+]

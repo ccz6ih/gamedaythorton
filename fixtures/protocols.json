@@ -1,0 +1,82 @@
+[
+  {
+    "id": "proto_p_04_doubter",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "status": "active",
+    "started_at": "2026-05-11",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_03_enthusiast",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "status": "active",
+    "started_at": "2026-07-13",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_05_safety",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_05_safety",
+    "status": "active",
+    "started_at": "2026-04-13",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_06_psa",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_06_psa",
+    "status": "active",
+    "started_at": "2026-01-12",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_07_churned",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_07_churned",
+    "status": "ended",
+    "started_at": "2026-03-16",
+    "ended_at": "2026-09-07"
+  },
+  {
+    "id": "proto_p_08_paused",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_08_paused",
+    "status": "paused",
+    "started_at": "2026-06-15",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_09_noshow",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_09_noshow",
+    "status": "active",
+    "started_at": "2026-08-03",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_10_weightloss",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "status": "active",
+    "started_at": "2026-06-08",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_11_hairloss",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_11_hairloss",
+    "status": "active",
+    "started_at": "2026-03-16",
+    "ended_at": null
+  },
+  {
+    "id": "proto_p_12_failedpay",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_12_failedpay",
+    "status": "active",
+    "started_at": "2026-06-29",
+    "ended_at": null
+  }
+]

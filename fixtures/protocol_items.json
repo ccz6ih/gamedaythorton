@@ -1,0 +1,122 @@
+[
+  {
+    "id": "proto_p_04_doubter_item0",
+    "protocol_id": "proto_p_04_doubter",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 120,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": "Rotate injection sites."
+  },
+  {
+    "id": "proto_p_04_doubter_item1",
+    "protocol_id": "proto_p_04_doubter",
+    "medication_name": "Vitamin D3",
+    "dose_amount": 5000,
+    "dose_unit": "IU",
+    "route": "oral",
+    "frequency": "daily",
+    "notes": null
+  },
+  {
+    "id": "proto_p_03_enthusiast_item0",
+    "protocol_id": "proto_p_03_enthusiast",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 100,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": null
+  },
+  {
+    "id": "proto_p_05_safety_item0",
+    "protocol_id": "proto_p_05_safety",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 160,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": "Under review — hematocrit."
+  },
+  {
+    "id": "proto_p_06_psa_item0",
+    "protocol_id": "proto_p_06_psa",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 110,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": null
+  },
+  {
+    "id": "proto_p_07_churned_item0",
+    "protocol_id": "proto_p_07_churned",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 100,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": null
+  },
+  {
+    "id": "proto_p_08_paused_item0",
+    "protocol_id": "proto_p_08_paused",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 100,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": "Paused."
+  },
+  {
+    "id": "proto_p_09_noshow_item0",
+    "protocol_id": "proto_p_09_noshow",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 100,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": null
+  },
+  {
+    "id": "proto_p_10_weightloss_item0",
+    "protocol_id": "proto_p_10_weightloss",
+    "medication_name": "Tirzepatide",
+    "dose_amount": 7.5,
+    "dose_unit": "mg",
+    "route": "SubQ",
+    "frequency": "weekly",
+    "notes": "Titration ongoing."
+  },
+  {
+    "id": "proto_p_11_hairloss_item0",
+    "protocol_id": "proto_p_11_hairloss",
+    "medication_name": "Finasteride",
+    "dose_amount": 1,
+    "dose_unit": "mg",
+    "route": "oral",
+    "frequency": "daily",
+    "notes": null
+  },
+  {
+    "id": "proto_p_11_hairloss_item1",
+    "protocol_id": "proto_p_11_hairloss",
+    "medication_name": "Minoxidil 5%",
+    "dose_amount": 1,
+    "dose_unit": "mL",
+    "route": "topical",
+    "frequency": "twice daily",
+    "notes": null
+  },
+  {
+    "id": "proto_p_12_failedpay_item0",
+    "protocol_id": "proto_p_12_failedpay",
+    "medication_name": "Testosterone Cypionate",
+    "dose_amount": 100,
+    "dose_unit": "mg",
+    "route": "IM",
+    "frequency": "weekly",
+    "notes": null
+  }
+]

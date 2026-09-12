@@ -1,0 +1,29 @@
+[
+  {
+    "id": "mc_01",
+    "clinic_id": "clinic_thornton_co",
+    "from_number": "+17205550137",
+    "received_at": "2026-09-14",
+    "duration_seconds": 0,
+    "textback_sent": true,
+    "status": "awaiting_reply"
+  },
+  {
+    "id": "mc_02",
+    "clinic_id": "clinic_thornton_co",
+    "from_number": "+13035550192",
+    "received_at": "2026-09-14",
+    "duration_seconds": 0,
+    "textback_sent": true,
+    "status": "booked"
+  },
+  {
+    "id": "mc_03",
+    "clinic_id": "clinic_thornton_co",
+    "from_number": "+17205550244",
+    "received_at": "2026-09-13",
+    "duration_seconds": 0,
+    "textback_sent": false,
+    "status": "needs_callback"
+  }
+]

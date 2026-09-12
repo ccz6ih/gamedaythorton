@@ -1,0 +1,59 @@
+{
+  "id": "clinic_thornton_co",
+  "name": "Gameday Men’s Health",
+  "location_name": "Thornton",
+  "legal_name": "Gameday Thornton (pilot)",
+  "address_line1": "10701 Melody Dr #315",
+  "address_city": "Northglenn",
+  "address_state": "CO",
+  "address_zip": "80234",
+  "nap_conflict_note": "Listed as Thornton in copy, Northglenn in the footer, Westminster on Yelp.",
+  "phone_voice": "+1 (720) 967-4263",
+  "phone_text": "+1 (970) 804-4263",
+  "timezone": "America/Denver",
+  "hours": [
+    {
+      "day": "Mon",
+      "open": "09:00",
+      "close": "17:00"
+    },
+    {
+      "day": "Tue",
+      "open": "09:00",
+      "close": "17:00"
+    },
+    {
+      "day": "Wed",
+      "open": "09:00",
+      "close": "17:00"
+    },
+    {
+      "day": "Thu",
+      "open": "09:00",
+      "close": "17:00"
+    },
+    {
+      "day": "Fri",
+      "open": "09:00",
+      "close": "17:00"
+    },
+    {
+      "day": "Sat",
+      "open": null,
+      "close": null
+    },
+    {
+      "day": "Sun",
+      "open": null,
+      "close": null
+    }
+  ],
+  "visit_facts": {
+    "parking": "Free surface lot directly in front of the suite. No garage, no meters.",
+    "suite": "Building 10701, third floor, Suite 315. Elevator on the right as you enter.",
+    "draw": "The blood draw is a single standard venipuncture. About 40 seconds.",
+    "duration": "First visit runs 45–60 minutes. Follow-ups are usually under 25.",
+    "privacy": "Private consult rooms. Nobody else is in the room. No waiting-room sign-in sheet.",
+    "cost": "Cash-pay. Price is confirmed before anything is drawn or administered."
+  }
+}

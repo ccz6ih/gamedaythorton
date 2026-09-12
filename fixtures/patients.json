@@ -1,0 +1,230 @@
+[
+  {
+    "id": "p_01_new",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Aaron",
+    "last_name": "Petrak",
+    "dob": "1985-01-10",
+    "email": "aaron.petrak@pilot.invalid",
+    "phone": "+17205551000",
+    "status": "lead",
+    "acquisition_source": "google_search_maps",
+    "therapy_start_date": null,
+    "weeks_on_therapy": null,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": true,
+      "hide_sensitive": true
+    }
+  },
+  {
+    "id": "p_02_firstvisit",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Curtis",
+    "last_name": "Nahm",
+    "dob": "1989-02-11",
+    "email": "curtis.nahm@pilot.invalid",
+    "phone": "+17205551001",
+    "status": "active",
+    "acquisition_source": "gym_referral",
+    "therapy_start_date": "2026-09-14",
+    "weeks_on_therapy": 0,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_03_enthusiast",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Dominic",
+    "last_name": "Rauwerda",
+    "dob": "1981-03-12",
+    "email": "dominic.rauwerda@pilot.invalid",
+    "phone": "+17205551002",
+    "status": "active",
+    "acquisition_source": "friend_family",
+    "therapy_start_date": "2026-07-13",
+    "weeks_on_therapy": 9,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_04_doubter",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Gregory",
+    "last_name": "Sunderman",
+    "dob": "1974-04-13",
+    "email": "gregory.sunderman@pilot.invalid",
+    "phone": "+17205551003",
+    "status": "active",
+    "acquisition_source": "billboard",
+    "therapy_start_date": "2026-05-11",
+    "weeks_on_therapy": 18,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": true,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_05_safety",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Vaughn",
+    "last_name": "Iselin",
+    "dob": "1978-05-14",
+    "email": "vaughn.iselin@pilot.invalid",
+    "phone": "+17205551004",
+    "status": "active",
+    "acquisition_source": "podcast",
+    "therapy_start_date": "2026-04-13",
+    "weeks_on_therapy": 22,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": true
+    }
+  },
+  {
+    "id": "p_06_psa",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Errol",
+    "last_name": "Bratcher",
+    "dob": "1965-06-15",
+    "email": "errol.bratcher@pilot.invalid",
+    "phone": "+17205551005",
+    "status": "active",
+    "acquisition_source": "online_article",
+    "therapy_start_date": "2026-01-12",
+    "weeks_on_therapy": 35,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_07_churned",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Damon",
+    "last_name": "Kelsoe",
+    "dob": "1987-07-16",
+    "email": "damon.kelsoe@pilot.invalid",
+    "phone": "+17205551006",
+    "status": "churned",
+    "acquisition_source": "facebook_instagram",
+    "therapy_start_date": "2026-03-16",
+    "weeks_on_therapy": 26,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": true,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_08_paused",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Leland",
+    "last_name": "Ashcraft",
+    "dob": "1982-08-17",
+    "email": "leland.ashcraft@pilot.invalid",
+    "phone": "+17205551007",
+    "status": "paused",
+    "acquisition_source": "radio",
+    "therapy_start_date": "2026-06-15",
+    "weeks_on_therapy": 13,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_09_noshow",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Trent",
+    "last_name": "Mabry",
+    "dob": "1991-09-18",
+    "email": "trent.mabry@pilot.invalid",
+    "phone": "+17205551008",
+    "status": "active",
+    "acquisition_source": "tiktok",
+    "therapy_start_date": "2026-08-03",
+    "weeks_on_therapy": 6,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": true
+    }
+  },
+  {
+    "id": "p_10_weightloss",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Hollis",
+    "last_name": "Draney",
+    "dob": "1976-01-10",
+    "email": "hollis.draney@pilot.invalid",
+    "phone": "+17205551009",
+    "status": "active",
+    "acquisition_source": "email_newsletter",
+    "therapy_start_date": "2026-06-08",
+    "weeks_on_therapy": 14,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": true,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_11_hairloss",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Simon",
+    "last_name": "Vertrees",
+    "dob": "1993-02-11",
+    "email": "simon.vertrees@pilot.invalid",
+    "phone": "+17205551010",
+    "status": "active",
+    "acquisition_source": "youtube",
+    "therapy_start_date": "2026-03-16",
+    "weeks_on_therapy": 26,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  },
+  {
+    "id": "p_12_failedpay",
+    "clinic_id": "clinic_thornton_co",
+    "synthetic": true,
+    "first_name": "Brady",
+    "last_name": "Hollifield",
+    "dob": "1983-03-12",
+    "email": "brady.hollifield@pilot.invalid",
+    "phone": "+17205551011",
+    "status": "active",
+    "acquisition_source": "mailbox_flyer",
+    "therapy_start_date": "2026-06-29",
+    "weeks_on_therapy": 11,
+    "external_emr_id": null,
+    "privacy_flags": {
+      "biometric_lock": false,
+      "hide_sensitive": false
+    }
+  }
+]

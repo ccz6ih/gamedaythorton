@@ -1,0 +1,52 @@
+[
+  {
+    "id": "thr_01",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_05_safety",
+    "triage_tag": "clinical",
+    "status": "open",
+    "assigned_to": "stf_prov_01",
+    "last_at": "2026-09-14",
+    "unread_staff": 1
+  },
+  {
+    "id": "thr_02",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "triage_tag": "clinical",
+    "status": "open",
+    "assigned_to": "stf_prov_01",
+    "last_at": "2026-09-12",
+    "unread_staff": 1
+  },
+  {
+    "id": "thr_03",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_12_failedpay",
+    "triage_tag": "billing",
+    "status": "open",
+    "assigned_to": "stf_front",
+    "last_at": "2026-09-13",
+    "unread_staff": 1
+  },
+  {
+    "id": "thr_04",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "triage_tag": "scheduling",
+    "status": "closed",
+    "assigned_to": "stf_front",
+    "last_at": "2026-09-08",
+    "unread_staff": 0
+  },
+  {
+    "id": "thr_05",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_08_paused",
+    "triage_tag": "billing",
+    "status": "open",
+    "assigned_to": "stf_front",
+    "last_at": "2026-09-10",
+    "unread_staff": 1
+  }
+]

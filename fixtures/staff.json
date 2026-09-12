@@ -1,0 +1,29 @@
+[
+  {
+    "id": "stf_owner",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Ray Okonjo",
+    "email": "owner@pilot.invalid",
+    "role": "owner",
+    "mfa_enabled": false,
+    "active": true
+  },
+  {
+    "id": "stf_prov_01",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Dana Whitfield, NP",
+    "email": "director@pilot.invalid",
+    "role": "provider",
+    "mfa_enabled": false,
+    "active": true
+  },
+  {
+    "id": "stf_front",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Tess Marlow",
+    "email": "frontdesk@pilot.invalid",
+    "role": "front_desk",
+    "mfa_enabled": false,
+    "active": true
+  }
+]

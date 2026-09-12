@@ -1,0 +1,178 @@
+[
+  {
+    "id": "bc_p_10_weightloss_w14",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-06-08",
+    "weight_lbs": 266.9,
+    "body_fat_pct": 34.2,
+    "lean_mass_lbs": 175.6,
+    "visceral_fat_level": 12,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w12",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-06-22",
+    "weight_lbs": 264.1,
+    "body_fat_pct": 33.4,
+    "lean_mass_lbs": 175.9,
+    "visceral_fat_level": 11,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w10",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-07-06",
+    "weight_lbs": 259.1,
+    "body_fat_pct": 32.3,
+    "lean_mass_lbs": 175.4,
+    "visceral_fat_level": 10,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w8",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-07-20",
+    "weight_lbs": 255.5,
+    "body_fat_pct": 31.5,
+    "lean_mass_lbs": 175,
+    "visceral_fat_level": 10,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w6",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-08-03",
+    "weight_lbs": 251.3,
+    "body_fat_pct": 30.4,
+    "lean_mass_lbs": 174.9,
+    "visceral_fat_level": 9,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w4",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-08-17",
+    "weight_lbs": 247.5,
+    "body_fat_pct": 29.7,
+    "lean_mass_lbs": 174,
+    "visceral_fat_level": 8,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w2",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-08-31",
+    "weight_lbs": 245.5,
+    "body_fat_pct": 29.3,
+    "lean_mass_lbs": 173.6,
+    "visceral_fat_level": 8,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_10_weightloss_w0",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "measured_at": "2026-09-14",
+    "weight_lbs": 240.5,
+    "body_fat_pct": 28,
+    "lean_mass_lbs": 173.2,
+    "visceral_fat_level": 7,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_04_doubter_w18",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "measured_at": "2026-05-11",
+    "weight_lbs": 213.4,
+    "body_fat_pct": 27.9,
+    "lean_mass_lbs": 153.9,
+    "visceral_fat_level": 12,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_04_doubter_w12",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "measured_at": "2026-06-22",
+    "weight_lbs": 211.3,
+    "body_fat_pct": 25.7,
+    "lean_mass_lbs": 157,
+    "visceral_fat_level": 11,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_04_doubter_w6",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "measured_at": "2026-08-03",
+    "weight_lbs": 207.8,
+    "body_fat_pct": 24.8,
+    "lean_mass_lbs": 156.3,
+    "visceral_fat_level": 10,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_04_doubter_w0",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "measured_at": "2026-09-14",
+    "weight_lbs": 201.7,
+    "body_fat_pct": 23.1,
+    "lean_mass_lbs": 155.1,
+    "visceral_fat_level": 9,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_03_enthusiast_w9",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "measured_at": "2026-07-13",
+    "weight_lbs": 195.7,
+    "body_fat_pct": 23.6,
+    "lean_mass_lbs": 149.5,
+    "visceral_fat_level": 12,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_03_enthusiast_w6",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "measured_at": "2026-08-03",
+    "weight_lbs": 193.7,
+    "body_fat_pct": 22.1,
+    "lean_mass_lbs": 150.9,
+    "visceral_fat_level": 11,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_03_enthusiast_w3",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "measured_at": "2026-08-24",
+    "weight_lbs": 192.7,
+    "body_fat_pct": 21.3,
+    "lean_mass_lbs": 151.7,
+    "visceral_fat_level": 11,
+    "device": "InBody-style (synthetic)"
+  },
+  {
+    "id": "bc_p_03_enthusiast_w0",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_03_enthusiast",
+    "measured_at": "2026-09-14",
+    "weight_lbs": 193.5,
+    "body_fat_pct": 20.4,
+    "lean_mass_lbs": 154,
+    "visceral_fat_level": 10,
+    "device": "InBody-style (synthetic)"
+  }
+]

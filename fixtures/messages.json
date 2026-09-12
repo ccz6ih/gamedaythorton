@@ -1,0 +1,65 @@
+[
+  {
+    "id": "msg_01a",
+    "thread_id": "thr_01",
+    "sender_type": "patient",
+    "sender_id": "p_05_safety",
+    "body": "Getting headaches most mornings and my face feels flushed a lot. Is that from the dose increase?",
+    "sent_at": "2026-09-14",
+    "read_at": null
+  },
+  {
+    "id": "msg_02a",
+    "thread_id": "thr_02",
+    "sender_type": "patient",
+    "sender_id": "p_04_doubter",
+    "body": "Being honest, I am not sure this is doing much anymore. I felt great around month two and now it feels like where I started. Thinking about stopping.",
+    "sent_at": "2026-09-12",
+    "read_at": null
+  },
+  {
+    "id": "msg_03a",
+    "thread_id": "thr_03",
+    "sender_type": "staff",
+    "sender_id": "stf_front",
+    "body": "Hi Brady — the card on file was declined on this month’s membership. Can you update it when you get a minute? No rush on your therapy, nothing changes today.",
+    "sent_at": "2026-09-11",
+    "read_at": "2026-09-11"
+  },
+  {
+    "id": "msg_03b",
+    "thread_id": "thr_03",
+    "sender_type": "patient",
+    "sender_id": "p_12_failedpay",
+    "body": "Yeah that card got replaced after a fraud alert. I will put the new one in tonight.",
+    "sent_at": "2026-09-13",
+    "read_at": null
+  },
+  {
+    "id": "msg_04a",
+    "thread_id": "thr_04",
+    "sender_type": "patient",
+    "sender_id": "p_03_enthusiast",
+    "body": "Can I move my lab draw to a Friday? Mondays are rough with work.",
+    "sent_at": "2026-09-07",
+    "read_at": "2026-09-07"
+  },
+  {
+    "id": "msg_04b",
+    "thread_id": "thr_04",
+    "sender_type": "staff",
+    "sender_id": "stf_front",
+    "body": "Done — moved you to Friday at 9:30. You will get a confirmation.",
+    "sent_at": "2026-09-08",
+    "read_at": "2026-09-08"
+  },
+  {
+    "id": "msg_05a",
+    "thread_id": "thr_05",
+    "sender_type": "patient",
+    "sender_id": "p_08_paused",
+    "body": "Is there a cheaper plan? I want to keep going but this month got tight.",
+    "sent_at": "2026-09-10",
+    "read_at": null
+  }
+]

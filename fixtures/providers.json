@@ -1,0 +1,22 @@
+[
+  {
+    "id": "prov_01",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Dana Whitfield, NP",
+    "credentials": "FNP-BC",
+    "role": "Clinic Director",
+    "photo_ref": "placeholder/prov_01.jpg",
+    "bio": "Fictional provider for pilot demonstration only.",
+    "active": true
+  },
+  {
+    "id": "prov_02",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Marcus Elleby, PA-C",
+    "credentials": "PA-C",
+    "role": "Provider",
+    "photo_ref": "placeholder/prov_02.jpg",
+    "bio": "Fictional provider for pilot demonstration only.",
+    "active": true
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "lot_01",
+    "item_id": "inv_test_cyp",
+    "lot_number": "SYN-4471A",
+    "expiry_date": "2027-05-12",
+    "qty_received": 12,
+    "qty_remaining": 4
+  },
+  {
+    "id": "lot_02",
+    "item_id": "inv_test_cyp",
+    "lot_number": "SYN-4608B",
+    "expiry_date": "2026-10-15",
+    "qty_received": 10,
+    "qty_remaining": 9
+  },
+  {
+    "id": "lot_03",
+    "item_id": "inv_tirzepatide",
+    "lot_number": "SYN-TZ-220",
+    "expiry_date": "2026-12-18",
+    "qty_received": 8,
+    "qty_remaining": 3
+  },
+  {
+    "id": "lot_04",
+    "item_id": "inv_b12",
+    "lot_number": "SYN-B12-77",
+    "expiry_date": "2027-10-29",
+    "qty_received": 20,
+    "qty_remaining": 14
+  },
+  {
+    "id": "lot_05",
+    "item_id": "inv_nad",
+    "lot_number": "SYN-NAD-12",
+    "expiry_date": "2026-10-02",
+    "qty_received": 6,
+    "qty_remaining": 2
+  },
+  {
+    "id": "lot_06",
+    "item_id": "inv_syringe",
+    "lot_number": "SYN-SYR-900",
+    "expiry_date": "2028-09-03",
+    "qty_received": 40,
+    "qty_remaining": 31
+  },
+  {
+    "id": "lot_07",
+    "item_id": "inv_pellet",
+    "lot_number": "SYN-PEL-33",
+    "expiry_date": "2027-02-11",
+    "qty_received": 60,
+    "qty_remaining": 48
+  }
+]

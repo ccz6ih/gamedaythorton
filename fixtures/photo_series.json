@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ps_p_11_hairloss_hair",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_11_hairloss",
+    "series_type": "hair",
+    "capture_guide_ref": "guide_hair_v1",
+    "guide_version": "v1",
+    "consent_ref": "consent_photo_v1"
+  },
+  {
+    "id": "ps_p_10_weightloss_body",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_10_weightloss",
+    "series_type": "body",
+    "capture_guide_ref": "guide_body_v1",
+    "guide_version": "v1",
+    "consent_ref": "consent_photo_v1"
+  },
+  {
+    "id": "ps_p_04_doubter_body",
+    "clinic_id": "clinic_thornton_co",
+    "patient_id": "p_04_doubter",
+    "series_type": "body",
+    "capture_guide_ref": "guide_body_v1",
+    "guide_version": "v1",
+    "consent_ref": "consent_photo_v1"
+  }
+]

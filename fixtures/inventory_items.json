@@ -1,0 +1,62 @@
+[
+  {
+    "id": "inv_test_cyp",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Testosterone Cypionate 200mg/mL 10mL",
+    "category": "injectable",
+    "is_controlled": true,
+    "schedule": "III",
+    "unit": "vial",
+    "reorder_threshold": 6
+  },
+  {
+    "id": "inv_tirzepatide",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Tirzepatide compounded 10mg",
+    "category": "injectable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "vial",
+    "reorder_threshold": 4
+  },
+  {
+    "id": "inv_b12",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Vitamin B12 (cyanocobalamin) 1000mcg/mL",
+    "category": "injectable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "vial",
+    "reorder_threshold": 8
+  },
+  {
+    "id": "inv_nad",
+    "clinic_id": "clinic_thornton_co",
+    "name": "NAD+ 100mg/mL",
+    "category": "injectable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "vial",
+    "reorder_threshold": 3
+  },
+  {
+    "id": "inv_syringe",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Syringe 25g 1mL",
+    "category": "consumable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "box",
+    "reorder_threshold": 10
+  },
+  {
+    "id": "inv_pellet",
+    "clinic_id": "clinic_thornton_co",
+    "name": "Testosterone pellets 75mg",
+    "category": "implant",
+    "is_controlled": true,
+    "schedule": "III",
+    "unit": "pellet",
+    "reorder_threshold": 20
+  }
+]
