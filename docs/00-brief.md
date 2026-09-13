@@ -1,5 +1,31 @@
 # 00 — Project Brief
 
+## Who this is actually for
+
+**Not one clinic.** As of September 2026 the project serves three or four locations
+across two practice types, owned by people who already own multiples:
+
+| Who | Holds | Practice type |
+|---|---|---|
+| The owner who made contact | A med spa **and** a Gameday franchise | both |
+| **Joni** | A Gameday franchise — Thornton and/or Northglenn | `mens_health` |
+| **Jamie Salazar** | Works with the med spa; now involved with Gameday | `med_spa` |
+
+Craig and his wife know Jamie personally, which is how this started and why the
+Med Bar fixtures use her real services at real prices.
+
+**Every location is cash-pay** — cash and card, no insurance billing. That fact
+drives the covered-entity question in `21-compliance-cost.md`, which is the single
+largest cost variable in the project.
+
+The multi-tenancy in the schema is therefore load-bearing, not speculative. So is
+the `practice_type` module map: both modelled practice types have a real tenant.
+
+*Unresolved — confirm before anything client-facing names them:* whether the
+two-franchise owner is Joni or a third person, and which locations are Thornton
+versus Northglenn.
+
+
 ## The business we are actually building software for
 
 Gameday Thornton is **not an appointment business**. It is a recurring-revenue medical

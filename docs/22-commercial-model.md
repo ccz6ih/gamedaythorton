@@ -4,50 +4,91 @@
 what to do about it commercially, and it exists because the honest reading of that
 document is *"at one clinic, compliance eats the entire fee."*
 
-That is true, and it has three answers. None of them is "absorb it".
+That is true at *one* clinic. **It is not one clinic** — see the deal shape below,
+which is the single most important fact in this document and changes the arithmetic
+before it starts.
+
+---
+
+## The deal shape (as told by Craig, Sept 2026)
+
+This was never a single-location project. Recorded here because none of it is
+derivable from the code, and every number in this document depends on it.
+
+| Who | What they own | Practice type |
+|---|---|---|
+| The owner who made contact | A med spa **and** a Gameday franchise | both |
+| **Joni** | A Gameday franchise — Thornton and/or Northglenn | `mens_health` |
+| **Jamie Salazar** | Works with the med spa; now involved with Gameday too | `med_spa` |
+
+Craig and his wife know Jamie personally. That relationship is how this started,
+and it is why the Med Bar fixtures are real services at real prices rather than
+invented ones.
+
+**Three or four locations across two practice types, from day one, owned by people
+who already own multiples.** Multi-location owners are the ideal first customer:
+they feel per-location software cost directly, and the expansion path is inside
+their own portfolio rather than a cold sale.
+
+**Every one is cash-pay** — cash and card, no insurance billing. That is what makes
+the covered-entity question below worth asking rather than academic.
+
+*Unresolved:* whether the two-franchise owner who made contact is Joni or a third
+person, and exactly which locations are Thornton vs Northglenn. Ask before anything
+client-facing names them.
+
+### What this changes immediately
+
+- **The multi-tenancy is not theoretical any more.** `clinic_id` on every table and
+  the `practice_type` module map were built for a hypothetical second tenant. There
+  are now three or four real ones, spanning both practice types already modelled.
+- **Payments are a must-have, not a nice-to-have.** The stated use is card
+  processing across all locations. That is GlossGenius's core value and the thing a
+  replacement cannot be missing.
+- **Separate legal entities need separate payout accounts.** A franchise LLC and a
+  med spa LLC cannot share one Stripe account. This means Stripe Connect, or one
+  account per clinic keyed off `clinic_id` — an architecture decision worth making
+  before the Stripe work goes deeper, not after. Not yet in `18-decisions.md`.
 
 ---
 
 ## What changed this week
 
-Two findings, both material, both from September 2026 research.
+Three findings from September 2026 research, one of which I got wrong.
 
-### 1. Gameday corporate already has the clinical system
+### 1. Corporate's software: unverified, and probably less real than the press says
 
-Gameday built a purpose-built EMR with software partner **Lobbie** — in-office
-labs, telehealth notes, inventory, charting. Their stated reason for building it
-is that **they do not bill insurance**, so they did not need a billing-shaped EMR.
-They are at ~400 clinics targeting 1,000 by 2027, and franchise support explicitly
-includes "access to proprietary software."
+Press coverage (Refresh Miami, Sept 2026) says Gameday built a purpose-built EMR
+with software partner **Lobbie** — labs, telehealth notes, inventory, charting —
+and that a patient mobile app for scheduling, results and messaging is "coming
+soon." They are at ~400 clinics targeting 1,000 by 2027.
 
-**And a patient mobile app — scheduling, results, provider messaging — is
-described as "coming soon."**
+**Weight that correctly. It is a PR article, not a product demo.** And it is
+contradicted by the single strongest piece of evidence available:
 
-`08-roadmap.md` listed "Corporate builds their own portal mid-build" as a Medium
-risk to ask about at Gate 0. **That risk has materialised.** It is no longer a
-question to ask; it is a fact to design around.
+> **Multiple Gameday franchise owners are actively shopping for alternatives.**
+> People do not do that when the first-party system exists, works, and is
+> mandated.
 
-What survives contact with it:
+"Coming soon" in franchise marketing can mean shipped, in beta, or on a slide.
+Craig's read from direct contact with owners is that little of it is in their hands
+today, and that is a better source than coverage.
 
-| Job | Owner | Contested? |
-|---|---|---|
-| Clinical record | Corporate EMR (Lobbie) | No — concede it |
-| Scheduling, results, messaging | Corporate app when it ships | **Yes — do not fight this** |
-| Progress engine — lab trends + weekly scores + dose markers on one axis, photo series | This system | No. Nothing described covers it |
-| Retention economics — NRR, months on protocol, churn reasons, no-next-visit | This system | No |
-| Med spa side — packages, prepaid liability, treatment records with lot numbers | This system | No. No corporate EMR covers aesthetics |
+**What to do with it:**
 
-The product thesis in `CLAUDE.md` — *does this make improvement visible?* — is the
-part nobody else is building. Everything adjacent to it is now someone else's.
+- **Do not design around the press release**, in either direction. Do not concede
+  the record because an article says an EMR exists, and do not assume a clear field
+  because owners are unhappy.
+- **Ask an owner to log in and show you** what corporate actually provides. One
+  screen-share resolves what no amount of research will.
+- **The product thesis is unaffected either way.** Charted lab trends + weekly
+  scores + dose markers on one axis, photo series, retention economics, and the
+  entire aesthetics side. Nothing described anywhere covers that, and it is the
+  part `CLAUDE.md` says to prioritise.
 
-**Consequence for the pitch:** stop positioning this as the system of record. It
-is the progress and retention layer. That is a smaller claim, a defensible one,
-and — critically — **it holds far less PHI, which is the largest cost lever
-available.**
-
-Unconfirmed and worth asking at Gate 0: whether franchisees *must* use the
-corporate EMR, whether it exposes an API (Lobbie advertises HL7/FHIR
-integration), and the real timeline on the patient app.
+Gate 0 in `08-roadmap.md` now carries this as an open question rather than a
+settled fact. **I previously logged it as a materialised risk on the strength of
+that article. That was wrong, and it is corrected.**
 
 ### 2. The covered-entity question was never asked
 
@@ -120,6 +161,12 @@ Per-practice cost of the $17k/yr infrastructure path:
 hosted compliant service is selling at a loss. Above it, the economics are better
 than the incumbent's because the fixed cost is already paid.
 
+**Starting at three or four changes the conversation.** It does not reach break-even
+on its own, but it is close enough that one more location — and these owners own
+multiples — crosses it. Combined with model A below, where the client carries the
+infrastructure bill directly, the arithmetic works from the first location rather
+than from the tenth.
+
 This is the whole argument for the multi-tenant discipline, and it is why
 `08-roadmap.md` calls multi-tenancy "the difference between a client project and a
 product."
@@ -157,7 +204,7 @@ to carry infrastructure plus our own assessment, insurance and training.
 **Only viable at 10+ practices.** Below that the monthly price required is higher
 than any single clinic will pay.
 
-### C. Sell to corporate, not to Thornton
+### C. Expand inside the portfolio, then to corporate
 
 Gameday has ~400 clinics, buys and builds software, and already proved it will
 commission a custom system. The fixed compliance cost divided across 400 clinics
@@ -166,9 +213,13 @@ is a rounding error.
 The pitch is not "replace your EMR" — it is the retention layer their EMR and
 their forthcoming app do not cover, priced per clinic.
 
-**Thornton is the proof, not the deal.** A working pilot with a real franchisee
-and real enthusiasm is the strongest possible introduction to corporate, and the
-Med Bar tenant proves the same code serves an entirely different practice type.
+**The nearer version of this is the portfolio itself.** These owners already hold
+multiple locations across both practice types; every additional one is a warm
+expansion, not a sale. Corporate is the ceiling, not the next step.
+
+A working pilot with several real franchisees is also the strongest possible
+introduction to corporate when that time comes, and the Med Bar tenant proves the
+same code serves an entirely different practice type.
 
 ---
 

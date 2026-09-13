@@ -184,11 +184,12 @@ Go further if the clinic will tolerate it: progress photographs are the highest
 sensitivity asset in the system and the hardest to delete convincingly. A version
 that does not store photos is materially cheaper to make compliant.
 
-**Gameday makes this concretely available.** Corporate already runs a purpose-built
-EMR (developed with Lobbie) covering labs, telehealth notes, inventory and
-charting. If the clinical record stays there and this system is the progress and
-retention layer, it holds a fraction of the PHI — and cost scales with what is
-held. See `22-commercial-model.md`.
+**Scope is negotiable in a way hosting is not.** If a corporate EMR turns out to be
+real and in use, the clinical record can stay there and this system becomes the
+progress and retention layer holding a fraction of the PHI. If it is not — which is
+what the owners shopping for alternatives suggests — then the scope question is
+still worth asking on its own merits. Either way, cost scales with what is held.
+See `22-commercial-model.md`.
 
 **2. Stay on synthetic data until the product is right.** Every month in pilot is a
 month not paying for compliance on features that might get cut. The pilot guard in

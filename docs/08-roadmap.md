@@ -47,16 +47,17 @@ Does the franchise agreement permit an independent patient-facing system and ind
 payment processing? **If no, stop and redesign the approach.** Do not build first and
 ask later.
 
-**Three more, added Sept 2026** after finding that corporate already runs a custom EMR
-built with Lobbie and has announced a patient app:
+**Three more, added Sept 2026.** Press coverage describes a corporate EMR built with
+Lobbie and a patient app "coming soon" — but that is a PR article, and the owners
+talking to us are shopping for alternatives, which is not what happens when the
+first-party product exists and works. **Verify before believing either way:**
 
-- Are franchisees **required** to use the corporate EMR, and does it expose an API?
-  (Lobbie advertises HL7/FHIR integration.)
-- What is the corporate patient app's **scope and timeline**? Scheduling, results and
-  messaging are lost ground; build around them, not against them.
-- Is the practice a **HIPAA covered entity** at all? Gameday does not bill insurance.
-  An attorney answers this in writing — it is the single largest cost variable in the
-  project. `21-compliance-cost.md`.
+- What does corporate actually provide *today*, and are franchisees **required** to use
+  it? Ask an owner to log in and show you, rather than trusting coverage.
+- If a corporate EMR is real, does it expose an API? (Lobbie advertises HL7/FHIR.)
+- Is the practice a **HIPAA covered entity** at all? Gameday does not bill insurance and
+  neither does the med spa. An attorney answers this in writing — it is the single
+  largest cost variable in the project. `21-compliance-cost.md`.
 
 ---
 
@@ -220,4 +221,4 @@ has surfaced in a month of live use that only the old system could do. Only then
 | Staff do not adopt the console | High | Gate A and Gate B exist precisely for this. Shadow them; do not demo at them |
 | Owner wants "just two real patients" in pilot | High | Say no. Point at `09-compliance-register.md`. This is the most likely way this project goes wrong |
 | Scope creep from an enthusiastic owner | Medium | Backlog is the contract. New asks get scored and phased, not absorbed |
-| **Corporate has built their own EMR and a patient app is "coming soon"** | **MATERIALISED** | Confirmed Sept 2026: Gameday built a custom EMR with Lobbie; a patient app for scheduling, results and messaging is announced. Concede the record and the messaging app; hold the progress engine and retention economics, which nothing described covers. `22-commercial-model.md` |
+| Corporate builds their own portal mid-build | Medium — **unresolved** | Press coverage (Sept 2026) describes a custom EMR built with Lobbie and a patient app "coming soon". **That is marketing copy, not a verified product**, and it is contradicted by the fact that multiple franchise owners are actively shopping for alternatives. Ask at Gate 0; do not design around the press release. `22-commercial-model.md` |

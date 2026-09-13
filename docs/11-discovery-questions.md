@@ -12,6 +12,10 @@ Answers go inline. Anything still blank at Gate B is a risk carried into product
       Gameday name or marks?
 - [ ] Is there a required technology stack, EMR, or vendor list?
 - [ ] Are there data-ownership clauses covering patient records?
+- [ ] **Have an owner log in and show you what corporate actually provides today.**
+      Press coverage (Sept 2026) describes a custom EMR built with Lobbie and a
+      patient app "coming soon" — but that is marketing copy, and owners shopping
+      for alternatives suggests otherwise. Five minutes of screen-share settles it
 - [ ] Does corporate have a patient portal on its roadmap? *(If yes, everything changes
       — see Phase D)*
 - [ ] Who at corporate is the right contact? Is the Franchise Advisory Council a route?
