@@ -357,6 +357,47 @@ async function cannotRead(label, table) {
   if (/'\/api\/stripe\/webhook'/.test(middleware)) ok('the Stripe webhook is not behind the passcode gate');
   else bad('the Stripe webhook is not behind the passcode gate', 'Stripe cannot enter a passcode');
 
+  /**
+   * EVERY REWRITE MUST PRESERVE ITS PATH.
+   *
+   * The wildcard rule read `/shop/:path*` -> `/c/<slug>/:path*`, which drops
+   * the segment: /shop/renew-eye-complex went to /c/<slug>/renew-eye-complex
+   * and 404'd. It was wrong from the day it was written and nothing noticed,
+   * because no /shop sub-path existed yet — /shop/thanks is an exact entry and
+   * matched the rule above it. A wildcard with nothing under it is untested by
+   * definition, which is exactly when a check like this earns its place.
+   */
+  const { default: nextConfig } = await import('../next.config.mjs');
+  const { beforeFiles } = await nextConfig.rewrites();
+
+  const broken = beforeFiles.filter(r => {
+    const source = r.source.replace(/\/:path\*$/, '');
+    const dest = r.destination.replace(/\/:path\*$/, '');
+    const wildcard = r.source.endsWith('/:path*');
+    // The destination must end with the source path, under the /c/<slug> prefix.
+    const expectedTail = source === '/' ? '' : source;
+    return wildcard
+      ? !dest.endsWith(expectedTail)
+      : !r.destination.endsWith(expectedTail);
+  });
+
+  if (broken.length === 0) {
+    ok(`all ${beforeFiles.length} rewrites keep their path`);
+  } else {
+    bad('all rewrites keep their path',
+        broken.map(r => `${r.source} -> ${r.destination}`).join(' · '));
+  }
+
+  // And every storefront path a visitor can reach has a rule for her domain.
+  const hostRules = beforeFiles.filter(r =>
+    r.has?.some(h => h.type === 'host' && h.value === 'medbarco.com'));
+  const covered = new Set(hostRules.map(r => r.source));
+  const wanted = ['/', '/services', '/shop', '/cart', '/enquire', '/shop/:path*'];
+  const gaps = wanted.filter(p => !covered.has(p));
+
+  if (gaps.length === 0) ok('every storefront path is rewritten on her domain');
+  else bad('every storefront path is rewritten on her domain', `missing: ${gaps.join(', ')}`);
+
   /* =====================================================================
      7. THE SHOP DOES NOT LEAK MARGIN
      ===================================================================== */

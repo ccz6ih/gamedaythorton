@@ -161,19 +161,30 @@ const nextConfig = {
     // reads too. They were separate lists once and immediately drifted.
     const storefrontPaths = STOREFRONT_PATHS.map(p => (p === '/' ? '' : p));
 
-    const forSlug = (slug, host) =>
-      storefrontPaths.map(p => ({
+    /**
+     * Sub-paths forwarded wholesale. The PREFIX HAS TO APPEAR ON BOTH SIDES:
+     * `/shop/:path*` -> `/c/<slug>/:path*` drops the segment and sends
+     * /shop/renew-eye-complex to /c/<slug>/renew-eye-complex, which is a 404.
+     *
+     * It was written that way and nothing noticed, because no /shop sub-path
+     * existed until product pages did — /shop/thanks is an exact entry in
+     * STOREFRONT_PATHS and matched the rule above it. A wildcard with nothing
+     * under it is untested by definition.
+     */
+    const WILDCARDS = ['/shop'];
+
+    const forSlug = (slug, host) => [
+      ...storefrontPaths.map(p => ({
         source: p === '' ? '/' : p,
         destination: `/c/${slug}${p}`,
         ...(host ? { has: [{ type: 'host', value: host }] } : {})
-      })).concat([{
-        source: p_wildcard(),
-        destination: `/c/${slug}/:path*`,
+      })),
+      ...WILDCARDS.map(prefix => ({
+        source: `${prefix}/:path*`,
+        destination: `/c/${slug}${prefix}/:path*`,
         ...(host ? { has: [{ type: 'host', value: host }] } : {})
-      }]);
-
-    // Only the shop has sub-paths worth forwarding wholesale today.
-    function p_wildcard() { return '/shop/:path*'; }
+      }))
+    ];
 
     const rules = Object.entries(STOREFRONT_DOMAINS)
       .flatMap(([host, slug]) => forSlug(slug, host));
