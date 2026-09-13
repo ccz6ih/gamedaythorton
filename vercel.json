@@ -1,28 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": [
-    "The framework declaration is load-bearing, not decoration.",
-    "",
-    "This project was originally imported into Vercel as a static site (there was no",
-    "package.json then), so its Framework Preset was null. After the Next.js app",
-    "landed, Vercel kept using a generic build: it emitted middleware.js as ESM but",
-    "loaded it as CommonJS, so every request died with",
-    "'SyntaxError: Cannot use import statement outside a module' and a",
-    "MIDDLEWARE_INVOCATION_FAILED 500.",
-    "",
-    "Declaring it here rather than fixing it in the dashboard means the fix travels",
-    "with the repository and cannot be lost when a project is re-imported or",
-    "recreated."
-  ],
-
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
-
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
-  }
+  "installCommand": "npm install"
 }

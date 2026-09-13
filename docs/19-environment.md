@@ -89,6 +89,26 @@ wired in Phase B behind the same flag, and only get real BAAs in Phase C.
 
 The repo is connected to Vercel and builds on push to `main`.
 
+### `vercel.json` — why `framework` is declared there
+
+This project was imported into Vercel **before** `package.json` existed, so its Framework
+Preset was `null`. Once the Next.js app landed, Vercel kept using a generic build: it
+emitted `middleware.js` as ESM but loaded it as CommonJS, and every request died with
+
+```
+SyntaxError: Cannot use import statement outside a module
+500 MIDDLEWARE_INVOCATION_FAILED
+```
+
+Declaring `"framework": "nextjs"` in `vercel.json` fixes it in the repository rather than
+in the dashboard, so it survives a re-import or a recreated project.
+
+**`vercel.json` rejects unknown top-level keys.** A `"//"` pseudo-comment — a common
+trick in other JSON configs — fails schema validation, and the deployment then fails
+*before* building with state `ERROR` and **no build logs at all**. Empty build logs on a
+failed deployment almost always mean invalid `vercel.json` rather than a broken build.
+That is why this explanation lives here and not in the file.
+
 **Set these in Vercel → Settings → Environment Variables** (Production and
 Preview both). Until they are set, every route returns a 503 that names what is
 missing — which is the intended behaviour, not a failure:
