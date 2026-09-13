@@ -180,6 +180,49 @@ async function req(url, opts = {}) {
     bad('an unsigned webhook is refused', `status ${unsigned.status} — it should never be trusted`);
   }
 
+  /* ------------------------------------------------- the gate boundary -- */
+  // The storefront now sits IN FRONT of the passcode gate so the practice can
+  // send the link to a prospective client. Everything holding client data must
+  // still sit behind it. This is the check that the line is where we think.
+  console.log('\nWHAT IS PUBLIC vs WHAT IS GATED');
+
+  const OPEN = [
+    '/c/medbar-loveland',
+    '/c/medbar-loveland/services',
+    '/c/medbar-loveland/packages',
+    '/c/medbar-loveland/about',
+    '/c/medbar-loveland/enquire',
+    '/c/gameday-thornton',
+    '/practitioners/jamie-salazar.jpg',
+    '/robots.txt'
+  ];
+  const GATED = ['/console', '/console/services', '/console/clients', '/portal', '/sign-in', '/prototype/index.html'];
+
+  for (const u of OPEN) {
+    const res = await req(u);                      // deliberately NO cookie
+    if (res.status === 200) ok(`open without a passcode  ${u}`);
+    else bad(`open without a passcode  ${u}`, `status ${res.status} → ${res.headers.get('location') || ''}`);
+  }
+
+  for (const u of GATED) {
+    const res = await req(u);
+    const loc = res.headers.get('location') || '';
+    if ([302, 307, 308].includes(res.status) && loc.includes('/gate')) {
+      ok(`still behind the passcode  ${u}`);
+    } else {
+      bad(`still behind the passcode  ${u}`, `status ${res.status} → ${loc || 'no redirect'}`);
+    }
+  }
+
+  // Open to the world is not the same as indexed by the world.
+  const openHead = await req('/c/medbar-loveland');
+  if (/noindex/i.test(openHead.headers.get('x-robots-tag') || '')) {
+    ok('public but still not indexable', 'it carries a real practice name');
+  } else bad('public but still not indexable');
+
+  const rb = await (await req('/robots.txt')).text();
+  if (/Disallow:\s*\/\s*$/m.test(rb)) ok('robots.txt still disallows everything');
+  else bad('robots.txt still disallows everything');
   /* -------------------------------------------------------- storefront -- */
   // The public face of each practice. This is the only surface a prospective
   // client sees before they are a client, and the only one with no login in

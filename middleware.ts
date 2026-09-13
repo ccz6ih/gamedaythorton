@@ -47,7 +47,32 @@ const ALWAYS_OPEN = [
   '/gate',
   '/robots.txt',
   '/favicon.ico',
-  '/api/stripe/webhook'
+  '/api/stripe/webhook',
+
+  /**
+   * Public storefronts: /c/<slug>.
+   *
+   * These sit in front of the gate rather than behind it, because a shop window
+   * that asks for a passcode is not a shop window. The practice needs to send
+   * this link to a prospective client and have it open.
+   *
+   * That is safe here for a specific, tested reason rather than by assumption.
+   * A storefront reads exactly five tables — clinic, provider, service,
+   * service_package, package_item — for clinics that opted in with `listed`,
+   * through named column grants that exclude npi, pilot_mode and Stripe ids.
+   * It cannot reach a patient, an appointment, a lab value, a treatment record,
+   * a payment or the audit log; scripts/storefront-test.cjs proves that with no
+   * session at all, every run.
+   *
+   * The gate still stands in front of everything that holds client data: the
+   * console, the portal, sign-in, the prototype. Set STOREFRONT_PRIVATE=true to
+   * put the storefront back behind it.
+   *
+   * What the storefront being public does NOT mean: it is still noindex, still
+   * disallowed in robots.txt, and still says on every page that it is a preview
+   * rather than the practice's live site.
+   */
+  ...(process.env.STOREFRONT_PRIVATE === 'true' ? [] : ['/c'])
 ];
 
 /** Past the gate, but readable before signing in. */
@@ -57,7 +82,7 @@ const ANONYMOUS_OK = [
   '/auth/callback',
   '/about-pilot',     // the compliance explainer must never require a login
   '/prototype',
-  '/c'                // public storefronts: /c/<slug>. No session, by design.
+  '/c'                // also listed here, for when STOREFRONT_PRIVATE is on
 ];
 
 function isUnder(pathname: string, paths: string[]) {

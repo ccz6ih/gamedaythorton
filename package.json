@@ -2,7 +2,7 @@
   "name": "gamedaythorton",
   "version": "0.1.0",
   "private": true,
-  "description": "Patient app (GAMEPLAN) and clinic console (PRESS BOX). Multi-tenant, practice-type aware. PILOT MODE — synthetic data only until Phase C sign-off.",
+  "description": "Patient app (GAMEPLAN) and clinic console (PRESS BOX). Multi-tenant, practice-type aware. PILOT MODE \u2014 synthetic data only until Phase C sign-off.",
   "engines": {
     "node": ">=20.9.0"
   },
@@ -24,7 +24,10 @@
     "test:routes": "node scripts/route-test.cjs",
     "verify": "npm run fixtures && npm run smoke && npm run test:routes && npm run typecheck",
     "verify:all": "npm run verify && npm run test:db && npm run test:auth",
-    "test:screens": "node scripts/screen-test.cjs"
+    "test:screens": "node scripts/screen-test.cjs",
+    "serve:restart": "node scripts/serve-restart.cjs",
+    "test:storefront": "node scripts/storefront-test.cjs",
+    "test:write": "node scripts/write-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

@@ -40,6 +40,22 @@ async function submit(formData: FormData) {
   const clinic = await getStorefront(slug);
   if (!clinic) redirect('/');
 
+  /**
+   * Honeypot. A field no person sees and no person fills, so anything in it
+   * came from something filling every input on the page.
+   *
+   * This matters now that the storefront sits in front of the passcode gate:
+   * the form is reachable by anyone, and an open form on the open internet
+   * finds bots within days. Silently accepting and discarding beats an error,
+   * because an error tells the sender what tripped it.
+   *
+   * It is not a serious defence and is not claimed as one. If real volume
+   * arrives, this wants rate limiting by IP and probably a challenge.
+   */
+  if (String(formData.get('company') ?? '').trim() !== '') {
+    redirect(`/c/${slug}/enquire?sent=1`);
+  }
+
   const name = String(formData.get('name') ?? '').trim();
   const phoneNo = String(formData.get('phone') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim();
@@ -151,6 +167,13 @@ export default async function Enquire({
 
           <form action={submit} className="sf-form">
             <input type="hidden" name="slug" value={slug} />
+
+            {/* Honeypot — hidden from people, offered to bots. Not
+                type="hidden", because that is the one thing a bot skips. */}
+            <div className="sf-hp" aria-hidden="true">
+              <label htmlFor="company">Company</label>
+              <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+            </div>
 
             <div className="sf-field">
               <label htmlFor="name">Your name</label>

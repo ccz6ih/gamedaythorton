@@ -49,6 +49,22 @@ deliberate cross-tenant read attempt, which `06-architecture.md` requires.
 | `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key. Safe in the browser; RLS is what protects data |
 
+| `STOREFRONT_PRIVATE` | Optional. `true` puts the public storefront at `/c/<slug>` back behind the passcode gate. Unset — the default — leaves it open, because a shop window that asks for a passcode is not a shop window |
+
+**The gate boundary, and why it sits where it does.** `/c/<slug>` is in front of
+the gate; the console, the portal, sign-in and the prototype are behind it. That
+is safe for a tested reason rather than an assumed one: a storefront reads five
+tables for clinics that opted in with `listed`, through named column grants that
+exclude `npi`, `pilot_mode` and Stripe ids, and it cannot reach a patient,
+appointment, lab value, treatment record, payment or the audit log.
+`npm run test:storefront` proves that with no session at all, and
+`npm run test:app` proves the boundary itself — which paths open without a
+passcode and which still redirect.
+
+Public is not the same as indexed. Storefronts still carry `X-Robots-Tag:
+noindex`, are disallowed in `robots.txt`, and say on every page that they are a
+preview rather than the practice's live site.
+
 **`PILOT_PASSCODE` fails closed.** If it is missing while `PILOT_MODE=true`, the
 middleware returns 503 on every route rather than skipping the gate. An unset
 control must not read as "no control needed" — that is the failure mode where a
@@ -264,6 +280,7 @@ cannot drift apart, and rebranding stays a token swap. `15-branding.md`.
 
 | Symptom | Cause |
 |---|---|
+| A change appears to be ignored — a route 404s, middleware seems not to run, a fix does nothing | **An old `npm start` is still holding :3000 and serving a stale build.** `pkill -f "next start"` does not reliably kill it on Windows; it matches the npm wrapper, not the node process holding the port. Use `npm run serve:restart`, which kills by PID and refuses to start if the port is still held. This has caused three wrong diagnoses in this repo |
 | Every route returns 503 naming a variable | That variable is not set. Intended behaviour |
 | "Database error querying schema" on sign-in | NULL token columns in `auth.users`. Re-run `db-users.cjs` |
 | Seed fails on `appointment_no_double_book` | Fixtures contain overlapping appointments for one provider. Fix the generator, not the seeder |

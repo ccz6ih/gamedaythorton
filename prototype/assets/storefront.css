@@ -616,3 +616,13 @@
 @media (prefers-reduced-motion: reduce) {
   .sf * { transition: none !important; animation: none !important; }
 }
+
+/* Honeypot. Off-screen rather than display:none — some bots skip anything the
+   browser would not render, and the point is that they fill it in. */
+.sf-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
