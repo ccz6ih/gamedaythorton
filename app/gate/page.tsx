@@ -51,12 +51,9 @@ export default async function GatePage({
   return (
     <main className="auth-wrap">
       <form className="auth-card" action={unlock}>
-        <div className="eyebrow">Pilot build</div>
-        <h1>This is not public yet</h1>
+        <h1>Private preview</h1>
         <p className="lede">
-          A passcode gates this deployment because it holds realistic clinical
-          screens and real published pricing, and it has no compliance controls
-          yet. Everything inside is synthetic.
+          This deployment is not public yet. Enter the passcode to continue.
         </p>
 
         <input type="hidden" name="next" value={params.next ?? '/'} />
@@ -75,11 +72,6 @@ export default async function GatePage({
         </div>
 
         <button className="btn primary block" type="submit">Continue</button>
-
-        <p className="metric-note" style={{ marginTop: '1.2rem' }}>
-          This is a hedge against casual discovery, not a security boundary. Access
-          control inside is enforced per row in the database.
-        </p>
       </form>
     </main>
   );

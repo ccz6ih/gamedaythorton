@@ -399,6 +399,270 @@ export async function getAttention(clinic: Clinic): Promise<AttentionItem[]> {
   return items.sort((a, b) => (a.tone === 'critical' ? -1 : 1) - (b.tone === 'critical' ? -1 : 1));
 }
 
+/* -------------------------------------------------------------- catalogue */
+
+export type ServiceRow = {
+  id: string;
+  name: string;
+  category: string;
+  duration_min: number;
+  buffer_after_min: number;
+  price_mode: string;
+  price_cents: number | null;
+  price_from_cents: number | null;
+  unit_label: string | null;
+  requires_consent: boolean;
+  requires_labs: boolean;
+  online_bookable: boolean;
+  active: boolean;
+};
+
+export async function getServices(): Promise<ServiceRow[]> {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('service')
+    .select('id, name, category, duration_min, buffer_after_min, price_mode, price_cents, price_from_cents, unit_label, requires_consent, requires_labs, online_bookable, active')
+    .order('category')
+    .order('sort_order');
+  return (data ?? []) as ServiceRow[];
+}
+
+export async function getPlans() {
+  const supabase = await serverClient();
+  const { data } = await supabase.from('plan').select('*').order('sort_order');
+  return data ?? [];
+}
+
+export async function getPackageCatalogue() {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('service_package')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order');
+  return data ?? [];
+}
+
+/* ------------------------------------------------------------ treatments */
+
+export async function getTreatments() {
+  const supabase = await serverClient();
+  const [records, details] = await Promise.all([
+    supabase.from('treatment_record')
+      .select(`
+        id, performed_at, total_units, adverse_event, adverse_event_note, follow_up_due,
+        notes_clinical,
+        patient:patient_id ( id, first_name, last_name ),
+        service:service_id ( name, category ),
+        provider:provider_id ( name )
+      `)
+      .order('performed_at', { ascending: false }),
+    supabase.from('treatment_detail').select('*').order('sort_order')
+  ]);
+
+  const byRecord = new Map<string, Record<string, unknown>[]>();
+  (details.data ?? []).forEach(d => {
+    const key = String(d.treatment_record_id);
+    if (!byRecord.has(key)) byRecord.set(key, []);
+    byRecord.get(key)!.push(d);
+  });
+
+  return (records.data ?? []).map(r => ({
+    ...r,
+    details: byRecord.get(String(r.id)) ?? []
+  }));
+}
+
+/* --------------------------------------------------------------- packages */
+
+/**
+ * Every prepaid package with what is still owed on it.
+ *
+ * The remaining-sessions figure is the practice's liability, so it is computed
+ * from redemptions rather than stored — a stored counter drifts, and a drifted
+ * counter here means either giving treatments away or refusing ones somebody
+ * paid for.
+ */
+export async function getPackageLedger() {
+  const supabase = await serverClient();
+  const [purchases, redemptions] = await Promise.all([
+    supabase.from('package_purchase')
+      .select('*, patient:patient_id ( id, first_name, last_name )')
+      .order('purchased_at', { ascending: false }),
+    supabase.from('package_redemption').select('purchase_id, sessions, redeemed_at')
+  ]);
+
+  const used = new Map<string, number>();
+  (redemptions.data ?? []).forEach(r => {
+    used.set(r.purchase_id, (used.get(r.purchase_id) ?? 0) + r.sessions);
+  });
+
+  return (purchases.data ?? []).map(p => {
+    const sessionsUsed = used.get(p.id) ?? 0;
+    const remaining = Math.max(0, p.sessions_total - sessionsUsed);
+    const perSession = p.sessions_total ? p.price_paid_cents / p.sessions_total : 0;
+    return {
+      ...p,
+      sessionsUsed,
+      sessionsRemaining: remaining,
+      liabilityCents: Math.round(perSession * remaining)
+    };
+  });
+}
+
+/* --------------------------------------------------------------- payments */
+
+export async function getPayments(limit = 200) {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('payment')
+    .select('*, patient:patient_id ( id, first_name, last_name )')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+/* ----------------------------------------------------------- safety queue */
+
+export type SafetyRow = {
+  patientId: string;
+  patientName: string;
+  tone: 'critical' | 'warn';
+  what: string;
+  detail: string | null;
+  when: string | null;
+};
+
+/**
+ * The clinically important queue. Thresholds are PROVISIONAL placeholders —
+ * hematocrit ceiling 52, PSA velocity 0.75 ng/mL/yr — and the screen says so.
+ * docs/11-discovery-questions.md §3.
+ */
+export async function getSafetyQueue(clinic: Clinic): Promise<SafetyRow[]> {
+  const supabase = await serverClient();
+  const rows: SafetyRow[] = [];
+
+  if (hasModule(clinic, 'labs')) {
+    const { data } = await supabase
+      .from('lab_result')
+      .select(`
+        patient_id, analyte_key, value_numeric, unit, flag, target_high, ref_high,
+        patient:patient_id ( first_name, last_name ),
+        panel:panel_id ( drawn_at )
+      `)
+      .in('flag', ['critical', 'above_ref', 'below_ref']);
+
+    (data ?? []).forEach(r => {
+      const p = r.patient as unknown as { first_name: string; last_name: string } | null;
+      const panel = r.panel as unknown as { drawn_at: string } | null;
+      rows.push({
+        patientId: r.patient_id,
+        patientName: p ? `${p.first_name} ${p.last_name}` : 'Patient',
+        tone: r.flag === 'critical' ? 'critical' : 'warn',
+        what: `${titleWords(r.analyte_key)} ${r.value_numeric}${r.unit ?? ''}`,
+        detail: r.flag === 'critical'
+          ? 'At or above the safety ceiling. Provider review required.'
+          : `Outside the lab reference range (up to ${r.ref_high ?? '—'}${r.unit ?? ''}).`,
+        when: panel?.drawn_at ?? null
+      });
+    });
+  }
+
+  if (hasModule(clinic, 'treatment_records')) {
+    const { data } = await supabase
+      .from('treatment_record')
+      .select('patient_id, performed_at, adverse_event_note, follow_up_due, patient:patient_id ( first_name, last_name )')
+      .eq('adverse_event', true);
+
+    (data ?? []).forEach(t => {
+      const p = t.patient as unknown as { first_name: string; last_name: string } | null;
+      rows.push({
+        patientId: t.patient_id,
+        patientName: p ? `${p.first_name} ${p.last_name}` : 'Client',
+        tone: 'critical',
+        what: 'Adverse event',
+        detail: [t.adverse_event_note, t.follow_up_due ? `Follow-up due ${t.follow_up_due}.` : null]
+          .filter(Boolean).join(' '),
+        when: t.performed_at
+      });
+    });
+  }
+
+  // Unread free-text notes. Patients write clinically significant things there.
+  const { data: notes } = await supabase
+    .from('checkin')
+    .select('patient_id, week_of, notes_free_text, patient:patient_id ( first_name, last_name )')
+    .not('notes_free_text', 'is', null)
+    .is('reviewed_at', null);
+
+  (notes ?? []).forEach(c => {
+    const p = c.patient as unknown as { first_name: string; last_name: string } | null;
+    rows.push({
+      patientId: c.patient_id,
+      patientName: p ? `${p.first_name} ${p.last_name}` : 'Patient',
+      tone: 'warn',
+      what: 'Check-in note nobody has read',
+      detail: `“${c.notes_free_text}”`,
+      when: c.week_of
+    });
+  });
+
+  return rows.sort((a, b) => {
+    if (a.tone !== b.tone) return a.tone === 'critical' ? -1 : 1;
+    return (b.when ?? '').localeCompare(a.when ?? '');
+  });
+}
+
+function titleWords(value: string) {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/* --------------------------------------------------------------- lab entry */
+
+export async function getAnalytes() {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('analyte')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order');
+  return data ?? [];
+}
+
+export async function getRecentPanels(limit = 25) {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('lab_panel')
+    .select('id, drawn_at, note, source, patient:patient_id ( id, first_name, last_name )')
+    .order('drawn_at', { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+/** Flag a typed value the same way the seeded data was flagged. One rule. */
+export function flagFor(
+  analyte: { ref_low: number | null; ref_high: number | null; target_low: number | null; target_high: number | null; ceiling: number | null },
+  value: number
+): string {
+  if (analyte.ceiling !== null && value >= analyte.ceiling) return 'critical';
+  if (analyte.ref_low !== null && value < analyte.ref_low) return 'below_ref';
+  if (analyte.ref_high !== null && value > analyte.ref_high) return 'above_ref';
+  if (analyte.target_low !== null && value < analyte.target_low) return 'below_target';
+  if (analyte.target_high !== null && value > analyte.target_high) return 'above_target';
+  return 'in_range';
+}
+
+/* ----------------------------------------------------------------- team */
+
+export async function getTeam() {
+  const supabase = await serverClient();
+  const [staff, providers] = await Promise.all([
+    supabase.from('staff_user').select('id, name, email, role, mfa_enabled, active').order('name'),
+    supabase.from('provider_public').select('*').order('sort_order')
+  ]);
+  return { staff: staff.data ?? [], providers: providers.data ?? [] };
+}
+
 /* ------------------------------------------------------------------- portal */
 
 export async function getPortalHome(patientId: string) {

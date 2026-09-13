@@ -1,12 +1,14 @@
 /**
  * app/sign-in/page.tsx
  *
- * Password sign-in for the pilot, magic link as the production path.
+ * Password sign-in for the pilot; magic link remains the production design.
  *
- * The pilot accounts are listed on screen because a pilot nobody can get into is
- * not a pilot — and there is no real patient data behind them to protect. That
- * list disappears the moment PILOT_MODE is off, and the accounts themselves are
- * deleted before Phase C (scripts/db-users.cjs --delete).
+ * THE ACCOUNT LIST IS OFF BY DEFAULT.
+ * An earlier version printed every pilot account on this page. That was wrong for
+ * two reasons: it showed one practice's staff the other practice's account list,
+ * which leaks the tenant structure to anyone who reaches the page — and it makes a
+ * sign-in screen look like a test harness rather than a product. It now renders
+ * only when PILOT_SHOW_ACCOUNTS=true is set deliberately for a hands-off demo.
  */
 
 import { redirect } from 'next/navigation';
@@ -14,12 +16,12 @@ import { serverClient } from '@/lib/supabase/server';
 import { PilotAccountPicker } from '@/components/PilotAccountPicker';
 
 const PILOT_ACCOUNTS = [
-  { email: 'jamie@medbar.pilot.invalid', who: 'Jamie Salazar', what: 'The Med Bar — owner (med spa)' },
+  { email: 'jamie@medbar.pilot.invalid', who: 'Jamie Salazar', what: 'The Med Bar — owner' },
   { email: 'owner@gameday.pilot.invalid', who: 'Ray Okonjo', what: 'Gameday Thornton — owner' },
   { email: 'provider@gameday.pilot.invalid', who: 'Dana Whitfield, NP', what: 'Gameday Thornton — provider' },
   { email: 'desk@gameday.pilot.invalid', who: 'Tess Marlow', what: 'Gameday Thornton — front desk' },
-  { email: 'delphine@medbar.pilot.invalid', who: 'Delphine Bettencourt', what: 'Med Bar client portal' },
-  { email: 'gregory@gameday.pilot.invalid', who: 'Gregory Sunderman', what: 'Gameday patient portal' }
+  { email: 'delphine@medbar.pilot.invalid', who: 'Delphine Bettencourt', what: 'Med Bar client account' },
+  { email: 'gregory@gameday.pilot.invalid', who: 'Gregory Sunderman', what: 'Gameday patient account' }
 ];
 
 async function signIn(formData: FormData) {
@@ -34,8 +36,8 @@ async function signIn(formData: FormData) {
 
   if (error) {
     // Deliberately vague. A message that distinguishes "no such account" from
-    // "wrong password" confirms whether an email address belongs to a patient of
-    // this clinic, which is itself a disclosure.
+    // "wrong password" confirms whether an address belongs to a patient of this
+    // practice, which is itself a disclosure.
     redirect(`/sign-in?bad=1${next ? `&next=${encodeURIComponent(next)}` : ''}`);
   }
 
@@ -48,16 +50,15 @@ export default async function SignInPage({
   searchParams: Promise<{ next?: string; bad?: string }>;
 }) {
   const params = await searchParams;
-  const pilot = process.env.PILOT_MODE !== 'false';
+  const showAccounts =
+    process.env.PILOT_MODE !== 'false' && process.env.PILOT_SHOW_ACCOUNTS === 'true';
 
   return (
     <main className="auth-wrap">
       <div className="auth-card">
-        <div className="eyebrow">Sign in</div>
-        <h1>Welcome back</h1>
+        <h1>Sign in</h1>
         <p className="lede">
-          Staff go to the console, clients go to their own account. The same form
-          handles both — where you land depends on who you are.
+          Staff go to the console; clients go to their own account.
         </p>
 
         <form action={signIn}>
@@ -65,7 +66,7 @@ export default async function SignInPage({
 
           <div className="field">
             <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" autoComplete="username" required />
+            <input id="email" name="email" type="email" autoComplete="username" required autoFocus />
           </div>
 
           <div className="field">
@@ -82,15 +83,7 @@ export default async function SignInPage({
           <button className="btn primary block" type="submit">Sign in</button>
         </form>
 
-        {pilot && (
-          <>
-            <PilotAccountPicker accounts={PILOT_ACCOUNTS} />
-            <p className="metric-note">
-              Password is whatever <span className="mono">PILOT_DEMO_PASSWORD</span> is
-              set to. These accounts are deleted before any real patient exists.
-            </p>
-          </>
-        )}
+        {showAccounts && <PilotAccountPicker accounts={PILOT_ACCOUNTS} />}
       </div>
     </main>
   );

@@ -18,12 +18,10 @@ export default async function RootPage() {
   return (
     <main className="auth-wrap">
       <div className="auth-card">
-        <div className="eyebrow">Pilot build</div>
         <h1>Clinic platform</h1>
         <p className="lede">
-          Booking, payments, clinical records and a progress engine for
-          membership-and-treatment practices. Currently running two synthetic
-          practices: a men&rsquo;s-health clinic and a med spa.
+          Booking, payments, clinical records, and a progress engine — for
+          membership and treatment practices.
         </p>
 
         <Link className="btn primary block" href="/sign-in">Sign in</Link>
@@ -32,19 +30,13 @@ export default async function RootPage() {
           <div className="lbl">Also here</div>
           <Link className="navlink" href="/prototype/index.html">
             <span className="ico" aria-hidden="true">◱</span>
-            <span>Phase A prototype — 27 screens, no backend</span>
+            <span>Design prototype — 27 screens</span>
           </Link>
           <Link className="navlink" href="/about-pilot">
-            <span className="ico" aria-hidden="true">⚠</span>
-            <span>Why this is not live yet</span>
+            <span className="ico" aria-hidden="true">◷</span>
+            <span>About this preview</span>
           </Link>
         </div>
-
-        <p className="metric-note" style={{ marginTop: '1.2rem' }}>
-          Every patient, appointment and payment in here is fabricated. This build
-          has no HIPAA controls and the database refuses to store anything not
-          marked synthetic.
-        </p>
       </div>
     </main>
   );

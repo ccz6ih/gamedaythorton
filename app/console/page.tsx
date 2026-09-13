@@ -190,20 +190,11 @@ export default async function ScoreboardPage() {
           )}
         </div>
 
-        <div className="card" style={{ marginTop: 'var(--gd-6)' }}>
-          <div className="eyebrow quiet">Where these numbers come from</div>
-          <p className="muted" style={{ fontSize: '.86rem', lineHeight: 1.6 }}>
-            Every figure on this screen is computed in one place
-            (<span className="mono">lib/db/queries.ts</span>) and read through
-            row-level security as you — so there is exactly one answer to
-            &ldquo;where does that come from&rdquo; per metric, and no screen can
-            see another practice&rsquo;s data even by accident.
-          </p>
-          <p className="muted" style={{ fontSize: '.86rem', lineHeight: 1.6, marginTop: '.6rem' }}>
-            All of it is synthetic. Membership pricing in particular is invented and
-            marked <span className="mono">est</span> wherever it is shown.
-          </p>
-        </div>
+        <p className="metric-note" style={{ marginTop: 'var(--gd-6)' }}>
+          Every figure here is computed in one place and read as you, so no screen can
+          see another practice&rsquo;s data. Values marked{' '}
+          <span className="mono">est</span> are placeholder pricing.
+        </p>
       </div>
     </>
   );
