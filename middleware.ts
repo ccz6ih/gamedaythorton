@@ -20,6 +20,7 @@
  */
 
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { clinicForHost, isStorefrontPath } from './storefront-domains.mjs';
 import { NextResponse, type NextRequest } from 'next/server';
 
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
@@ -97,15 +98,13 @@ const ANONYMOUS_OK = [
  * a new private area added later should be private by default, not public
  * because a wildcard already covered it.
  */
-const STOREFRONT_ROOT = [
-  '/', '/services', '/packages', '/about', '/shop', '/enquire'
-];
-
-function isStorefrontRoot(pathname: string) {
-  // Only meaningful when some clinic is actually serving the root — on a host
-  // with no primary clinic these paths are ordinary app routes.
-  if (!process.env.PRIMARY_CLINIC_SLUG) return false;
-  return STOREFRONT_ROOT.includes(pathname) || pathname.startsWith('/shop/');
+function isStorefrontRoot(pathname: string, host: string | null) {
+  // Keyed on the HOST first. Relying on PRIMARY_CLINIC_SLUG alone meant the
+  // practice's own domain showed a passcode box, because that variable was set
+  // locally and never in the hosting environment — a failure nobody sees until
+  // a customer does.
+  if (!clinicForHost(host, process.env.PRIMARY_CLINIC_SLUG)) return false;
+  return isStorefrontPath(pathname);
 }
 
 function isUnder(pathname: string, paths: string[]) {
@@ -138,7 +137,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/assets') ||
     isExactlyOrUnder(pathname, ALWAYS_OPEN) ||
-    isStorefrontRoot(pathname)
+    isStorefrontRoot(pathname, request.headers.get('host'))
   ) {
     return NextResponse.next();
   }

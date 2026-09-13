@@ -1,3 +1,4 @@
+import { STOREFRONT_DOMAINS, STOREFRONT_PATHS } from './storefront-domains.mjs';
 /**
  * next.config.mjs
  *
@@ -149,7 +150,9 @@ const nextConfig = {
    */
   async rewrites() {
     const primary = process.env.PRIMARY_CLINIC_SLUG;
-    const storefrontPaths = ['', '/services', '/packages', '/about', '/shop', '/enquire'];
+    // Paths and domains come from storefront-domains.mjs, which middleware.ts
+    // reads too. They were separate lists once and immediately drifted.
+    const storefrontPaths = STOREFRONT_PATHS.map(p => (p === '/' ? '' : p));
 
     const forSlug = (slug, host) =>
       storefrontPaths.map(p => ({
@@ -165,11 +168,8 @@ const nextConfig = {
     // Only the shop has sub-paths worth forwarding wholesale today.
     function p_wildcard() { return '/shop/:path*'; }
 
-    const rules = [
-      // Her domain, however it resolves.
-      ...forSlug('medbar-loveland', 'medbarco.com'),
-      ...forSlug('medbar-loveland', 'www.medbarco.com')
-    ];
+    const rules = Object.entries(STOREFRONT_DOMAINS)
+      .flatMap(([host, slug]) => forSlug(slug, host));
 
     if (primary) rules.push(...forSlug(primary, null));
 
