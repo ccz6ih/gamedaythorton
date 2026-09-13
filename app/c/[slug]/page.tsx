@@ -12,6 +12,7 @@ import { notFound } from 'next/navigation';
 import {
   getStorefront, getStorefrontServices, getStorefrontProviders, hoursLines
 } from '@/lib/db/storefront';
+import { ServiceIcon } from '@/components/ServiceIcon';
 import { priceLabel, initials } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -104,7 +105,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             <div className="sf-menu-group">
               {featured.map(s => (
                 <article className="sf-item" key={s.id}>
-                  <div>
+                  <span className="sf-item-mark" aria-hidden="true">
+                    <ServiceIcon name={s.name} category={s.category} />
+                  </span>
+                  <div className="sf-item-body">
                     <h3 className="sf-item-name">
                       {s.name}
                       {s.is_membership && <span className="sf-chip accent">membership</span>}

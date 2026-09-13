@@ -189,7 +189,7 @@
   gap: var(--gd-4);
   margin-bottom: var(--gd-5);
 }
-.sf-menu-cat h3 {
+.sf-menu-cat h2 {
   font-family: var(--brand-display-font);
   font-size: var(--gd-step-1);
   letter-spacing: -.012em;
@@ -204,15 +204,112 @@
   white-space: nowrap;
 }
 
+/* Four columns: mark, body, price, action. The price column keeps a shared
+   right edge down the whole menu — that alignment is what makes a long list
+   readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--gd-2) var(--gd-6);
-  padding-block: var(--gd-4);
+  grid-template-columns: 2.25rem 1fr auto;
+  gap: var(--gd-2) var(--gd-5);
+  padding-block: var(--gd-5);
   border-bottom: 1px solid var(--gd-border);
-  align-items: baseline;
+  align-items: start;
 }
 .sf-item:last-child { border-bottom: none; }
+
+.sf-item-mark {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--gd-r-full);
+  border: 1px solid var(--gd-accent-line);
+  color: var(--gd-accent);
+  margin-top: .1rem;
+}
+.sf-item-mark svg { width: 1.15rem; height: 1.15rem; }
+
+.sf-item-body { min-width: 0; }
+
+.sf-item-cta {
+  grid-column: 2 / -1;
+  margin-top: var(--gd-2);
+}
+
+/* Long copy, one tap away. Native <details> so it needs no JavaScript. */
+.sf-more { margin-top: var(--gd-3); }
+.sf-more summary {
+  cursor: pointer;
+  font-size: var(--gd-step--2);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--gd-accent);
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  padding: .2rem 0;
+}
+.sf-more summary::-webkit-details-marker { display: none; }
+.sf-more summary::after {
+  content: "";
+  width: .42em; height: .42em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform var(--gd-fast) var(--gd-ease);
+}
+.sf-more[open] summary::after { transform: rotate(-135deg) translate(-1px, -1px); }
+.sf-more p {
+  margin: var(--gd-3) 0 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+  max-width: 58ch;
+  border-left: 1px solid var(--gd-border);
+  padding-left: var(--gd-4);
+  text-wrap: pretty;
+}
+
+/* Jump rail. Thirty services inside a closed dropdown is a menu you have to
+   already know your way around. */
+.sf-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin-top: var(--gd-6);
+}
+.sf-jump-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  padding: .4rem .8rem;
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-full);
+  font-size: var(--gd-step--1);
+  text-decoration: none;
+  color: var(--gd-text-muted);
+  transition: color var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-jump-link:hover { color: var(--gd-accent); border-color: var(--gd-accent); }
+.sf-jump-link .n {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-cat-note {
+  margin: calc(-1 * var(--gd-2)) 0 var(--gd-4);
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  max-width: 56ch;
+}
+
+.sf-item-desc.dim { color: var(--gd-text-dim); font-style: italic; }
+
+/* Anchored jumps must not land under the sticky nav. */
+.sf-menu-group { scroll-margin-top: 5rem; }
 
 .sf-item-name {
   font-size: var(--gd-step-0);
@@ -509,9 +606,10 @@
 @media (max-width: 640px) {
   .sf-person { grid-template-columns: 1fr; }
   .sf-portrait { max-width: 11rem; }
-  .sf-item { grid-template-columns: 1fr; }
-  .sf-item-price { text-align: left; display: flex; gap: var(--gd-3); align-items: baseline; }
+  .sf-item { grid-template-columns: 2rem 1fr; gap: var(--gd-2) var(--gd-4); }
+  .sf-item-price { grid-column: 2 / -1; text-align: left; display: flex; gap: var(--gd-3); align-items: baseline; }
   .sf-item-price .dur { margin-top: 0; }
+  .sf-item-cta { grid-column: 2 / -1; }
   .sf-nav-inner { gap: var(--gd-4); }
 }
 

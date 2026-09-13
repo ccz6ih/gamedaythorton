@@ -53,10 +53,12 @@
     "clinicName": "The Med Bar",
     "locationName": "Loveland",
     "tagline": "Skin, lashes, and regenerative treatments.",
-    "accent": "#8a6a52",
-    "radius": 16,
-    "font": "serif",
-    "surface": "light",
+    "accent": "#d9a88c",
+    "accentInk": "#1a1513",
+    "radius": 14,
+    "font": "\"Cormorant Garamond\", Georgia, serif",
+    "displayFont": "\"Cormorant Garamond\", Georgia, serif",
+    "surface": "dark",
     "sportsVocabulary": false
   },
   "visit_facts": {

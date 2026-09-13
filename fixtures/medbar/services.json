@@ -16,7 +16,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 0
+    "sort_order": 0,
+    "description": "Softens expression lines by relaxing the facial muscles that cause them, dosed to how your face actually moves.",
+    "details": "Commonly treated areas include forehead lines, frown lines between the brows and crow’s feet. Results begin to appear within several days and continue to develop over one to two weeks. A consultation and assessment is performed before treatment to determine the areas and dosing.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_02",
@@ -35,7 +38,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 1
+    "sort_order": 1,
+    "description": "A regenerative under-eye treatment using your own platelet-rich fibrin, for tired, crepey or hollow-looking eyes.",
+    "details": "A small blood draw is processed to concentrate your own platelets, fibrin and growth factors. The liquid PRF is then administered to the under-eye area to support skin quality and texture. Because PRF works with your body’s own regenerative process, results develop progressively, and a series may be recommended. Consultation and candidacy assessment required.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_03",
@@ -54,7 +60,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 2
+    "sort_order": 2,
+    "description": "Microneedling with your own platelet-rich fibrin — for fine lines, acne scars, enlarged pores and uneven texture.",
+    "details": "Begins with a small blood draw processed to isolate PRF, a concentrated source of your own platelets, growth factors and fibrin. That is incorporated into a customised microneedling treatment to support the skin’s natural repair process and stimulate collagen and elastin. Salmon DNA or Plant Cell Acne serum can be added as a booster at no charge. Includes consultation, blood draw, PRF preparation and the treatment itself.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_04",
@@ -73,7 +82,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 3
+    "sort_order": 3,
+    "description": "Scalp microneedling with your own platelet-rich fibrin and Nue Strand, for areas of thinning or decreased density.",
+    "details": "Begins with a blood draw processed to isolate PRF. PRF and Nue Strand are then incorporated into a customised scalp microneedling treatment to support the scalp’s natural regenerative process. A series is recommended for best results. Includes consultation, blood draw, PRF preparation, Nue Strand and the treatment.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_05",
@@ -92,7 +104,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 4
+    "sort_order": 4,
+    "description": "One extension on each natural lash — length and definition, with an effortless mascara-like finish.",
+    "details": "Uses UV-cured lash technology, which bonds instantly with no traditional adhesive curing period. Suited to anyone who prefers a clean, timeless lash look.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_06",
@@ -111,7 +126,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 5
+    "sort_order": 5,
+    "description": "For existing Classic clients returning within 14 days.",
+    "details": "Grown-out extensions are removed and new extensions applied to restore fullness, balance and definition.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_07",
@@ -130,7 +148,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 6
+    "sort_order": 6,
+    "description": "For existing Classic clients returning 15–21 days after their last appointment.",
+    "details": "Includes removal of grown-out extensions and the additional lash replacement needed to restore your set. Appointments beyond three weeks require a new full set.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_08",
@@ -149,7 +170,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 7
+    "sort_order": 7,
+    "description": "Classic extensions combined with lightweight volume fans — texture and dimension without an overly dramatic look.",
+    "details": "Each set is customised to your natural lashes, eye shape and the look you want, and cured using UV lash technology.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_09",
@@ -168,7 +192,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 8
+    "sort_order": 8,
+    "description": "For existing Hybrid clients returning within 14 days.",
+    "details": "Grown-out extensions are removed and a customised combination of Classic lashes and volume fans is added to restore fullness and dimension.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_10",
@@ -187,7 +214,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 9
+    "sort_order": 9,
+    "description": "For existing Hybrid clients returning 15–21 days after their last appointment.",
+    "details": "Additional lash replacement and removal of grown-out extensions restore the fullness and balance of your Hybrid set. Appointments beyond three weeks require a new full set.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_11",
@@ -206,7 +236,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 10
+    "sort_order": 10,
+    "description": "Lightweight handmade volume fans for density and fluffiness — customised from soft and wispy to fuller and more dramatic.",
+    "details": "Cured using UV lash technology, and designed to maintain the health and integrity of your natural lashes.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_12",
@@ -225,7 +258,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 11
+    "sort_order": 11,
+    "description": "For existing Volume clients returning within 14 days.",
+    "details": "Grown-out extensions are removed and fresh lightweight volume fans applied to restore fullness, shape and fluffiness.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_13",
@@ -244,7 +280,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 12
+    "sort_order": 12,
+    "description": "For existing Volume clients returning 15–21 days after their last appointment.",
+    "details": "Removal of grown-out extensions and additional volume fans restore the fullness and shape of your Volume set. Appointments beyond three weeks require a new full set.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_14",
@@ -263,7 +302,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 13
+    "sort_order": 13,
+    "description": "Inkless scar revision for small surgical, injury or trauma scars — up to about 2″ × 2″, or one linear scar up to 4″.",
+    "details": "Customised using professional NUE Conceal serums. NUE Regen supports skin renewal and helps improve the appearance and texture of scars; NUE Bright is an inkless brightening treatment for darker or hyperpigmented scars and uneven tone. Multiple sessions may be recommended. Larger areas, multiple scars and stretch marks require a consultation.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_15",
@@ -282,7 +324,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 14
+    "sort_order": 14,
+    "description": "Inkless scar revision for scars larger than 2″ × 2″ and up to about 4″ × 4″, or one linear scar 4–8″.",
+    "details": "Customised using professional NUE Conceal serums — NUE Regen for skin renewal and texture, NUE Bright for darker or hyperpigmented scars. Multiple sessions may be recommended. Larger areas, multiple scars and stretch marks require a consultation.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_16",
@@ -301,7 +346,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 15
+    "sort_order": 15,
+    "description": "Inkless scar and stretch mark revision across larger areas — abdomen, waistline, hips, thighs, chest or back.",
+    "details": "Customised using professional NUE Conceal serums for your skin and treatment needs, and designed for extensive scarring or stretch marks over a larger surface area. Final pricing is determined at consultation based on the size, location and extent of the area. Multiple sessions may be recommended.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_17",
@@ -320,7 +368,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 16
+    "sort_order": 16,
+    "description": "A professional salicylic acid peel for back acne, clogged pores, excess oil and uneven texture.",
+    "details": "Strength is customised to your skin using either a 20% or 30% professional salicylic acid peel, based on skin type, condition and tolerance. Suited to athletes, active lifestyles and oily or breakout-prone skin. A series may be recommended for ongoing or persistent breakouts.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_18",
@@ -339,7 +390,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 17
+    "sort_order": 17,
+    "description": "Non-invasive light therapy with no downtime. Good on its own, and can be added to another treatment.",
+    "details": "Different wavelengths address different concerns: red and infrared for collagen support and fine lines; blue for acne and breakout-prone skin; green for uneven tone and pigmentation; yellow for redness and sensitivity; purple for a combination of rejuvenating and clarifying benefits; cyan for stressed skin; white for overall renewal. Suitable for the face or targeted areas of the body.",
+    "needs_copy": false
   },
   {
     "id": "mb_svc_19",
@@ -358,7 +412,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 18
+    "sort_order": 18,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_20",
@@ -377,7 +434,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 19
+    "sort_order": 19,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_21",
@@ -396,7 +456,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 20
+    "sort_order": 20,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_22",
@@ -415,7 +478,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 21
+    "sort_order": 21,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_23",
@@ -434,7 +500,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 22
+    "sort_order": 22,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_24",
@@ -453,7 +522,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 23
+    "sort_order": 23,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_25",
@@ -472,7 +544,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 24
+    "sort_order": 24,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_26",
@@ -491,7 +566,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 25
+    "sort_order": 25,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_27",
@@ -510,7 +588,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 26
+    "sort_order": 26,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_28",
@@ -529,7 +610,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 27
+    "sort_order": 27,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_29",
@@ -548,7 +632,10 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 28
+    "sort_order": 28,
+    "description": null,
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_30",
@@ -567,6 +654,9 @@
     "requires_labs": false,
     "online_bookable": true,
     "active": true,
-    "sort_order": 29
+    "sort_order": 29,
+    "description": "Fifteen complimentary minutes to talk through your concerns, goals and options. No commitment.",
+    "details": "We review what you are after, answer questions, and put together a treatment plan. Useful for new clients, or for anyone considering a treatment they have not had before.",
+    "needs_copy": false
   }
 ]

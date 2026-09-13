@@ -24,6 +24,7 @@
  */
 
 const fs = require('fs');
+const { applyCopy } = require('./medbar-copy.cjs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -83,10 +84,15 @@ const clinic = {
     clinicName: 'The Med Bar',
     locationName: 'Loveland',
     tagline: 'Skin, lashes, and regenerative treatments.',
-    accent: '#8a6a52',
-    radius: 16,
-    font: 'serif',
-    surface: 'light',
+    // Read off her existing site rather than guessed: near-black ground, rose
+    // gold line art, cream. An earlier version of this file had a muted brown
+    // on a light surface, which was nothing like her actual brand.
+    accent: '#d9a88c',
+    accentInk: '#1a1513',
+    radius: 14,
+    font: '"Cormorant Garamond", Georgia, serif',
+    displayFont: '"Cormorant Garamond", Georgia, serif',
+    surface: 'dark',
     // A med spa has no reason to inherit a sports metaphor.
     sportsVocabulary: false
   },
@@ -650,6 +656,19 @@ const automationRuns = [
     channel: 'sms', status: 'logged_not_sent', triggered_at: weeksAgo(3),
     payload_preview: 'The Med Bar: how are you getting on? Reply any time.', synthetic: true }
 ];
+
+// ----------------------------------------------------------------- copy ----
+// Public menu copy lives in medbar-copy.cjs, condensed from what the practice
+// already publishes. Applied here so the service list and its copy cannot
+// drift apart, and so anything she has not written is flagged rather than
+// silently blank.
+
+{
+  const { written, flagged, total } = applyCopy(services);
+  console.log(`
+  storefront copy: ${written} of ${total} written, ${flagged} awaiting the practice
+`);
+}
 
 // ---------------------------------------------------------------- write ----
 

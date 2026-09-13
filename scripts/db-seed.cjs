@@ -490,6 +490,11 @@ async function seedMedBar() {
     unit_label: s.unit_label, min_units: s.min_units,
     requires_labs: false, requires_consent: s.requires_consent,
     is_membership: false, online_bookable: true,
+    // Storefront copy. A service the practice has not written copy for carries
+    // needs_copy, so the public page can say so instead of rendering a blank.
+    description: s.description ?? null,
+    details: s.details ?? null,
+    needs_copy: s.needs_copy ?? false,
     active: true, sort_order: s.sort_order
   })));
 

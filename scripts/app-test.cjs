@@ -221,15 +221,54 @@ async function req(url, opts = {}) {
     else bad('free services say Complimentary, not $0');
   }
 
+  // The menu rebuild: short line in the row, long copy one tap away, an icon
+  // per service, and an honest line where the practice has not written copy.
+  // Each of these replaced something specific on the page it supersedes.
+  const menu = await req('/c/medbar-loveland/services', { headers: gateCookie() });
+  if (menu.status === 200) {
+    const html = await menu.text();
+    const count = re => (html.match(re) || []).length;
+
+    const rows = count(/class="sf-item"/g);
+    const marks = count(/<svg/g);
+    if (marks >= rows && rows > 20) ok('every service has a mark', `${marks} icons, ${rows} rows`);
+    else bad('every service has a mark', `${marks} icons for ${rows} rows`);
+
+    if (count(/<details/g) > 10) ok('long copy collapses behind a summary', `${count(/<details/g)} expandable`);
+    else bad('long copy collapses behind a summary', 'the menu is back to walls of text');
+
+    if (/sf-jump-link/.test(html)) ok('categories are a rail, not a dropdown');
+    else bad('categories are a rail, not a dropdown');
+
+    if (/to be supplied by the practice/i.test(html)) {
+      ok('a service with no copy says so', 'rather than rendering a blank');
+    } else bad('a service with no copy says so');
+
+    // The source copy sprinkles emoji mid-sentence. On a medical price list it
+    // reads as unfinished, so it was stripped — and must stay stripped.
+    const emoji = (html.match(/\p{Extended_Pictographic}/gu) || []).filter(c => c !== '®');
+    if (emoji.length === 0) ok('no emoji in the menu copy');
+    else bad('no emoji in the menu copy', `found ${[...new Set(emoji)].join(' ')}`);
+  }
+
   const spa = await req('/c/medbar-loveland', { headers: gateCookie() });
   const gd = await req('/c/gameday-thornton', { headers: gateCookie() });
   if (spa.status === 200 && gd.status === 200) {
     const spaHtml = await spa.text();
     const gdHtml = await gd.text();
-    if (/data-surface="light"/.test(spaHtml) && /data-surface="dark"/.test(gdHtml)) {
-      ok('each practice renders in its own skin', 'med spa light, mens health dark');
-    } else bad('each practice renders in its own skin');
-
+    // Surface is no longer the discriminator: The Med Bar's real brand is
+    // near-black with rose gold, so both practices render dark. What must
+    // stay true is that they do not look like the same business — which is
+    // the actual failure mode of the template this replaces.
+    const accentOf = h => (h.match(/--brand-accent:\s*([^;"]+)/) || [])[1];
+    const spaAccent = accentOf(spaHtml);
+    const gdAccent = accentOf(gdHtml);
+    if (spaAccent && gdAccent && spaAccent.trim() !== gdAccent.trim()) {
+      ok('each practice renders in its own brand', `${spaAccent.trim()} vs ${gdAccent.trim()}`);
+    } else {
+      bad('each practice renders in its own brand',
+        `both resolved to ${spaAccent || 'no accent'} — the template is showing through`);
+    }
     // The page carries a real business name and real prices, so it must say
     // what it is or it can be mistaken for that business's live site.
     if (/Not the practice/i.test(spaHtml)) ok('the storefront says it is a preview');
