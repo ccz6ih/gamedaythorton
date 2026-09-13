@@ -126,9 +126,13 @@ export function BookingFlow({
         <p className="sf-lede sm">
           <b>{result.serviceName}</b><br />{when}
         </p>
+        {/* Only promise the email if one actually went. Somebody waiting for a
+            confirmation that is never coming assumes the booking failed and
+            books again — which is worse than saying nothing. */}
         <p className="sf-note-line">
-          A confirmation is on its way to {email}. If you need to change or
-          cancel, just reply to it or call us.
+          {result.emailed
+            ? <>A confirmation is on its way to {email}. To change or cancel, reply to it{result.practicePhone ? <> or call {result.practicePhone}</> : null}.</>
+            : <>We have you down. To change or cancel, {result.practicePhone ? <>call {result.practicePhone}</> : <>get in touch</>}.</>}
         </p>
         {result.requiresConsent && (
           <p className="sf-note">

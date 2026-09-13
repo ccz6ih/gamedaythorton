@@ -10,7 +10,7 @@
  */
 
 import { createServerClient } from '@supabase/ssr';
-import { sendEnquiryEmail } from '@/lib/notify';
+import { sendBookingConfirmation, sendBookingNotice } from '@/lib/notify';
 
 function anonClient() {
   return createServerClient(
@@ -34,7 +34,20 @@ export async function slotsFor(
 }
 
 export type BookingResult =
-  | { ok: true; when: string; serviceName: string; requiresConsent: boolean }
+  | {
+      ok: true;
+      when: string;
+      serviceName: string;
+      requiresConsent: boolean;
+      /**
+       * Whether a confirmation actually went. The page used to promise one
+       * unconditionally, which was untrue whenever sending was switched off —
+       * and somebody waiting for an email that is never coming will assume the
+       * booking failed and book again.
+       */
+      emailed: boolean;
+      practicePhone: string | null;
+    }
   | { ok: false; error: string };
 
 /** Messages we raised on purpose, and are safe to show a stranger. */
@@ -82,42 +95,58 @@ export async function book(input: {
   }
 
   const result = data as {
-    service_name: string; practice_name: string;
-    starts_at: string; requires_consent: boolean;
+    clinic_id: string; service_name: string; practice_name: string;
+    practice_phone: string | null; notify_email: string | null;
+    starts_at: string; requires_consent: boolean; synthetic: boolean;
   };
 
-  /**
-   * Tell the practice. Best-effort and deliberately after the booking is
-   * already committed — a notification that fails must never cost somebody
-   * their appointment. The subject line names the practice and nothing else;
-   * who booked and for what stay inside the message. lib/notify enforces that.
-   */
-  try {
-    const { data: clinic } = await supabase
-      .from('clinic').select('id, name, lead_email').eq('slug', input.slug).maybeSingle();
+  const whenText = new Date(result.starts_at).toLocaleString('en-US', {
+    timeZone: 'America/Denver', dateStyle: 'full', timeStyle: 'short'
+  });
 
-    if (clinic) {
-      await sendEnquiryEmail({
-        clinicId: String(clinic.id),
-        to: (clinic as { lead_email?: string | null }).lead_email ?? null,
-        clinicName: String(clinic.name),
-        name: `${input.first} ${input.last}`,
-        contact: input.phone ? `${input.email} · ${input.phone}` : input.email,
-        interest: `${result.service_name} — ${new Date(result.starts_at).toLocaleString('en-US', {
-          timeZone: 'America/Denver', dateStyle: 'full', timeStyle: 'short'
-        })}`,
-        message: input.note ?? null,
-        synthetic: false
-      });
-    }
+  /**
+   * Both emails, after the booking is already committed.
+   *
+   * The practice's inbox comes back from the RPC rather than being read here.
+   * Reading it here was the bug: `lead_email` is not granted to anon, a
+   * column-level denial takes out the whole select, `clinic` came back null,
+   * and the notification block was skipped in silence. The booking worked; the
+   * email never even logged.
+   *
+   * Neither send can affect the appointment. It exists either way.
+   */
+  const common = {
+    clinicId: result.clinic_id,
+    clinicName: result.practice_name,
+    practicePhone: result.practice_phone,
+    practiceInbox: result.notify_email,
+    clientName: `${input.first} ${input.last}`,
+    clientEmail: input.email,
+    clientPhone: input.phone ?? null,
+    serviceName: result.service_name,
+    whenText,
+    note: input.note ?? null,
+    requiresConsent: result.requires_consent === true,
+    synthetic: result.synthetic === true
+  };
+
+  let emailed = false;
+  try {
+    const [confirmation] = await Promise.all([
+      sendBookingConfirmation(common),
+      sendBookingNotice(common)
+    ]);
+    emailed = confirmation.delivered;
   } catch {
-    // Logged inside sendEnquiryEmail. The booking stands either way.
+    // Both log their own failures. The booking stands.
   }
 
   return {
     ok: true,
     when: result.starts_at,
     serviceName: result.service_name,
-    requiresConsent: result.requires_consent === true
+    requiresConsent: result.requires_consent === true,
+    emailed,
+    practicePhone: result.practice_phone
   };
 }
