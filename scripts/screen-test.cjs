@@ -27,6 +27,17 @@ const PASSCODE = process.argv[3] || process.env.PILOT_PASSCODE;
 const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const PW = process.env.PILOT_DEMO_PASSWORD;
+
+/**
+ * The Med Bar's owner has a real login now. Her password is not in this
+ * repository and never will be, so it comes from the environment.
+ *
+ * The seeded .pilot.invalid address is left as the fallback only so a fresh
+ * clone with a seeded database still runs; against the live practice it will
+ * fail to sign in, loudly, which is the correct outcome.
+ */
+const MEDBAR_EMAIL = process.env.MEDBAR_OWNER_EMAIL ?? 'jamie@medbar.pilot.invalid';
+const MEDBAR_PW = process.env.MEDBAR_OWNER_PASSWORD ?? PW;
 const REF = process.env.SUPABASE_PROJECT_REF;
 
 let pass = 0, fail = 0;
@@ -35,11 +46,11 @@ const bad = (m, e) => { fail++; console.log(`  ✗ ${m}`); if (e) console.log(' 
 
 const CHUNK = 3180;   // @supabase/ssr's threshold
 
-async function sessionCookies(email) {
+async function sessionCookies(email, password) {
   const res = await fetch(`${URL_SB}/auth/v1/token?grant_type=password`, {
     method: 'POST',
     headers: { apikey: KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password: PW })
+    body: JSON.stringify({ email, password: password ?? PW })
   });
   const session = await res.json();
   if (!res.ok) throw new Error(`${res.status} ${session.error_description || session.msg || 'sign-in failed'}`);
@@ -132,10 +143,10 @@ const CONSOLE_ROUTES = [
   console.log(`\nAUTHENTICATED SCREENS  ${BASE}\n`);
 
   /* ------------------------------------------------------------- med spa -- */
-  console.log('THE MED BAR (med_spa) — jamie@medbar.pilot.invalid');
+  console.log(`THE MED BAR (med_spa) — ${MEDBAR_EMAIL}`);
   let jamie;
   try {
-    jamie = await sessionCookies('jamie@medbar.pilot.invalid');
+    jamie = await sessionCookies(MEDBAR_EMAIL, MEDBAR_PW);
     ok('signed in');
   } catch (err) { bad('signed in', err.message); }
 

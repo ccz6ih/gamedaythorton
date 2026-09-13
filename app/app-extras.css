@@ -134,3 +134,149 @@
   line-height: 1.45;
   margin-top: .35rem;
 }
+
+/* ==========================================================================
+   TREATMENT NOTES & CLIENT PHOTOGRAPHS
+   --------------------------------------------------------------------------
+   The chart is read far more often than it is written to, so the reading view
+   gets the space and the composer stays compact.
+   ========================================================================== */
+
+.note {
+  border-top: 1px solid var(--gd-border);
+  padding: var(--gd-5) 0;
+}
+.note:first-of-type { border-top: 0; padding-top: 0; }
+
+.note-head { display: flex; align-items: flex-start; gap: var(--gd-4); margin-bottom: var(--gd-3); }
+.note-head .spacer { flex: 1; }
+
+.note-part { margin-bottom: var(--gd-3); }
+.note-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--gd-accent);
+  font-weight: 700;
+  margin-bottom: .15rem;
+}
+.note-body { margin: 0; white-space: pre-wrap; line-height: 1.5; }
+
+.note-facts {
+  list-style: none;
+  margin: var(--gd-4) 0 0;
+  padding: var(--gd-3) var(--gd-4);
+  background: var(--gd-surface-raised);
+  border-radius: var(--gd-r-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2) var(--gd-6);
+  font-size: .82rem;
+}
+.note-facts span {
+  color: var(--gd-text-dim);
+  margin-right: .35rem;
+}
+
+/* An amendment is visibly attached to what it corrects, never free-standing.
+   The indent and rule are doing real work: they say "this came later, and it
+   is about that". */
+.note-amendment {
+  margin: var(--gd-4) 0 0 var(--gd-5);
+  padding-left: var(--gd-4);
+  border-left: 2px solid var(--gd-accent-line);
+}
+
+.note-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-4);
+  margin-top: var(--gd-4);
+}
+.note-photos figure { margin: 0; width: 8.5rem; }
+.note-photos img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--gd-r-sm);
+  display: block;
+}
+.note-photo-missing {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-surface-raised);
+  display: grid;
+  place-items: center;
+  font-size: .72rem;
+  color: var(--gd-text-dim);
+  text-align: center;
+  padding: .5rem;
+}
+.note-photos figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+  font-size: .72rem;
+  text-transform: capitalize;
+  color: var(--gd-text-dim);
+  margin-top: .25rem;
+}
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--gd-text-dim);
+  text-decoration: underline;
+  cursor: pointer;
+  text-transform: none;
+}
+
+.note-form .field { margin-bottom: var(--gd-3); }
+.note-form textarea { width: 100%; resize: vertical; }
+label.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .84rem;
+}
+
+/* --------------------------------------------------------- the face -- */
+.client-photo {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--gd-border);
+  background: var(--gd-surface-raised);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.client-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.client-photo-initials {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gd-text-dim);
+}
+/* The hint only appears on hover or keyboard focus, so a chart being read is
+   not covered in affordances nobody is using. */
+.client-photo-hint {
+  position: absolute;
+  inset: auto 0 0 0;
+  background: color-mix(in srgb, var(--gd-bg) 82%, transparent);
+  font-size: .62rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .2rem 0;
+  opacity: 0;
+  transition: opacity var(--gd-fast) var(--gd-ease);
+}
+.client-photo:hover .client-photo-hint,
+.client-photo:focus-visible .client-photo-hint { opacity: 1; }
+.client-photo:disabled { cursor: wait; }
+.client-photo:disabled .client-photo-hint { opacity: 1; }

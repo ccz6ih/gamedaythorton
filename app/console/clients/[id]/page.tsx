@@ -14,6 +14,10 @@ import { notFound } from 'next/navigation';
 import { getClinic, getChart, hasModule } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { dateLabel, relative, money, num, titleCase, phone, initials, daysUntil } from '@/lib/format';
+import { serverClient } from '@/lib/supabase/server';
+import { signedPhotoUrls } from '@/lib/client-media';
+import { ClientNotes, type NoteRow } from '@/components/ClientNotes';
+import { ClientPhoto } from '@/components/ClientPhoto';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +116,54 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
   );
   const adverse = chart.treatments.find((t: Record<string, unknown>) => t.adverse_event);
 
+  /* -------------------------------------------------------------- notes -- */
+  // Read here rather than inside getChart because notes and their photographs
+  // need signed URLs, and getChart is also used by screens that do not render
+  // images — minting signed URLs nobody looks at is work and a small exposure.
+  const supabase = await serverClient();
+
+  const [{ data: noteRows }, { data: notePhotos }, { data: serviceRows }] = await Promise.all([
+    supabase.from('client_note').select('*').eq('patient_id', id)
+      .order('performed_at', { ascending: false }).order('created_at'),
+    supabase.from('photo').select('id, note_id, pose_key, storage_path')
+      .eq('patient_id', id).not('note_id', 'is', null),
+    supabase.from('service').select('id, name').eq('clinic_id', clinic.id)
+      .eq('active', true).order('name')
+  ]);
+
+  // One round trip for every image on the page, including the face.
+  const urls = await signedPhotoUrls([
+    p.photo_path ?? null,
+    ...(notePhotos ?? []).map(ph => ph.storage_path as string | null)
+  ]);
+
+  const faceUrl = p.photo_path ? urls.get(p.photo_path) ?? null : null;
+
+  const photosByNote = new Map<string, { id: string; pose_key: string; url: string | null }[]>();
+  for (const ph of notePhotos ?? []) {
+    const key = String(ph.note_id);
+    if (!photosByNote.has(key)) photosByNote.set(key, []);
+    photosByNote.get(key)!.push({
+      id: String(ph.id),
+      pose_key: String(ph.pose_key),
+      url: ph.storage_path ? urls.get(String(ph.storage_path)) ?? null : null
+    });
+  }
+
+  const notes: NoteRow[] = (noteRows ?? []).map(n => ({
+    ...(n as unknown as NoteRow),
+    photos: photosByNote.get(String(n.id)) ?? []
+  }));
+
+  /* ----------------------------------------------------------- birthday -- */
+  // Month and day, never a year — the year is genuinely unknown for imported
+  // clients and inventing one would be worse than leaving it out. See 0019.
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                  'August', 'September', 'October', 'November', 'December'];
+  const bm = (p as unknown as { birth_month?: number | null }).birth_month;
+  const bd = (p as unknown as { birth_day?: number | null }).birth_day;
+  const birthday = bm && bd ? `${MONTHS[bm - 1]} ${bd}` : null;
+
   return (
     <>
       <header className="topbar">
@@ -139,7 +191,7 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
       <div className="view wide">
         <section className={`card${adverse ? ' critical' : ''}`}>
           <div className="row" style={{ gap: '1rem', alignItems: 'flex-start' }}>
-            <span className="av lg" aria-hidden="true">{initials(name)}</span>
+            <ClientPhoto patientId={id} name={name} url={faceUrl} />
             <div style={{ flex: '1 1 240px', minWidth: 0 }}>
               <div style={{ fontSize: 'var(--gd-step-1)', fontWeight: 700 }}>{name}</div>
               <div className="muted" style={{ fontSize: '.86rem' }}>
@@ -147,6 +199,7 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
               </div>
               <div className="row tight" style={{ marginTop: '.5rem' }}>
                 <span className="pill">Since {dateLabel(p.created_at, 'md')}</span>
+                {birthday && <span className="pill">Birthday {birthday}</span>}
                 {p.acquisition_source && (
                   <span className="pill">via {titleCase(p.acquisition_source)}</span>
                 )}
@@ -175,6 +228,16 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
         </section>
+
+        {/* Treatment notes sit directly under the header, above everything
+            else, because they are what the practitioner opens this screen to
+            read before walking into the room. Append-only: see migration 0019
+            and components/ClientNotes.tsx. */}
+        <ClientNotes
+          patientId={id}
+          notes={notes}
+          services={(serviceRows ?? []).map(s => ({ id: String(s.id), name: String(s.name) }))}
+        />
 
         {/* Prepaid balances. Money already taken, sessions still owed. */}
         {hasModule(clinic, 'packages') && openPackages.length > 0 && (

@@ -21,15 +21,30 @@ const URL_SB = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const PW = process.env.PILOT_DEMO_PASSWORD;
 
+/**
+ * The Med Bar's owner signs in with her REAL address now, not a .pilot.invalid
+ * one, and with a password this repository must never contain.
+ *
+ * When her login changed, this harness failed at its first step and reported
+ * "1 of 2 write checks FAILED" — thirty-four real assertions silently not
+ * running. A suite that quietly shrinks is worse than one that fails, because
+ * the number still reads like a pass rate.
+ *
+ * So the credential comes from the environment, and its absence is stated
+ * plainly once rather than looking like a broken test.
+ */
+const MEDBAR_EMAIL = process.env.MEDBAR_OWNER_EMAIL ?? 'themedbar.co@gmail.com';
+const MEDBAR_PW = process.env.MEDBAR_OWNER_PASSWORD;
+
 let pass = 0, fail = 0;
 const ok = (m, n) => { pass++; console.log(`  ✓ ${m}${n ? '  ' + n : ''}`); };
 const bad = (m, e) => { fail++; console.log(`  ✗ ${m}`); if (e) console.log('      ' + String(e).slice(0, 200)); };
 
-async function signIn(email) {
+async function signIn(email, password) {
   const r = await fetch(`${URL_SB}/auth/v1/token?grant_type=password`, {
     method: 'POST',
     headers: { apikey: KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password: PW })
+    body: JSON.stringify({ email, password: password ?? PW })
   });
   const j = await r.json();
   if (!r.ok) throw new Error(j.error_description || j.msg || 'sign-in failed');
@@ -103,7 +118,12 @@ async function refuses(label, fn, because, cleanupFn) {
   let db;
 
   try {
-    const token = await signIn('jamie@medbar.pilot.invalid');
+    if (!MEDBAR_PW) {
+      console.log('\n  SKIPPED: MEDBAR_OWNER_PASSWORD is not set in .env.local, so the');
+      console.log('  Med Bar write paths cannot be exercised. Set it to run them.\n');
+      process.exit(0);
+    }
+    const token = await signIn(MEDBAR_EMAIL, MEDBAR_PW);
     db = api(token);
     ok('signed in as Jamie');
 

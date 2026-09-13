@@ -29,7 +29,8 @@
     "test:storefront": "node scripts/storefront-test.cjs",
     "test:write": "node scripts/write-test.cjs",
     "test:brand": "node scripts/brand-test.cjs",
-    "test:shop": "node scripts/shop-test.cjs"
+    "test:shop": "node scripts/shop-test.cjs",
+    "test:notes": "node scripts/notes-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

@@ -47,6 +47,8 @@ const args = process.argv.slice(2);
 const slug = args.find(a => !a.startsWith('--'));
 const CONFIRM = args.includes('--confirm');
 const RESTORE = args.includes('--restore');
+// Closing the accounts is a SEPARATE decision from hiding the public page.
+const DISABLE_LOGINS = args.includes('--disable-logins');
 
 if (!slug) {
   console.error('\n  Which clinic?  node scripts/retire-clinic.cjs <slug> [--confirm|--restore]\n');
@@ -84,13 +86,11 @@ async function main() {
   console.log(`    ${c.staff} active staff account(s), ${c.clients} client record(s)\n`);
 
   if (RESTORE) {
-    await client.query(
-      `update clinic set listed = true, active = true where id = $1`, [c.id]);
-    await client.query(
-      `update staff_user set active = true where clinic_id = $1 and retired_note is not distinct from 'retired-with-clinic'`,
-      [c.id]
-    ).catch(() => {}); // column may not exist; staff are restored by hand if so
-    console.log('  Restored: listed and active again.\n');
+    await client.query('update clinic set listed = true, active = true where id = $1', [c.id]);
+    const back = await client.query(
+      'update staff_user set active = true where clinic_id = $1 and not active returning name',
+      [c.id]);
+    console.log(`  Restored: listed and active again, ${back.rowCount} sign-in(s) re-enabled.\n`);
     await client.end();
     return;
   }
@@ -98,13 +98,22 @@ async function main() {
   if (!CONFIRM) {
     console.log('  WHAT --confirm WOULD DO');
     console.log('    clinic.listed  -> false   its /c/<slug> page stops resolving for the public');
-    console.log('                              (the anon RLS policy requires listed AND active)');
-    console.log('    clinic.active  -> false   it stops appearing anywhere a clinic is listed');
-    console.log('    staff_user     -> inactive for this clinic; those sign-ins stop working');
     console.log('');
-    console.log('  WHAT IT WOULD NOT DO');
-    console.log('    No rows are deleted. The tenant stays in the database as synthetic');
-    console.log('    data so the cross-tenant isolation tests keep meaning something.');
+    console.log('  WHAT IT DELIBERATELY LEAVES ALONE');
+    console.log('    clinic.active   stays true, and staff sign-ins keep working.');
+    console.log('');
+    console.log('    An earlier version of this script also cleared `active` and');
+    console.log('    deactivated every staff row, and that was wrong in a way worth');
+    console.log('    writing down: the stated reason for retiring rather than deleting');
+    console.log('    was to keep the second tenant so the cross-tenant isolation tests');
+    console.log('    stay meaningful. Deactivating its staff meant those tests could no');
+    console.log('    longer sign in — so the coverage was lost anyway, while the row');
+    console.log('    count made it look preserved. That is the worst of both.');
+    console.log('');
+    console.log('    The requirement was PUBLIC invisibility. `listed` is the flag that');
+    console.log('    delivers it, and it is the only one this touches. Use');
+    console.log('    --disable-logins if you also want the accounts closed.');
+    console.log('');
     console.log('    clinic.pilot_mode is left ON, so its tables still refuse real rows.');
     console.log('');
     console.log('  Reversible with --restore.\n');
@@ -115,16 +124,24 @@ async function main() {
 
   await client.query('begin');
   try {
-    await client.query('update clinic set listed = false, active = false where id = $1', [c.id]);
-    const staff = await client.query(
-      'update staff_user set active = false where clinic_id = $1 and active returning name, role',
-      [c.id]
-    );
+    await client.query('update clinic set listed = false where id = $1', [c.id]);
+
+    let staff = { rows: [] };
+    if (DISABLE_LOGINS) {
+      staff = await client.query(
+        'update staff_user set active = false where clinic_id = $1 and active returning name, role',
+        [c.id]
+      );
+    }
     await client.query('commit');
 
     console.log('  Retired.');
-    console.log('    clinic unlisted and deactivated');
-    for (const s of staff.rows) console.log(`    sign-in disabled: ${s.name} (${s.role})`);
+    console.log('    clinic unlisted — its public page stops resolving');
+    if (DISABLE_LOGINS) {
+      for (const s of staff.rows) console.log(`    sign-in disabled: ${s.name} (${s.role})`);
+    } else {
+      console.log('    staff sign-ins left working (use --disable-logins to close them)');
+    }
     console.log('\n  Its /c/' + slug + ' page will 404 for the public on the next request.');
     console.log('  Nothing was deleted. --restore puts it back.\n');
   } catch (err) {

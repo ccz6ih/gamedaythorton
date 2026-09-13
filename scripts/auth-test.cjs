@@ -25,14 +25,14 @@ const ACCOUNTS = [
   // test. The property being checked is "sees their own clinic's people and
   // nobody else's", which the clinic check below enforces.
   //
-  // GAMEDAY IS RETIRED. Its staff_user rows are inactive and its clinic is
-  // unlisted and deactivated (scripts/retire-clinic.cjs). So its owner now sees
-  // NOTHING — app.is_staff() requires an active staff row, and clinic_public
-  // requires an active clinic. That is the retirement working, and it is
-  // asserted here rather than deleted, because "a retired tenant's staff can
-  // still read its records" is exactly the bug this would otherwise hide.
-  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday',
-    retired: true, expectPatients: 0, expectClinics: 0 },
+  // GAMEDAY IS RETIRED, which means UNLISTED — invisible to the public, fully
+  // usable by its own staff. Its isolation from The Med Bar is exactly as
+  // important as before, arguably more so now that the other tenant holds real
+  // client records, so these expectations are the ordinary ones.
+  //
+  // The retirement itself is asserted where it actually lives: storefront-test
+  // checks that a retired tenant does not appear to an anonymous visitor.
+  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday', minPatients: 1 },
 
   // The Med Bar's owner signs in with her REAL address now, not a .pilot.invalid
   // one. Read from the environment so rotating her password or her email does
@@ -45,8 +45,7 @@ const ACCOUNTS = [
 
   // A client seeing exactly one row — their own — stays an exact number. That
   // one IS the invariant, and "at least one" would pass while leaking.
-  { email: 'gregory@gameday.pilot.invalid', kind: 'patient', clinic: 'Gameday',
-    retired: true, expectPatients: 1, expectClinics: 0 },
+  { email: 'gregory@gameday.pilot.invalid', kind: 'patient', clinic: 'Gameday', expectPatients: 1 },
   { email: 'delphine@medbar.pilot.invalid', kind: 'patient', clinic: 'Med Bar', expectPatients: 1 }
 ];
 
