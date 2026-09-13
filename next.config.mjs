@@ -22,6 +22,13 @@ const nextConfig = {
   // to. Strip them at the origin.
   async headers() {
     const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co';
+    const supabaseOrigin = (() => {
+      try {
+        return new URL(supabase).origin;
+      } catch {
+        return supabase;
+      }
+    })();
 
     /**
      * Two policies, not one.
@@ -50,7 +57,7 @@ const nextConfig = {
       // external script origins are allowed at all, which is the point.
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+      `img-src 'self' data: blob: ${supabaseOrigin} https://*.supabase.co`,
       "font-src 'self' data:",
       // Supabase only. No analytics, no pixels, no session replay.
       `connect-src 'self' ${supabase} wss://*.supabase.co`,

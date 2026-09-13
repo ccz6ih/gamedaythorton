@@ -31,6 +31,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
 
   const clinic = await getClinic();
   const words = vocab(clinic);
+  const brand = (clinic?.brand ?? {}) as Record<string, string>;
 
   // pilot_mode is not exposed by clinic_public on purpose, so read it directly —
   // RLS still scopes it to this staff member's own clinic.
@@ -70,13 +71,23 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
       <div className="shell" data-app="staff">
         <nav className="rail" aria-label="Console navigation">
           <div className="rail-brand">
-            <span className="mark" aria-hidden="true">
-              {(clinic?.name ?? '?').slice(0, 2).toUpperCase()}
-            </span>
-            <div>
-              <div className="nm">{clinic?.location_name ?? clinic?.name ?? 'Clinic'}</div>
-              <div className="sub">{words.console}</div>
-            </div>
+            {brand.logoUrl ? (
+              <img
+                src={brand.logoUrl}
+                alt={clinic?.name ?? 'Clinic'}
+                style={{ maxHeight: 'var(--brand-logo-height, 36px)', maxWidth: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <>
+                <span className="mark" aria-hidden="true">
+                  {(clinic?.name ?? '?').slice(0, 2).toUpperCase()}
+                </span>
+                <div>
+                  <div className="nm">{clinic?.location_name ?? clinic?.name ?? 'Clinic'}</div>
+                  <div className="sub">{words.console}</div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="tenant-chip">

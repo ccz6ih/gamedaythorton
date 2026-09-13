@@ -30,6 +30,8 @@ type BrandKit = {
   surfaceRaised?: string;
   borderColor?: string;
   displayFont?: string;
+  logoHeight?: number;
+  logoUrl?: string;
 };
 
 const FONTS: Record<string, string> = {
@@ -108,6 +110,7 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
     '--brand-radius': `${radius}px`,
     '--brand-font': font,
     '--brand-display-font': displayFont,
+    '--brand-logo-height': `${typeof brand.logoHeight === 'number' ? brand.logoHeight : 28}px`,
 
     /* ------------------------------------------------------------------
        RE-DERIVE EVERYTHING tokens.css DERIVES FROM --brand-*.

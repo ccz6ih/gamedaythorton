@@ -1199,3 +1199,131 @@
   .sf-cart-row { grid-template-columns: 4rem 1fr; }
   .sf-cart-price { grid-column: 2; text-align: right; }
 }
+
+/* ==========================================================================
+   COLLAPSING NAVIGATION
+   --------------------------------------------------------------------------
+   The nav used to be a flex row that wrapped, which on a phone meant the logo,
+   five links, a basket and a Book button stacked into three rows of small type
+   before any of the page appeared. The first thing a visitor saw was a table of
+   contents and the headline started below the fold.
+
+   THE HIDING IS GATED ON `.is-enhanced`, which StorefrontNav adds on mount.
+   With no JavaScript the links stay visible and the nav behaves as it did
+   before — ugly, usable. Hiding them in CSS and revealing them with script
+   would mean a failed script leaves a site with no navigation at all.
+   ========================================================================== */
+
+.sf-burger { display: none; }
+
+@media (max-width: 780px) {
+  .sf-nav-inner { gap: var(--gd-3); flex-wrap: nowrap; }
+
+  .sf-burger {
+    display: grid;
+    gap: 4px;
+    margin-left: auto;
+    padding: .55rem;
+    background: none;
+    border: 1px solid var(--gd-border-strong);
+    border-radius: var(--gd-r-sm);
+    cursor: pointer;
+    /* 44px, the smallest reliable touch target. */
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    place-content: center;
+  }
+  .sf-burger span {
+    display: block;
+    width: 1.15rem;
+    height: 1.5px;
+    background: var(--gd-text);
+    transition: transform var(--gd-fast) var(--gd-ease), opacity var(--gd-fast) var(--gd-ease);
+  }
+  /* Becomes a cross while open, so the same control visibly closes it. */
+  .sf-nav.is-open .sf-burger span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .sf-nav.is-open .sf-burger span:nth-child(2) { opacity: 0; }
+  .sf-nav.is-open .sf-burger span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  .sf-nav.is-enhanced .sf-nav-links {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--gd-bg);
+    border-bottom: 1px solid var(--gd-border);
+    padding: var(--gd-3) var(--sf-gutter) var(--gd-6);
+  }
+  .sf-nav.is-enhanced.is-open .sf-nav-links { display: flex; }
+
+  /* Full-width rows at a readable size, not a column of 13px links. */
+  .sf-nav.is-enhanced .sf-nav-links .sf-link {
+    font-size: var(--gd-step-1);
+    padding: var(--gd-4) 0;
+    border-bottom: 1px solid var(--gd-border);
+    border-top: 0;
+  }
+  .sf-nav.is-enhanced .sf-nav-links .sf-btn {
+    margin-top: var(--gd-5);
+    justify-content: center;
+    padding-block: var(--gd-4);
+    font-size: var(--gd-step-0);
+  }
+  .sf-nav.is-enhanced .sf-nav-links .sf-cart-badge {
+    margin-top: var(--gd-4);
+    justify-content: center;
+    padding-block: var(--gd-3);
+  }
+}
+
+/* The panel is positioned against the bar. */
+.sf-nav { position: sticky; }
+.sf-nav-inner { position: relative; }
+
+/* Above 780px the links are a plain row again, as before. */
+@media (min-width: 781px) {
+  .sf-nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--gd-5);
+    margin-left: auto;
+  }
+}
+
+/* ==========================================================================
+   BIGGER ON THE MENU AND IN THE SHOP
+   --------------------------------------------------------------------------
+   Both pages were set at body size throughout. They are the two screens a
+   visitor actually reads to decide what to book and what to buy, and on a phone
+   a service name at 16px sitting above a 14px description reads as a list of
+   settings rather than a menu.
+
+   The price is the other half: it is what the eye goes to, and it was the same
+   weight as everything around it.
+   ========================================================================== */
+
+.sf-item-name { font-size: var(--gd-step-1); }
+.sf-item-desc { font-size: var(--gd-step-0); line-height: 1.5; }
+.sf-item-price .amount { font-size: var(--gd-step-1); }
+
+.sf-card h3 { font-size: var(--gd-step-1); line-height: 1.2; }
+.sf-card-desc { font-size: var(--gd-step-0); line-height: 1.5; }
+.sf-card-price { font-size: var(--gd-step-2); }
+.sf-card-brand { font-size: var(--gd-step--1); }
+
+/* Wider cards so a product photograph has room to be looked at, which is how a
+   product is chosen — unlike a service, which is compared down a column. */
+.sf-grid { grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr)); }
+
+@media (max-width: 640px) {
+  /* One column rather than two cramped ones. A 150px-wide product card shows a
+     thumbnail and a truncated name, which helps nobody choose anything. */
+  .sf-grid { grid-template-columns: 1fr; gap: var(--gd-6); }
+  .sf-card-img { aspect-ratio: 4 / 3; }
+  .sf-item-name { font-size: var(--gd-step-1); }
+  .sf-menu-cat h2 { font-size: var(--gd-step-2); }
+}

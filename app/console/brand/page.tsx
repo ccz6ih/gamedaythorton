@@ -19,39 +19,11 @@ import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase/server';
 import { getClinic } from '@/lib/db/queries';
 import { requireRole, text, formMessage } from '@/lib/actions';
+import { uploadBrandImage } from '@/lib/brand-upload';
 import { contrastRatio, inkFor } from '@/components/Brand';
 import { initials } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-
-const MAX_BYTES = 5 * 1024 * 1024;
-const OK_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
-
-/** Uploads one image into brand/<clinic_id>/ and returns its public URL. */
-async function upload(file: File, clinicId: string, prefix: string) {
-  if (!file || file.size === 0) return null;
-  if (file.size > MAX_BYTES) {
-    throw new Error(`That image is ${Math.round(file.size / 1024 / 1024)}MB. The limit is 5MB.`);
-  }
-  if (!OK_TYPES.includes(file.type)) {
-    throw new Error('Images only — PNG, JPEG, WebP or SVG.');
-  }
-
-  const ext = (file.name.split('.').pop() ?? 'png').toLowerCase().replace(/[^a-z0-9]/g, '');
-  // Timestamped rather than overwritten, so a cached old logo cannot be served
-  // in place of a new one and nobody has to think about cache invalidation.
-  const path = `${clinicId}/${prefix}-${Date.now()}.${ext}`;
-
-  const supabase = await serverClient();
-  const { error } = await supabase.storage
-    .from('brand')
-    .upload(path, file, { contentType: file.type, upsert: false });
-
-  if (error) throw new Error(error.message);
-
-  const { data } = supabase.storage.from('brand').getPublicUrl(path);
-  return data.publicUrl;
-}
 
 async function saveBrand(formData: FormData) {
   'use server';
@@ -86,13 +58,17 @@ async function saveBrand(formData: FormData) {
     if (font) { brand.font = font; brand.displayFont = font; }
 
     const logoFile = formData.get('logo') as File | null;
-    const logoUrl = logoFile ? await upload(logoFile, staff.clinicId, 'logo') : null;
+    const logoUrl = logoFile ? await uploadBrandImage(logoFile, staff.clinicId, 'logo') : null;
     if (logoUrl) brand.logoUrl = logoUrl;
-    if (text(formData, 'remove_logo') === '1') delete brand.logoUrl;
+    const removingLogo = text(formData, 'remove_logo') === '1';
+    if (removingLogo) delete brand.logoUrl;
 
     const { error } = await supabase
       .from('clinic')
-      .update({ brand, ...(logoUrl ? { logo_path: logoUrl } : {}) })
+      .update({
+        brand,
+        ...(logoUrl ? { logo_path: logoUrl } : removingLogo ? { logo_path: null } : {})
+      })
       .eq('id', staff.clinicId);
     if (error) throw new Error(error.message);
   } catch (err) {
@@ -113,7 +89,7 @@ async function savePortrait(formData: FormData) {
   try {
     if (!providerId) throw new Error('No practitioner selected.');
     const file = formData.get('portrait') as File | null;
-    const url = file ? await upload(file, staff.clinicId, `provider-${providerId}`) : null;
+    const url = file ? await uploadBrandImage(file, staff.clinicId, `provider-${providerId}`) : null;
     if (!url) throw new Error('Choose an image first.');
 
     const supabase = await serverClient();

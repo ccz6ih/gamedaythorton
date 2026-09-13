@@ -14,6 +14,7 @@ import type { Metadata } from 'next';
 import { getStorefront, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
+import { StorefrontNav } from '@/components/StorefrontNav';
 import { phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -123,20 +124,15 @@ export default async function StorefrontLayout({ children, params }: Props) {
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         />
       )}
-      <nav className="sf-nav" aria-label="Storefront">
-        <div className="sf-nav-inner">
-          <Link href={links.home} className="sf-mark">
-            {brand.logoUrl
-              ? <img src={brand.logoUrl} alt={clinic.name} />
-              : <span>{clinic.name}</span>}
-          </Link>
-          {nav.map(item => (
-            <Link key={item.href} href={item.href} className="sf-link">{item.label}</Link>
-          ))}
-          <CartBadge slug={slug} href={links.cart} />
-          <Link href={links.enquire} className="sf-btn primary sm">Book</Link>
-        </div>
-      </nav>
+      <StorefrontNav
+        items={nav}
+        homeHref={links.home}
+        bookHref={links.enquire}
+        logoUrl={brand.logoUrl}
+        name={clinic.name}
+      >
+        <CartBadge slug={slug} href={links.cart} />
+      </StorefrontNav>
 
       {children}
 
