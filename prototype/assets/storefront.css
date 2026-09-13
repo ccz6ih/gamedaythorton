@@ -1327,3 +1327,116 @@
   .sf-item-name { font-size: var(--gd-step-1); }
   .sf-menu-cat h2 { font-size: var(--gd-step-2); }
 }
+
+/* ==========================================================================
+   ONE PRODUCT
+   --------------------------------------------------------------------------
+   The page a grid cannot be: a card shows one photograph and two lines, which
+   is enough to recognise something you already know and not enough to decide
+   on something you do not.
+   ========================================================================== */
+
+.sf-back {
+  display: inline-block;
+  color: var(--gd-text-muted);
+  text-decoration: none;
+  font-size: var(--gd-step--1);
+}
+.sf-back:hover { color: var(--gd-accent); }
+
+.sf-product {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.sf-product-main {
+  aspect-ratio: 1;
+  border-radius: var(--gd-r-md);
+  overflow: hidden;
+  background: var(--gd-surface-raised);
+  display: grid;
+  place-items: center;
+}
+.sf-product-main img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sf-product-empty {
+  font-family: var(--brand-display-font);
+  font-size: 5rem;
+  color: var(--gd-text-dim);
+}
+
+.sf-product-thumbs {
+  display: flex;
+  gap: var(--gd-3);
+  margin-top: var(--gd-3);
+  flex-wrap: wrap;
+}
+.sf-product-thumb {
+  width: 4.5rem;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-surface-raised);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-product-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sf-product-thumb:hover { border-color: var(--gd-border-strong); }
+.sf-product-thumb.is-active { border-color: var(--gd-accent); }
+
+.sf-product-detail h1 { margin: var(--gd-2) 0 var(--gd-4); }
+.sf-product-price {
+  font-size: var(--gd-step-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--gd-5);
+}
+.sf-product-desc {
+  font-size: var(--gd-step-0);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+  max-width: 42ch;
+}
+.sf-product-desc.dim { color: var(--gd-text-dim); font-style: italic; }
+
+.sf-product-details { margin-top: var(--gd-6); }
+.sf-product-details h2 {
+  font-size: var(--gd-step--1);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gd-accent);
+  margin: 0 0 var(--gd-2);
+}
+.sf-product-details p { margin: 0; color: var(--gd-text-muted); line-height: 1.6; }
+
+.sf-product-buy {
+  display: flex;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  margin: var(--gd-6) 0 var(--gd-4);
+  align-items: center;
+}
+/* On its own page the add button is the primary action, not a chip in a card. */
+.sf-product-buy .sf-add {
+  padding: var(--gd-3) var(--gd-6);
+  font-size: var(--gd-step-0);
+  font-weight: 600;
+  border-radius: var(--gd-r-md);
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink);
+}
+.sf-product-buy .sf-add:hover:not(:disabled) { background: var(--gd-accent-hover); }
+
+/* A card that is entirely a link still needs to look like a card. */
+a.sf-card { text-decoration: none; color: inherit; }
+a.sf-card:hover { border-color: var(--gd-accent); }
+.sf-card h3 a { color: inherit; text-decoration: none; }
+.sf-card h3 a:hover { color: var(--gd-accent); }
+
+@media (max-width: 860px) {
+  .sf-product { grid-template-columns: 1fr; }
+  .sf-product-main { aspect-ratio: 4 / 3; }
+}

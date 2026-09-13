@@ -106,7 +106,15 @@ export default async function Shop({ params }: { params: Promise<{ slug: string 
 
                       <div className="sf-card-body">
                         {p.brand && <div className="sf-card-brand">{p.brand}</div>}
-                        <h3>{p.name}</h3>
+                        {/* The name is the link to the product page. The whole
+                            card is not, because the card also holds an Add to
+                            basket button, and nesting a button inside a link
+                            is both invalid and genuinely ambiguous to tap. */}
+                        <h3>
+                          {p.slug
+                            ? <Link href={`${links.shop}/${p.slug}`}>{p.name}</Link>
+                            : p.name}
+                        </h3>
                         {p.description
                           ? <p className="sf-card-desc">{p.description}</p>
                           : (

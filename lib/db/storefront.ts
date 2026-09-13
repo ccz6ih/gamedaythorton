@@ -203,6 +203,60 @@ export async function getStorefrontProducts(clinicId: string): Promise<Storefron
   return (data as unknown as StorefrontProduct[]) ?? [];
 }
 
+/** One product, by its slug, with every photograph of it. */
+export async function getStorefrontProduct(
+  clinicId: string, slug: string
+): Promise<(StorefrontProduct & { images: string[] }) | null> {
+  const supabase = anonClient();
+
+  const { data } = await supabase
+    .from('product')
+    .select('id, name, slug, brand, category, description, details, price_cents, stock_qty, image_path')
+    .eq('clinic_id', clinicId)
+    .eq('slug', slug)
+    .eq('active', true)
+    .eq('online', true)
+    .maybeSingle();
+
+  if (!data) return null;
+  const product = data as unknown as StorefrontProduct;
+
+  const { data: extra } = await supabase
+    .from('product_image')
+    .select('path, sort_order')
+    .eq('product_id', product.id)
+    .order('sort_order');
+
+  // The lead image first, then the rest, with duplicates collapsed — the same
+  // file can legitimately be both product.image_path and a product_image row if
+  // somebody links twice.
+  const images = [...new Set([
+    product.image_path,
+    ...((extra ?? []) as { path: string }[]).map(e => e.path)
+  ].filter((p): p is string => !!p))];
+
+  return { ...product, images };
+}
+
+/** Everything else in the same category, for "you might also like". */
+export async function getRelatedProducts(
+  clinicId: string, category: string, excludeId: string
+): Promise<StorefrontProduct[]> {
+  const supabase = anonClient();
+  const { data } = await supabase
+    .from('product')
+    .select('id, name, slug, brand, category, description, details, price_cents, stock_qty, image_path')
+    .eq('clinic_id', clinicId)
+    .eq('category', category)
+    .eq('active', true)
+    .eq('online', true)
+    .neq('id', excludeId)
+    .order('name')
+    .limit(4);
+
+  return (data as unknown as StorefrontProduct[]) ?? [];
+}
+
 /**
  * Group services the way a menu reads rather than the way they are stored.
  * Category order follows first appearance in the practice's own sort order, so

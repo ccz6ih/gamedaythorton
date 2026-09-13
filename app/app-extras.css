@@ -347,3 +347,61 @@ label.inline {
   .charge-line .field.tiny { flex: 1 1 auto; }
   .charge-line-total { text-align: left; }
 }
+
+/* ==========================================================================
+   SHOP PRODUCTS EDITOR
+   ========================================================================== */
+
+.product-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--gd-4);
+  flex-wrap: wrap;
+  padding: var(--gd-4) 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--gd-bg);
+  border-bottom: 1px solid var(--gd-border);
+  margin-bottom: var(--gd-4);
+}
+.product-bar.bottom { position: static; border-bottom: 0; border-top: 1px solid var(--gd-border); }
+.product-bar .spacer { flex: 1; }
+
+.product-row { margin-bottom: var(--gd-4); }
+/* An unsaved row is marked, so a long list does not lose track of itself. */
+.product-row.is-dirty { border-color: var(--gd-accent); }
+
+.product-row-body { display: flex; gap: var(--gd-5); align-items: flex-start; }
+
+.product-row-img {
+  flex: 0 0 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+.product-row-img img,
+.product-row-img > span {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: contain;
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-surface-raised);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  color: var(--gd-text-dim);
+}
+
+.product-row-main { flex: 1 1 auto; min-width: 0; }
+.product-row-head { display: flex; align-items: flex-start; gap: var(--gd-3); margin-bottom: var(--gd-3); }
+.product-row-head .spacer { flex: 1; }
+.product-row-main .field { margin-bottom: var(--gd-3); }
+.product-row-main textarea { width: 100%; resize: vertical; }
+.product-row-foot { display: flex; gap: var(--gd-5); align-items: center; flex-wrap: wrap; }
+.product-row-foot .field.narrow { flex: 0 0 7rem; margin: 0; }
+
+@media (max-width: 640px) {
+  .product-row-body { flex-direction: column; }
+  .product-row-img { flex-direction: row; align-items: center; gap: var(--gd-3); }
+}

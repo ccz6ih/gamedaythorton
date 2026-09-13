@@ -112,9 +112,27 @@ async function main() {
     console.log(`  created ${path.relative(process.cwd(), DIR)} — drop product images in there.`);
   }
 
-  const files = fs.readdirSync(DIR)
-    .filter(f => EXT.has(path.extname(f).toLowerCase()) && !f.startsWith('.'))
+  /**
+   * Browser-duplicate downloads are dropped.
+   *
+   * Saving the same asset twice gives `Hydrate-Facial-Mist.webp` and
+   * `Hydrate-Facial-Mist (1).webp` — byte-identical, and both would score 100%
+   * and end up on the product page as the same photograph shown twice. The
+   * original is kept and the " (1)" copy skipped when the original is present.
+   */
+  const all = fs.readdirSync(DIR)
+    .filter(f => EXT.has(path.extname(f).toLowerCase()) && !f.startsWith('.'));
+
+  const present = new Set(all);
+  const files = all
+    .filter(f => {
+      const original = f.replace(/ \(\d+\)(?=\.[^.]+$)/, '');
+      return original === f || !present.has(original);
+    })
     .map(f => ({ file: f, words: words(path.basename(f, path.extname(f))) }));
+
+  const dupes = all.length - files.length;
+  if (dupes) console.log(`\n  ${dupes} duplicate download(s) ignored.`);
 
   const client = new Client({ connectionString: connectionString() });
   await client.connect();
@@ -152,32 +170,48 @@ async function main() {
     const best = ranked[0];
     if (!best || best.s === 0) continue;
 
-    const record = {
+    if (best.s < FLOOR) { weak.push({ id: product.id, name: product.name, file: best.file, score: best.s }); continue; }
+
+    /**
+     * EVERY confident match, not just the winner.
+     *
+     * The supplier ships two or more shots of each product — a plain one on
+     * white and an alternate. Keeping only the best scorer threw the rest away
+     * and left the product page with a single image, which is the difference
+     * between a shop and a list.
+     *
+     * The first stays product.image_path, because the grid reads one image and
+     * should not join to find it. The remainder become product_image rows.
+     */
+    const all = ranked.filter(f => f.s >= FLOOR);
+
+    matched.push({
       id: product.id,
       name: product.name,
       file: best.file,
       score: best.s,
       url: `/products/${best.file}`,
-      changed: product.image_path !== `/products/${best.file}`
-    };
+      changed: product.image_path !== `/products/${best.file}`,
+      extras: all.slice(1).map(f => ({ file: f.file, url: `/products/${f.file}`, score: f.s }))
+    });
 
-    if (best.s >= FLOOR) { matched.push(record); claimed.add(best.file); }
-    else weak.push(record);
+    for (const f of all) claimed.add(f.file);
   }
 
   /* ------------------------------------------------------------- report -- */
   console.log(`\n  ${slug}: ${rows.length} products, ${files.length} image file(s)\n`);
 
-  const toChange = matched.filter(m => m.changed);
-  if (toChange.length) {
-    console.log(`  ${WRITE ? 'LINKING' : 'WOULD LINK'} ${toChange.length}:`);
-    for (const m of toChange) {
-      console.log(`    ${(m.score * 100).toFixed(0).padStart(3)}%  ${m.name.padEnd(34)} ${m.file}`);
+  const extraCount = matched.reduce((n, m) => n + m.extras.length, 0);
+
+  if (matched.length) {
+    console.log(`  ${WRITE ? 'LINKING' : 'WOULD LINK'} ${matched.length} product(s), ${extraCount} extra image(s):`);
+    for (const m of matched) {
+      console.log(`    ${(m.score * 100).toFixed(0).padStart(3)}%  ${m.name.padEnd(34)} ${m.file}${m.changed ? '' : '   (unchanged)'}`);
+      for (const e of m.extras) {
+        console.log(`          ${(e.score * 100).toFixed(0).padStart(3)}%  ${''.padEnd(34)} + ${e.file}`);
+      }
     }
   }
-
-  const already = matched.length - toChange.length;
-  if (already) console.log(`\n  ${already} already linked correctly.`);
 
   const noPhoto = rows.filter(p => !matched.some(m => m.id === p.id));
   if (noPhoto.length) {
@@ -197,12 +231,31 @@ async function main() {
   }
 
   /* -------------------------------------------------------------- write -- */
-  if (WRITE && toChange.length) {
-    for (const m of toChange) {
-      await client.query('update product set image_path = $1 where id = $2', [m.url, m.id]);
+  if (WRITE && matched.length) {
+    const { rows: clinicRow } = await client.query(
+      'select id from clinic where slug = $1', [slug]);
+    const clinicId = clinicRow[0].id;
+
+    let extras = 0;
+    for (const m of matched) {
+      if (m.changed) {
+        await client.query('update product set image_path = $1 where id = $2', [m.url, m.id]);
+      }
+
+      // Idempotent on (product, path), so re-running after dropping more files
+      // in adds the new ones and leaves the rest alone.
+      for (const [i, e] of m.extras.entries()) {
+        const res = await client.query(
+          `insert into product_image (clinic_id, product_id, path, alt, sort_order)
+           values ($1, $2, $3, $4, $5)
+           on conflict (product_id, path) do nothing`,
+          [clinicId, m.id, e.url, m.name, i + 1]
+        );
+        extras += res.rowCount;
+      }
     }
-    console.log(`\n  ${toChange.length} product(s) updated.\n`);
-  } else if (toChange.length) {
+    console.log(`\n  ${matched.filter(m => m.changed).length} lead image(s) set, ${extras} extra image(s) added.\n`);
+  } else if (matched.length) {
     console.log('\n  Nothing written. Re-run with --write to apply.\n');
   } else {
     console.log('\n  Nothing to change.\n');
