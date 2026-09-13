@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { getClinic, getClients, getVisitBookends } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { dateLabel, relative, titleCase, phone, initials } from '@/lib/format';
+import { signedPhotoUrls } from '@/lib/client-media';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,21 @@ export default async function ClientsPage() {
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
   const [clients, bookends] = await Promise.all([getClients(), getVisitBookends()]);
+
+  /**
+   * Faces for the roster, signed in ONE call rather than one per row.
+   *
+   * These live in the private bucket and have no public URL by design, so each
+   * one needs a short-lived signed link. Thirty-five separate round trips to
+   * mint them would make this page noticeably slower than the list it replaces;
+   * createSignedUrls takes the whole set at once.
+   */
+  const signed = await signedPhotoUrls(clients.map(c => c.photo_path));
+  const faces = new Map<string, string>();
+  for (const c of clients) {
+    const url = c.photo_path ? signed.get(c.photo_path) : undefined;
+    if (url) faces.set(c.id, url);
+  }
   const words = vocab(clinic);
 
   // Anyone with no future visit booked. For a practice that lives on rebooking —
@@ -82,7 +98,12 @@ export default async function ClientsPage() {
                       <td>
                         <Link href={`/console/clients/${c.id}`} style={{ textDecoration: 'none' }}>
                           <div className="row tight">
-                            <span className="av" aria-hidden="true">{initials(`${c.first_name} ${c.last_name}`)}</span>
+                            {/* A face if there is one, initials if not. The
+                                point of the roster is recognising somebody
+                                before they say their name. */}
+                            {faces.get(c.id)
+                              ? <img className="av" src={faces.get(c.id)} alt="" loading="lazy" />
+                              : <span className="av" aria-hidden="true">{initials(`${c.first_name} ${c.last_name}`)}</span>}
                             <span>
                               <b>{c.first_name} {c.last_name}</b>
                             </span>

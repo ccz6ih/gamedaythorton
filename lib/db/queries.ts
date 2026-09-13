@@ -187,13 +187,18 @@ export type ClientRow = {
   acquisition_source: string | null;
   therapy_start_date: string | null;
   created_at: string;
+  /**
+   * Object path in the PRIVATE client-media bucket, never a URL. The roster
+   * signs them in one batch — see app/console/clients/page.tsx.
+   */
+  photo_path: string | null;
 };
 
 export async function getClients(): Promise<ClientRow[]> {
   const supabase = await serverClient();
   const { data } = await supabase
     .from('patient')
-    .select('id, first_name, last_name, status, phone, email, acquisition_source, therapy_start_date, created_at')
+    .select('id, first_name, last_name, status, phone, email, acquisition_source, therapy_start_date, created_at, photo_path')
     .order('last_name');
   return (data ?? []) as ClientRow[];
 }

@@ -29,7 +29,7 @@ async function main() {
     await db.query(
       `insert into product_image (clinic_id, product_id, path, sort_order)
        values ($1, $2, $3, 1)
-       on conflict (clinic_id, product_id, path) do nothing`,
+       on conflict (product_id, path) do nothing`,
       [clinic_id, id, extraPath]
     );
     console.log(`Linked extra image for ${name} -> ${extraPath}`);

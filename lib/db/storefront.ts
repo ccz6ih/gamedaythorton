@@ -105,6 +105,7 @@ export type StorefrontProduct = {
   /** Real on-hand count. The shop says "out of stock" rather than inventing availability. */
   stock_qty: number;
   image_path: string | null;
+  secondary_image_path?: string | null;
 };
 
 export type StorefrontPackage = {
@@ -194,16 +195,34 @@ export async function getStorefrontPackages(clinicId: string): Promise<Storefron
 /** The shop. Online and active only; stock is shown rather than filtered on. */
 export async function getStorefrontProducts(clinicId: string): Promise<StorefrontProduct[]> {
   const supabase = anonClient();
-  const { data } = await supabase
-    .from('product')
-    .select('id, name, slug, brand, category, description, details, price_cents, stock_qty, image_path')
-    .eq('clinic_id', clinicId)
-    .eq('active', true)
-    .eq('online', true)
-    .order('sort_order')
-    .order('name');
+  const [{ data: products }, { data: extraImages }] = await Promise.all([
+    supabase
+      .from('product')
+      .select('id, name, slug, brand, category, description, details, price_cents, stock_qty, image_path')
+      .eq('clinic_id', clinicId)
+      .eq('active', true)
+      .eq('online', true)
+      .order('sort_order')
+      .order('name'),
+    supabase
+      .from('product_image')
+      .select('product_id, path, sort_order')
+      .eq('clinic_id', clinicId)
+      .order('sort_order')
+  ]);
 
-  return (data as unknown as StorefrontProduct[]) ?? [];
+  const secondaryByProduct = new Map<string, string>();
+  for (const img of extraImages ?? []) {
+    const pId = String(img.product_id);
+    if (!secondaryByProduct.has(pId)) {
+      secondaryByProduct.set(pId, String(img.path));
+    }
+  }
+
+  return ((products ?? []) as unknown as StorefrontProduct[]).map(p => ({
+    ...p,
+    secondary_image_path: secondaryByProduct.get(p.id) ?? null
+  }));
 }
 
 /** One product, by its slug, with every photograph of it. */
