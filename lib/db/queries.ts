@@ -17,6 +17,7 @@ import { dayKey } from '@/lib/format';
 
 export type Clinic = {
   id: string;
+  slug: string;          // addresses the public storefront at /c/<slug>
   name: string;
   location_name: string | null;
   practice_type: 'mens_health' | 'med_spa' | 'other';

@@ -56,7 +56,8 @@ const ANONYMOUS_OK = [
   '/sign-in',
   '/auth/callback',
   '/about-pilot',     // the compliance explainer must never require a login
-  '/prototype'
+  '/prototype',
+  '/c'                // public storefronts: /c/<slug>. No session, by design.
 ];
 
 function isUnder(pathname: string, paths: string[]) {

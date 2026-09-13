@@ -143,10 +143,23 @@ console.log('\nWIRING');
 {
   const html = fs.readFileSync(path.join(PROTO, 'index.html'), 'utf8');
   const assetFiles = fs.readdirSync(A).filter(f => /\.(js|css)$/.test(f));
-  const unreferenced = assetFiles.filter(f => !html.includes(f));
-  if (unreferenced.length) bad('every asset is referenced by index.html',
-    new Error('not referenced: ' + unreferenced.join(', ')));
-  else ok('every asset is referenced by index.html', assetFiles.length + ' files');
+  // prototype/assets has TWO consumers: index.html for the standalone pilot,
+  // and app/layout.tsx, which imports the stylesheets directly so the prototype
+  // and the production app cannot drift apart (docs/19 § One copy of the design
+  // system). storefront.css is used only by the app — referenced, just not here.
+  //
+  // Checking both consumers rather than keeping a list of exemptions: an
+  // exception list inside a control is where the next mistake hides.
+  const appLayout = path.join(__dirname, '..', 'app', 'layout.tsx');
+  const appImports = fs.existsSync(appLayout) ? fs.readFileSync(appLayout, 'utf8') : '';
+  const unreferenced = assetFiles.filter(f => !html.includes(f) && !appImports.includes(f));
+  if (unreferenced.length) bad('every asset is referenced by a consumer',
+    new Error('not referenced by index.html or app/layout.tsx: ' + unreferenced.join(', ')));
+  else {
+    const appOnly = assetFiles.filter(f => !html.includes(f));
+    ok('every asset is referenced by a consumer',
+      `${assetFiles.length} files` + (appOnly.length ? ` (${appOnly.length} app-only: ${appOnly.join(', ')})` : ''));
+  }
 
   const referenced = (html.match(/(?:src|href)="([^"]+\.(?:js|css))"/g) || [])
     .map(m => m.replace(/.*="/, '').replace(/"$/, ''))

@@ -10,6 +10,7 @@
 import type { Metadata, Viewport } from 'next';
 import '../prototype/assets/tokens.css';
 import '../prototype/assets/app.css';
+import '../prototype/assets/storefront.css';
 import './app-extras.css';
 
 export const metadata: Metadata = {

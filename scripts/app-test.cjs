@@ -180,6 +180,76 @@ async function req(url, opts = {}) {
     bad('an unsigned webhook is refused', `status ${unsigned.status} — it should never be trusted`);
   }
 
+  /* -------------------------------------------------------- storefront -- */
+  // The public face of each practice. This is the only surface a prospective
+  // client sees before they are a client, and the only one with no login in
+  // front of it — so it gets checked for what it shows AND what it must not.
+  console.log('\nSTOREFRONTS');
+
+  const STOREFRONTS = [
+    { slug: 'medbar-loveland',  neverShows: 'Gameday' },
+    { slug: 'gameday-thornton', neverShows: 'Jeuveau' }
+  ];
+
+  for (const sf of STOREFRONTS) {
+    for (const page of ['', '/services', '/packages', '/about', '/enquire']) {
+      const res = await req(`/c/${sf.slug}${page}`, { headers: gateCookie() });
+      if (res.status !== 200) { bad(`/c/${sf.slug}${page}`, `status ${res.status}`); continue; }
+      const html = await res.text();
+      const problems = [];
+      if (/could not be found/i.test(html)) problems.push('404 content');
+      if (/>undefined<|>NaN<|\[object Object\]/.test(html)) problems.push('placeholder rendered');
+      if (new RegExp(sf.neverShows, 'i').test(html)) {
+        problems.push(`leaked the other practice (${sf.neverShows})`);
+      }
+      if (problems.length) bad(`/c/${sf.slug}${page}`, problems.join(', '));
+      else ok(`/c/${sf.slug}${page}`, `${Math.round(html.length / 1024)}kB`);
+    }
+  }
+
+  const medbar = await req('/c/medbar-loveland/services', { headers: gateCookie() });
+  if (medbar.status === 200) {
+    const html = await medbar.text();
+    // priceLabel() is the only thing allowed to render a price. If a "from"
+    // service ever prints as a bare number the page is quoting a price the
+    // practice does not honour, which is a complaint at the counter.
+    if (/from \$/.test(html)) ok('"from" pricing survives to the public page');
+    else bad('"from" pricing survives to the public page', 'a range was flattened to a number');
+    if (/\/ unit/.test(html)) ok('per-unit pricing survives');
+    else bad('per-unit pricing survives');
+    if (/Complimentary/.test(html)) ok('free services say Complimentary, not $0');
+    else bad('free services say Complimentary, not $0');
+  }
+
+  const spa = await req('/c/medbar-loveland', { headers: gateCookie() });
+  const gd = await req('/c/gameday-thornton', { headers: gateCookie() });
+  if (spa.status === 200 && gd.status === 200) {
+    const spaHtml = await spa.text();
+    const gdHtml = await gd.text();
+    if (/data-surface="light"/.test(spaHtml) && /data-surface="dark"/.test(gdHtml)) {
+      ok('each practice renders in its own skin', 'med spa light, mens health dark');
+    } else bad('each practice renders in its own skin');
+
+    // The page carries a real business name and real prices, so it must say
+    // what it is or it can be mistaken for that business's live site.
+    if (/Not the practice/i.test(spaHtml)) ok('the storefront says it is a preview');
+    else bad('the storefront says it is a preview', 'it could be mistaken for the live site');
+
+    if (!/Bettencourt/i.test(spaHtml)) ok('no client names on the public page');
+    else bad('no client names on the public page', 'CLIENT DATA ON AN UNAUTHENTICATED PAGE');
+  }
+
+  const unknown = await req('/c/no-such-clinic', { headers: gateCookie() });
+  if (unknown.status === 404) {
+    ok('an unknown or unlisted practice is a 404', 'not a 403, which would confirm it exists');
+  } else bad('an unknown or unlisted practice is a 404', `status ${unknown.status}`);
+
+  const sfHead = await req('/c/medbar-loveland', { headers: gateCookie() });
+  if (/noindex/i.test(sfHead.headers.get('x-robots-tag') || '')) {
+    ok('the storefront is not indexable', 'it carries a real practice name');
+  } else bad('the storefront is not indexable', 'it could appear in search beside their real site');
+
+
   /* ------------------------------------------------------------- public -- */
   console.log('\nPUBLIC SURFACE');
 

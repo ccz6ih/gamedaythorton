@@ -41,6 +41,57 @@ export default async function SettingsPage() {
       </header>
 
       <div className="view wide">
+
+        <section className="card">
+
+          <div className="card-head">
+
+            <div>
+
+              <div className="eyebrow">Public page</div>
+
+              <h2>Your storefront</h2>
+
+              <p>
+
+                What someone sees before they are a client — services, pricing,
+
+                packages, and a request form. Built from this clinic&rsquo;s own
+
+                record, so editing a service here changes it there.
+
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="row tight">
+
+            <a className="btn primary" href={`/c/${clinic.slug}`} target="_blank" rel="noreferrer">
+
+              View storefront
+
+            </a>
+
+            <a className="btn" href={`/c/${clinic.slug}/services`} target="_blank" rel="noreferrer">
+
+              Services page
+
+            </a>
+
+          </div>
+
+          <p className="muted" style={{ fontSize: '.82rem', marginTop: 'var(--gd-4)' }}>
+
+            Not indexed by search engines and not accepting real enquiries while
+
+            the pilot is on.
+
+          </p>
+
+        </section>
+
         <div className="grid g2">
           <section className="card">
             <div className="card-head">

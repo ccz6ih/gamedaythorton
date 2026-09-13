@@ -1,0 +1,520 @@
+/* ==========================================================================
+   storefront.css — the public face of a practice
+   --------------------------------------------------------------------------
+   The page a prospective client lands on. Layers on tokens.css; every colour,
+   radius and font comes from the brand kit, so Jamie's storefront and a
+   Gameday storefront are the same code and look nothing alike.
+
+   WHAT THIS IS COMPETING WITH
+   GlossGenius gives every business the same template: a centred hero, a flat
+   grey list of services, a thin about page. It is competent and it is
+   anonymous — a visitor cannot tell one practice from another, which is the
+   opposite of what a practice is paying for.
+
+   So the two decisions that matter here:
+
+   1. THE MENU IS A MENU. Services are set like a considered print menu —
+      category rules, name and description on the left, duration and price
+      aligned right on a shared baseline — not as a grid of identical cards.
+      Prices render through priceLabel(), so "from $800" and "$14+/unit" stay
+      honest instead of being flattened into a number that misleads.
+
+   2. THE PAGE ANSWERS THE ANXIOUS QUESTION. A first visit to a men's health
+      clinic or an injectables appointment carries real apprehension. Nothing
+      on a GlossGenius page addresses it. The visit-facts block does, in plain
+      language, above the fold on mobile. docs/14-screen-specs.md P13.
+   ========================================================================== */
+
+.sf {
+  --sf-measure: 38rem;
+  --sf-gutter: clamp(1.25rem, 5vw, 3.5rem);
+  --sf-max: 72rem;
+  background: var(--gd-bg);
+  color: var(--gd-text);
+  min-height: 100vh;
+  font-family: var(--gd-font);
+}
+
+.sf-wrap {
+  max-width: var(--sf-max);
+  margin: 0 auto;
+  padding-inline: var(--sf-gutter);
+}
+
+/* ------------------------------------------------------------------ nav -- */
+.sf-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--gd-bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-nav-inner {
+  max-width: var(--sf-max);
+  margin: 0 auto;
+  padding: var(--gd-3) var(--sf-gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--gd-5);
+  flex-wrap: wrap;
+}
+.sf-mark {
+  font-family: var(--brand-display-font);
+  font-weight: 700;
+  font-size: var(--gd-step-0);
+  letter-spacing: -.01em;
+  text-decoration: none;
+  color: var(--gd-text);
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--gd-2);
+}
+.sf-mark img { height: var(--brand-logo-height); width: auto; }
+.sf-nav a.sf-link {
+  color: var(--gd-text-muted);
+  text-decoration: none;
+  font-size: var(--gd-step--1);
+  letter-spacing: .01em;
+  padding: var(--gd-1) 0;
+  border-bottom: 1.5px solid transparent;
+  transition: color var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-nav a.sf-link:hover { color: var(--gd-text); border-bottom-color: var(--gd-accent); }
+.sf-nav a.sf-link[aria-current="page"] { color: var(--gd-text); border-bottom-color: var(--gd-accent); }
+
+/* ----------------------------------------------------------------- hero -- */
+/* Sized to what it holds. A 100vh opener would push the first service — the
+   thing the visitor came for — off the first screen. */
+.sf-hero {
+  padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(2rem, 5vw, 3.5rem);
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-eyebrow {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--gd-accent);
+  font-weight: 600;
+  margin-bottom: var(--gd-4);
+}
+.sf-hero h1 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-3);
+  line-height: 1.02;
+  letter-spacing: -.025em;
+  margin: 0 0 var(--gd-4);
+  text-wrap: balance;
+  max-width: 18ch;
+}
+.sf-tagline {
+  font-size: var(--gd-step-1);
+  line-height: 1.45;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+  margin: 0 0 var(--gd-6);
+  text-wrap: pretty;
+}
+.sf-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-3) var(--gd-6);
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  margin-bottom: var(--gd-6);
+}
+.sf-hero-meta b { color: var(--gd-text); font-weight: 600; }
+.sf-hero-meta > span { display: flex; align-items: baseline; gap: var(--gd-2); }
+
+/* --------------------------------------------------------------- action -- */
+.sf-actions { display: flex; flex-wrap: wrap; gap: var(--gd-3); }
+
+.sf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gd-2);
+  padding: var(--gd-3) var(--gd-6);
+  border-radius: var(--gd-r-md);
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: var(--gd-step-0);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              transform var(--gd-fast) var(--gd-ease);
+}
+.sf-btn:active { transform: translateY(1px); }
+.sf-btn:focus-visible { outline: none; box-shadow: var(--gd-ring); }
+
+.sf-btn.primary { background: var(--gd-accent); color: var(--brand-accent-ink); }
+.sf-btn.primary:hover { background: var(--gd-accent-hover); }
+.sf-btn.ghost { border-color: var(--gd-border-strong); color: var(--gd-text); }
+.sf-btn.ghost:hover { border-color: var(--gd-accent); color: var(--gd-accent); }
+.sf-btn.sm { padding: var(--gd-2) var(--gd-4); font-size: var(--gd-step--1); }
+
+/* -------------------------------------------------------------- section -- */
+.sf-section { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+.sf-section + .sf-section { border-top: 1px solid var(--gd-border); }
+
+.sf-section-head { margin-bottom: var(--gd-8); max-width: var(--sf-measure); }
+.sf-section-head h2 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin: 0 0 var(--gd-3);
+  text-wrap: balance;
+}
+.sf-section-head p {
+  margin: 0;
+  color: var(--gd-text-muted);
+  font-size: var(--gd-step-0);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ----------------------------------------------------------- the menu ---- */
+/* Set like a print menu. The price column holds a shared right edge across
+   every category, which is what makes a long list scannable — and what a grid
+   of cards, the obvious alternative, destroys. */
+.sf-menu-group + .sf-menu-group { margin-top: var(--gd-10); }
+
+.sf-menu-cat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gd-4);
+  margin-bottom: var(--gd-5);
+}
+.sf-menu-cat h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  letter-spacing: -.012em;
+  margin: 0;
+  white-space: nowrap;
+}
+.sf-menu-cat .rule { flex: 1; height: 1px; background: var(--gd-border); }
+.sf-menu-cat .count {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sf-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--gd-2) var(--gd-6);
+  padding-block: var(--gd-4);
+  border-bottom: 1px solid var(--gd-border);
+  align-items: baseline;
+}
+.sf-item:last-child { border-bottom: none; }
+
+.sf-item-name {
+  font-size: var(--gd-step-0);
+  font-weight: 600;
+  letter-spacing: -.005em;
+  margin: 0 0 var(--gd-1);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+}
+.sf-item-desc {
+  margin: 0;
+  color: var(--gd-text-muted);
+  font-size: var(--gd-step--1);
+  line-height: 1.55;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+.sf-item-price {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sf-item-price .amount {
+  display: block;
+  font-size: var(--gd-step-0);
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.sf-item-price .dur {
+  display: block;
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  margin-top: var(--gd-1);
+}
+.sf-item-actions { grid-column: 1 / -1; display: flex; gap: var(--gd-2); margin-top: var(--gd-1); }
+
+.sf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3em;
+  font-size: var(--gd-step--2);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .18em .55em;
+  border-radius: var(--gd-r-sm);
+  border: 1px solid var(--gd-border-strong);
+  color: var(--gd-text-dim);
+  white-space: nowrap;
+}
+.sf-chip.accent { border-color: var(--gd-accent-line); color: var(--gd-accent); }
+
+/* ------------------------------------------------------- what happens ---- */
+/* The differentiator. Nothing on a GlossGenius page tells a nervous first-timer
+   what the room is like, how long it takes, or whether it hurts. */
+.sf-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1px;
+  background: var(--gd-border);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  overflow: hidden;
+}
+.sf-fact { background: var(--gd-surface); padding: var(--gd-5) var(--gd-5) var(--gd-6); }
+.sf-fact dt {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-weight: 700;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-3);
+}
+.sf-fact dd {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text);
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------- practitioner -- */
+.sf-people { display: grid; gap: var(--gd-8); }
+.sf-person {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: var(--gd-6);
+  align-items: start;
+}
+.sf-portrait {
+  aspect-ratio: 4 / 5;
+  max-width: 100%;
+  border-radius: var(--gd-r-md);
+  overflow: hidden;
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border);
+  display: grid;
+  place-items: center;
+}
+.sf-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf-portrait .initials {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 700;
+  color: var(--gd-text-dim);
+  letter-spacing: .02em;
+}
+.sf-person h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  letter-spacing: -.015em;
+  margin: 0 0 var(--gd-1);
+}
+.sf-person .role {
+  font-size: var(--gd-step--1);
+  color: var(--gd-accent);
+  font-weight: 600;
+  margin: 0 0 var(--gd-4);
+}
+.sf-person .bio {
+  font-size: var(--gd-step-0);
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+  margin: 0;
+  text-wrap: pretty;
+}
+/* Med Bar credentials and bio are deliberately null in the fixtures — we do not
+   invent a practitioner's qualifications. This is what that looks like. */
+.sf-pending {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  font-style: italic;
+  border-left: 2px solid var(--gd-border-strong);
+  padding-left: var(--gd-4);
+  margin: 0;
+  max-width: var(--sf-measure);
+}
+
+/* -------------------------------------------------------------- packages -- */
+.sf-packages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--gd-5);
+}
+.sf-pack {
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  padding: var(--gd-6);
+  background: var(--gd-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+}
+.sf-pack h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  letter-spacing: -.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+.sf-pack .sessions {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  margin: 0;
+}
+.sf-pack .price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: var(--gd-4);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-pack .price {
+  font-size: var(--gd-step-2);
+  font-weight: 700;
+  letter-spacing: -.025em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.sf-pack .was {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  text-decoration: line-through;
+  font-variant-numeric: tabular-nums;
+}
+.sf-pack .save {
+  font-size: var(--gd-step--2);
+  font-weight: 700;
+  color: var(--gd-in-range);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.sf-pack .note {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ----------------------------------------------------------------- form -- */
+.sf-form { max-width: var(--sf-measure); display: grid; gap: var(--gd-4); }
+.sf-field { display: grid; gap: var(--gd-2); }
+.sf-field label { font-size: var(--gd-step--1); font-weight: 600; }
+.sf-field input,
+.sf-field textarea,
+.sf-field select {
+  font: inherit;
+  font-size: var(--gd-step-0);
+  padding: var(--gd-3) var(--gd-4);
+  border-radius: var(--gd-r-sm);
+  border: 1px solid var(--gd-border-strong);
+  background: var(--gd-surface);
+  color: var(--gd-text);
+  width: 100%;
+}
+.sf-field textarea { min-height: 6rem; resize: vertical; }
+.sf-field input:focus-visible,
+.sf-field textarea:focus-visible,
+.sf-field select:focus-visible {
+  outline: none;
+  border-color: var(--gd-accent);
+  box-shadow: var(--gd-ring);
+}
+.sf-row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--gd-4); }
+
+.sf-consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--gd-3);
+  align-items: start;
+  font-size: var(--gd-step--1);
+  line-height: 1.55;
+  color: var(--gd-text-muted);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  padding: var(--gd-4);
+}
+.sf-consent input { margin-top: .2em; width: 1rem; height: 1rem; accent-color: var(--gd-accent); }
+
+.sf-note {
+  border-left: 3px solid var(--gd-accent);
+  background: var(--gd-accent-dim);
+  padding: var(--gd-4) var(--gd-5);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  max-width: var(--sf-measure);
+}
+.sf-note.ok { border-left-color: var(--gd-in-range); background: color-mix(in srgb, var(--gd-in-range) 10%, transparent); }
+.sf-note.warn { border-left-color: var(--gd-below); background: color-mix(in srgb, var(--gd-below) 10%, transparent); }
+
+/* --------------------------------------------------------------- footer -- */
+.sf-foot {
+  border-top: 1px solid var(--gd-border);
+  padding-block: var(--gd-10) var(--gd-12);
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+}
+.sf-foot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--gd-8);
+  margin-bottom: var(--gd-8);
+}
+.sf-foot h4 {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gd-text-dim);
+  margin: 0 0 var(--gd-3);
+  font-weight: 700;
+}
+.sf-foot p, .sf-foot address { margin: 0; font-style: normal; line-height: 1.7; }
+.sf-foot a { color: var(--gd-text); text-decoration: none; border-bottom: 1px solid var(--gd-border-strong); }
+.sf-foot a:hover { color: var(--gd-accent); border-bottom-color: var(--gd-accent); }
+.sf-hours { display: grid; grid-template-columns: auto 1fr; gap: var(--gd-1) var(--gd-4); }
+.sf-hours dt { color: var(--gd-text); font-weight: 600; white-space: nowrap; }
+.sf-hours dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+.sf-pilot {
+  border-top: 1px solid var(--gd-border);
+  padding-top: var(--gd-5);
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------- mobile -- */
+@media (max-width: 640px) {
+  .sf-person { grid-template-columns: 1fr; }
+  .sf-portrait { max-width: 11rem; }
+  .sf-item { grid-template-columns: 1fr; }
+  .sf-item-price { text-align: left; display: flex; gap: var(--gd-3); align-items: baseline; }
+  .sf-item-price .dur { margin-top: 0; }
+  .sf-nav-inner { gap: var(--gd-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf * { transition: none !important; animation: none !important; }
+}
