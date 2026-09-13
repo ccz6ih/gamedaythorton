@@ -10,6 +10,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getStorefront, getStorefrontProviders, hoursLines } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { initials, phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,8 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const clinic = await getStorefront(slug);
   if (!clinic) notFound();
+
+  const links = storefrontLinks(await storefrontBase(slug));
 
   const providers = await getStorefrontProviders(clinic.id);
   const hours = hoursLines(clinic.hours);
@@ -125,7 +128,7 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
           </div>
 
           <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-            <Link href={`/c/${slug}/enquire`} className="sf-btn primary">Request an appointment</Link>
+            <Link href={links.enquire} className="sf-btn primary">Request an appointment</Link>
           </div>
         </div>
       </section>

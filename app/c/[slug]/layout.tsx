@@ -12,6 +12,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, hoursLines } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { CartBadge } from '@/components/CartBadge';
 import { phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -85,12 +87,21 @@ export default async function StorefrontLayout({ children, params }: Props) {
   }
 
   const hours = hoursLines(clinic.hours);
+
+  /**
+   * Links are relative to the DOMAIN the visitor is on, not to the route the
+   * pages happen to live at. On medbarco.com that means /services; on the
+   * shared deployment it means /c/medbar-loveland/services. See
+   * lib/storefront-links.ts for why this is decided by the Host header alone.
+   */
+  const links = storefrontLinks(await storefrontBase(slug));
+
   const nav = [
-    { href: `/c/${slug}`, label: 'Home' },
-    { href: `/c/${slug}/services`, label: 'Services' },
-    { href: `/c/${slug}/shop`, label: 'Shop' },
-    { href: `/c/${slug}/packages`, label: 'Packages' },
-    { href: `/c/${slug}/about`, label: 'About' }
+    { href: links.home, label: 'Home' },
+    { href: links.services, label: 'Services' },
+    { href: links.shop, label: 'Shop' },
+    { href: links.packages, label: 'Packages' },
+    { href: links.about, label: 'About' }
   ];
 
   /**
@@ -114,7 +125,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
       )}
       <nav className="sf-nav" aria-label="Storefront">
         <div className="sf-nav-inner">
-          <Link href={`/c/${slug}`} className="sf-mark">
+          <Link href={links.home} className="sf-mark">
             {brand.logoUrl
               ? <img src={brand.logoUrl} alt={clinic.name} />
               : <span>{clinic.name}</span>}
@@ -122,7 +133,8 @@ export default async function StorefrontLayout({ children, params }: Props) {
           {nav.map(item => (
             <Link key={item.href} href={item.href} className="sf-link">{item.label}</Link>
           ))}
-          <Link href={`/c/${slug}/enquire`} className="sf-btn primary sm">Book</Link>
+          <CartBadge slug={slug} href={links.cart} />
+          <Link href={links.enquire} className="sf-btn primary sm">Book</Link>
         </div>
       </nav>
 
@@ -171,8 +183,8 @@ export default async function StorefrontLayout({ children, params }: Props) {
           {clinic.live ? (
             <p className="sf-pilot">
               &copy; {new Date().getFullYear()} {clinic.legal_name ?? clinic.name}.
-              {' '}<Link href={`/c/${slug}/about`}>About</Link>
-              {' · '}<Link href={`/c/${slug}/enquire`}>Contact</Link>
+              {' '}<Link href={links.about}>About</Link>
+              {' · '}<Link href={links.enquire}>Contact</Link>
             </p>
           ) : (
             /* A pilot tenant carries a real practice's name and real prices, so

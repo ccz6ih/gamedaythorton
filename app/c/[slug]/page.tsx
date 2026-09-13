@@ -24,6 +24,7 @@ import { notFound } from 'next/navigation';
 import {
   getStorefront, getStorefrontServices, getStorefrontProviders, hoursLines
 } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { Centrifuge } from '@/components/Centrifuge';
 import { ProcessRail } from '@/components/ProcessRail';
@@ -43,6 +44,8 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const clinic = await getStorefront(slug);
   if (!clinic) notFound();
+
+  const links = storefrontLinks(await storefrontBase(slug));
 
   const [services, providers] = await Promise.all([
     getStorefrontServices(clinic.id),
@@ -92,10 +95,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             </p>
 
             <div className="sf-actions sf-fade" style={{ animationDelay: '1.1s' }}>
-              <Link href={`/c/${slug}/enquire`} className="sf-btn primary">Book a treatment</Link>
+              <Link href={links.enquire} className="sf-btn primary">Book a treatment</Link>
               {consult && (
                 <Link
-                  href={`/c/${slug}/enquire?service=${encodeURIComponent(consult.name)}`}
+                  href={`${links.enquire}?service=${encodeURIComponent(consult.name)}`}
                   className="sf-btn ghost"
                 >
                   Free 15-minute consult
@@ -155,10 +158,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             </div>
 
             <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-              <Link href={`/c/${slug}/services`} className="sf-btn ghost">
+              <Link href={links.services} className="sf-btn ghost">
                 All {services.length} treatments &amp; pricing
               </Link>
-              <Link href={`/c/${slug}/shop`} className="sf-btn ghost">Shop</Link>
+              <Link href={links.shop} className="sf-btn ghost">Shop</Link>
             </div>
           </div>
         </section>
@@ -187,7 +190,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                 ))}
               </div>
               <div className="sf-actions" style={{ marginTop: 'var(--gd-6)' }}>
-                <Link href={`/c/${slug}/services`} className="sf-btn ghost sm">Lash menu</Link>
+                <Link href={links.services} className="sf-btn ghost sm">Lash menu</Link>
               </div>
             </div>
           </div>
@@ -247,7 +250,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
               'Bring your questions and whatever you have already tried. We will talk through what is realistic, what it costs, and whether you are a candidate — at no charge, with nothing booked at the end unless you want it.'}
           </p>
           <div className="sf-actions centre">
-            <Link href={`/c/${slug}/enquire`} className="sf-btn primary">
+            <Link href={links.enquire} className="sf-btn primary">
               {consult ? 'Book the free consult' : 'Request an appointment'}
             </Link>
             {clinic.phone_voice && (

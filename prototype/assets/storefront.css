@@ -97,8 +97,13 @@
   align-items: center;
   gap: var(--gd-2);
 }
+/* The practice's mark is a STACKED lockup — three short words over each other
+   inside a bounding box — not a horizontal wordmark. At the 32-42px a
+   horizontal logo wants, each line of type lands around 9px and the whole thing
+   reads as a smudge. A stacked mark needs its height measured against its own
+   line count, so this is roughly half again as tall. */
 .sf-mark img {
-  height: clamp(2rem, 4vw, 2.6rem);
+  height: clamp(3.1rem, 5.2vw, 4.25rem);
   width: auto;
   display: block;
 }
@@ -1033,4 +1038,158 @@
   .sf-cent-prf { transform: scaleY(1); }
   .sf-cent-halo,
   .sf-cent-label { opacity: 1; }
+}
+
+/* ==========================================================================
+   THE SHOP — add to basket, the basket itself
+   --------------------------------------------------------------------------
+   Everything here derives from the same tokens as the rest of the storefront,
+   so the basket is green-and-gold for this practice and whatever the next one
+   chooses without a line changing.
+   ========================================================================== */
+
+.sf-add {
+  font: inherit;
+  font-size: var(--gd-step--1);
+  letter-spacing: .02em;
+  padding: var(--gd-2) var(--gd-4);
+  border-radius: calc(var(--brand-radius, 14px) * .6);
+  border: 1px solid var(--gd-accent);
+  background: transparent;
+  color: var(--gd-accent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--gd-fast) var(--gd-ease), color var(--gd-fast) var(--gd-ease);
+}
+.sf-add:hover:not(:disabled) { background: var(--gd-accent); color: var(--gd-accent-ink); }
+/* Disabled only means "not hydrated yet". It must not read as unavailable. */
+.sf-add:disabled { opacity: .55; cursor: default; }
+
+.sf-cart-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gd-2);
+  text-decoration: none;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text);
+  padding: var(--gd-1) var(--gd-3);
+  border: 1px solid var(--gd-border-strong);
+  border-radius: 999px;
+}
+.sf-cart-badge .n {
+  background: var(--gd-accent);
+  color: var(--gd-accent-ink);
+  border-radius: 999px;
+  min-width: 1.35em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------- the basket -- */
+.sf-cart-grid {
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.sf-cart-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  gap: var(--gd-5);
+  align-items: center;
+  padding: var(--gd-5) 0;
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-cart-img {
+  aspect-ratio: 1;
+  border-radius: calc(var(--brand-radius, 14px) * .6);
+  background: var(--gd-surface-raised);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--gd-text-dim);
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+}
+.sf-cart-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.sf-cart-body h3 {
+  font-family: var(--brand-display-font);
+  font-weight: 400;
+  font-size: var(--gd-step-1);
+  margin: 0 0 var(--gd-2);
+}
+.sf-cart-qty { display: flex; align-items: center; gap: var(--gd-3); flex-wrap: wrap; }
+.sf-cart-qty button {
+  font: inherit;
+  width: 1.9rem; height: 1.9rem;
+  line-height: 1;
+  border-radius: 50%;
+  border: 1px solid var(--gd-border-strong);
+  background: transparent;
+  color: var(--gd-text);
+  cursor: pointer;
+}
+.sf-cart-qty button:disabled { opacity: .4; cursor: default; }
+.sf-cart-qty > span { font-variant-numeric: tabular-nums; min-width: 1.5ch; text-align: center; }
+.sf-cart-remove {
+  width: auto !important; height: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin-left: var(--gd-2);
+  color: var(--gd-text-dim) !important;
+  text-decoration: underline;
+  font-size: var(--gd-step--2);
+}
+.sf-cart-price {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--gd-step-1);
+  white-space: nowrap;
+}
+
+.sf-cart-side {
+  position: sticky;
+  top: var(--gd-6);
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--brand-radius, 14px);
+  padding: var(--gd-6);
+}
+.sf-cart-totals { margin: 0 0 var(--gd-5); }
+.sf-cart-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gd-4);
+  padding: var(--gd-2) 0;
+}
+.sf-cart-totals dt { color: var(--gd-text-muted); }
+.sf-cart-totals dd { margin: 0; font-variant-numeric: tabular-nums; }
+.sf-cart-totals .grand {
+  border-top: 1px solid var(--gd-border);
+  margin-top: var(--gd-2);
+  padding-top: var(--gd-4);
+  font-size: var(--gd-step-1);
+}
+.sf-cart-totals .grand dt { color: var(--gd-text); }
+
+.sf-cart-fine {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  line-height: 1.5;
+  margin: var(--gd-4) 0 0;
+}
+.sf-cart-form { margin-top: var(--gd-5); }
+.sf-cart-form .sf-btn { width: 100%; justify-content: center; margin-top: var(--gd-4); }
+
+.sf-empty { padding-block: clamp(2rem, 6vw, 4rem); }
+
+@media (max-width: 860px) {
+  .sf-cart-grid { grid-template-columns: 1fr; }
+  /* Sticky inside a single column pins the summary over the items it summarises. */
+  .sf-cart-side { position: static; }
+  .sf-cart-row { grid-template-columns: 4rem 1fr; }
+  .sf-cart-price { grid-column: 2; text-align: right; }
 }

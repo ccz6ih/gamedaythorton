@@ -146,3 +146,174 @@ export function verifyWebhook(rawBody: string, signature: string): Stripe.Event 
   if (!secret) throw new Error('STRIPE_WEBHOOK_SECRET is not set; refusing to trust this webhook.');
   return stripe().webhooks.constructEvent(rawBody, signature, secret);
 }
+
+/* ============================================================================
+   THE RETAIL SHOP
+   ============================================================================
+   Everything above this line is the clinical money path: memberships, visits,
+   deposits, all keyed to a patient. Everything below is a stranger buying a
+   bottle of cleanser on a website.
+
+   They are kept apart because the constraints genuinely differ. Nothing above
+   may carry a service name to Stripe, because a line item reading "TRT
+   consultation" next to a person's card is a disclosure. A line item reading
+   "Renew Eye Complex" is a shop receipt, and hiding it would produce a bank
+   statement the customer cannot recognise — which is how disputes start.
+   ========================================================================= */
+
+/**
+ * May this practice take real money right now?
+ *
+ * REPLACES A GLOBAL SWITCH WITH A PER-PRACTICE ONE, and that is the point.
+ *
+ * The original rule was one env var: PILOT_MODE on meant nobody could use a
+ * live key. That was right when there was one tenant. With two it became
+ * unsatisfiable — Gameday must stay guarded because it holds clinical records,
+ * and The Med Bar must be able to sell a moisturiser, in the same deployment,
+ * on the same afternoon.
+ *
+ * So the question is now asked per clinic, against `clinic.pilot_mode` — the
+ * same column the DATABASE independently enforces, where every PHI table
+ * rejects non-synthetic rows while it is true. One flag, two enforcers, no way
+ * for the app's belief and the database's to drift apart.
+ *
+ * PILOT_MODE the env var survives as an absolute override: while it is on, no
+ * clinic may use a live key regardless of its own column. It is the switch that
+ * turns the whole deployment back into a rehearsal, and it is still the one
+ * deliberate act required before any real money moves.
+ */
+export type MoneyClinic = { slug: string; pilot_mode?: boolean | null };
+
+export type MoneyVerdict =
+  | { ok: true; live: boolean }
+  | { ok: false; reason: string };
+
+export function canTakeMoney(clinic: MoneyClinic): MoneyVerdict {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    return { ok: false, reason: 'Payments are not configured on this deployment.' };
+  }
+
+  const live = !key.startsWith('sk_test_');
+
+  if (live && isPilotMode()) {
+    return {
+      ok: false,
+      reason:
+        'This deployment has PILOT_MODE on and a live Stripe key. Refusing to ' +
+        'charge. Either use sk_test_… or set PILOT_MODE=false deliberately.'
+    };
+  }
+
+  if (live && clinic.pilot_mode) {
+    return {
+      ok: false,
+      reason:
+        `${clinic.slug} is still in pilot mode, so its records are synthetic and ` +
+        'it must not take real payments. Clear clinic.pilot_mode first.'
+    };
+  }
+
+  return { ok: true, live };
+}
+
+export type ShopLine = {
+  name: string;
+  brand: string | null;
+  unitPriceCents: number;
+  qty: number;
+};
+
+export type ShopCheckoutInput = {
+  clinicSlug: string;
+  practiceName: string;
+  orderId: string;
+  orderNo: string;
+  lines: ShopLine[];
+  taxCents: number;
+  email: string;
+  successUrl: string;
+  cancelUrl: string;
+  /**
+   * The practice's connected account, when the platform is acting on its
+   * behalf. Absent means the configured secret key IS the practice's own — the
+   * single-practice case, and the simplest correct one.
+   */
+  stripeAccount?: string | null;
+};
+
+/**
+ * A Stripe-hosted Checkout Session.
+ *
+ * HOSTED, NOT EMBEDDED, and the reason is the content security policy. An
+ * embedded Payment Element needs script-src https://js.stripe.com plus a frame
+ * ancestor, and admitting a script origin to a page is a far larger concession
+ * than it looks — a script can read the whole DOM. A hosted session needs
+ * nothing: the visitor is navigated away, pays on Stripe's own origin, and
+ * comes back. The storefront's CSP stays exactly as strict as it is today, and
+ * no card data has ever been in a page we serve.
+ *
+ * Tax is passed as its own zero-quantity line rather than a Stripe tax rate
+ * object, because the rate lives in `clinic.sales_tax_bps` where the practice
+ * can change it, and duplicating it into Stripe creates two numbers that must
+ * agree forever.
+ */
+export async function createShopCheckoutSession(input: ShopCheckoutInput) {
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = input.lines.map(l => ({
+    quantity: l.qty,
+    price_data: {
+      currency: 'usd',
+      unit_amount: l.unitPriceCents,
+      product_data: {
+        name: l.brand ? `${l.brand} — ${l.name}` : l.name
+      }
+    }
+  }));
+
+  if (input.taxCents > 0) {
+    lineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: 'usd',
+        unit_amount: input.taxCents,
+        product_data: { name: 'Sales tax' }
+      }
+    });
+  }
+
+  const params: Stripe.Checkout.SessionCreateParams = {
+    mode: 'payment',
+    line_items: lineItems,
+    customer_email: input.email,
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    shipping_address_collection: { allowed_countries: ['US'] },
+    // Ours, not Stripe's. The webhook looks the order up by session id and by
+    // this, and trusts neither as a price — only as a pointer into our own
+    // database, which is where the price lives.
+    metadata: {
+      order_id: input.orderId,
+      order_no: input.orderNo,
+      clinic_slug: input.clinicSlug,
+      kind: 'shop_order'
+    },
+    payment_intent_data: {
+      // The practice's name on the statement. A customer who cannot recognise
+      // a charge disputes it, and a dispute costs more than the order.
+      statement_descriptor_suffix: input.practiceName
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        .slice(0, 22)
+        .trim() || undefined,
+      metadata: { order_id: input.orderId, kind: 'shop_order' }
+    },
+    // Abandoned baskets should not sit as pending orders indefinitely.
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24
+  };
+
+  // A retry of the same order must never produce a second session that could
+  // be paid separately.
+  const options: Stripe.RequestOptions = { idempotencyKey: `shop_${input.orderId}` };
+  if (input.stripeAccount) options.stripeAccount = input.stripeAccount;
+
+  return stripe().checkout.sessions.create(params, options);
+}

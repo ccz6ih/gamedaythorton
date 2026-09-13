@@ -13,6 +13,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getStorefront, getStorefrontPackages } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +22,8 @@ export default async function StorefrontPackages({ params }: { params: Promise<{
   const { slug } = await params;
   const clinic = await getStorefront(slug);
   if (!clinic) notFound();
+
+  const links = storefrontLinks(await storefrontBase(slug));
 
   const packages = await getStorefrontPackages(clinic.id);
 
@@ -43,7 +46,7 @@ export default async function StorefrontPackages({ params }: { params: Promise<{
           {packages.length === 0 ? (
             <p className="sf-note">
               No packages are offered at the moment. Individual{' '}
-              <Link href={`/c/${slug}/services`}>services and pricing</Link> are on the menu.
+              <Link href={links.services}>services and pricing</Link> are on the menu.
             </p>
           ) : (
             <div className="sf-packages">
@@ -87,8 +90,8 @@ export default async function StorefrontPackages({ params }: { params: Promise<{
           )}
 
           <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-            <Link href={`/c/${slug}/enquire`} className="sf-btn primary">Ask about a package</Link>
-            <Link href={`/c/${slug}/services`} className="sf-btn ghost">Individual pricing</Link>
+            <Link href={links.enquire} className="sf-btn primary">Ask about a package</Link>
+            <Link href={links.services} className="sf-btn ghost">Individual pricing</Link>
           </div>
         </div>
       </section>

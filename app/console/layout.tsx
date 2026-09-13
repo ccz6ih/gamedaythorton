@@ -54,6 +54,9 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { group: 'Money' },
     { href: '/console/packages', label: 'Packages', icon: '◱', when: hasModule(clinic, 'packages') },
     { href: '/console/payments', label: 'Payments', icon: '⌗' },
+    // Only where there is a shop to have orders in. A men's health clinic with
+    // no retail line does not need a permanently empty screen in its rail.
+    { href: '/console/orders', label: 'Shop orders', icon: '⬓', when: hasModule(clinic, 'retail') },
     { group: 'Setup' },
     { href: '/console/services', label: 'Services & pricing', icon: '☰' },
     { href: '/console/storefront', label: 'Your public page', icon: '◈' },

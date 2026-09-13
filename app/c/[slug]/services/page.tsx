@@ -27,6 +27,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getStorefront, getStorefrontServices, groupByCategory } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { priceLabel, titleCase, money } from '@/lib/format';
 
@@ -48,6 +49,8 @@ export default async function StorefrontServices({ params }: { params: Promise<{
   const { slug } = await params;
   const clinic = await getStorefront(slug);
   if (!clinic) notFound();
+
+  const links = storefrontLinks(await storefrontBase(slug));
 
   const services = await getStorefrontServices(clinic.id);
   const groups = groupByCategory(services).sort((a, b) => {
@@ -153,7 +156,7 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                   <div className="sf-item-cta">
                     <Link
                       className="sf-btn ghost sm"
-                      href={`/c/${slug}/enquire?service=${encodeURIComponent(s.name)}`}
+                      href={`${links.enquire}?service=${encodeURIComponent(s.name)}`}
                     >
                       {s.online_bookable ? 'Request this' : 'Ask about this'}
                     </Link>
@@ -172,8 +175,8 @@ export default async function StorefrontServices({ params }: { params: Promise<{
           )}
 
           <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-            <Link href={`/c/${slug}/enquire`} className="sf-btn primary">Request an appointment</Link>
-            <Link href={`/c/${slug}/packages`} className="sf-btn ghost">Packages &amp; series</Link>
+            <Link href={links.enquire} className="sf-btn primary">Request an appointment</Link>
+            <Link href={links.packages} className="sf-btn ghost">Packages &amp; series</Link>
           </div>
         </div>
       </section>

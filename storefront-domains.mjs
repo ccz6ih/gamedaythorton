@@ -33,7 +33,11 @@ export const STOREFRONT_DOMAINS = {
  * because a wildcard already swept it up.
  */
 export const STOREFRONT_PATHS = [
-  '/', '/services', '/packages', '/about', '/shop', '/enquire'
+  '/', '/services', '/packages', '/about', '/shop', '/enquire',
+  // The basket and the page Stripe returns to. Both must be public: a customer
+  // coming back from paying has no session and must not meet a passcode box
+  // holding a receipt they have already been charged for.
+  '/cart', '/shop/thanks'
 ];
 
 /** True when this path is a storefront page on a root-serving domain. */

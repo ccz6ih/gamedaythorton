@@ -24,6 +24,7 @@ import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { getStorefront, getStorefrontServices } from '@/lib/db/storefront';
+import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { sendEnquiryEmail } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
@@ -146,6 +147,8 @@ export default async function Enquire({
   const clinic = await getStorefront(slug);
   if (!clinic) notFound();
 
+  const links = storefrontLinks(await storefrontBase(slug));
+
   const services = await getStorefrontServices(clinic.id);
   const isSpa = clinic.practice_type === 'med_spa';
 
@@ -166,7 +169,7 @@ export default async function Enquire({
               where the practice would be notified.
             </div>
             <div className="sf-actions">
-              <Link href={`/c/${slug}`} className="sf-btn ghost">Back to {clinic.name}</Link>
+              <Link href={links.home} className="sf-btn ghost">Back to {clinic.name}</Link>
             </div>
           </div>
         </header>
