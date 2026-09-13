@@ -169,7 +169,7 @@ export default async function BrandPage({
               {brand.logoUrl && (
                 <div className="row" style={{ gap: 'var(--gd-4)', alignItems: 'center' }}>
                   <img src={brand.logoUrl} alt="Current logo"
-                    style={{ maxHeight: 56, maxWidth: 220, objectFit: 'contain' }} />
+                    style={{ maxHeight: 80, maxWidth: 300, objectFit: 'contain' }} />
                   <label className="switch">
                     <input type="checkbox" name="remove_logo" value="1" />
                     <span className="track" />

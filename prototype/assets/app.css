@@ -58,8 +58,8 @@ img { max-width: 100%; }
   padding: var(--gd-4) var(--gd-3); display: flex; flex-direction: column; gap: var(--gd-1);
   position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
 }
-.rail-brand { display: flex; align-items: center; gap: .6rem; padding: .2rem .5rem var(--gd-4); }
-.rail-brand img { height: var(--brand-logo-height); width: auto; }
+.rail-brand { display: flex; align-items: center; gap: .6rem; padding: .4rem .5rem var(--gd-4); }
+.rail-brand img { max-height: var(--brand-logo-height, 75px); width: auto; max-width: 100%; object-fit: contain; }
 .rail-brand .mark {
   width: 30px; height: 30px; border-radius: var(--gd-r-sm); flex: none;
   background: var(--gd-accent); color: var(--brand-accent-ink);

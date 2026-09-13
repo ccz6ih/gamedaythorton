@@ -110,7 +110,7 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
     '--brand-radius': `${radius}px`,
     '--brand-font': font,
     '--brand-display-font': displayFont,
-    '--brand-logo-height': `${typeof brand.logoHeight === 'number' ? brand.logoHeight : 28}px`,
+    '--brand-logo-height': `${typeof brand.logoHeight === 'number' ? brand.logoHeight : 75}px`,
 
     /* ------------------------------------------------------------------
        RE-DERIVE EVERYTHING tokens.css DERIVES FROM --brand-*.

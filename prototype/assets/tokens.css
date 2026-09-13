@@ -18,7 +18,7 @@
   --brand-radius:        10px;      /* 0 = hard corporate, 16 = soft consumer */
   --brand-font:          "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --brand-display-font:  var(--brand-font);
-  --brand-logo-height:   28px;
+  --brand-logo-height:   75px;
 
   /* --- Derived accent states -------------------------------------------- */
   --gd-accent:        var(--brand-accent);

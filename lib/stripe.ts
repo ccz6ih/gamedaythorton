@@ -317,3 +317,97 @@ export async function createShopCheckoutSession(input: ShopCheckoutInput) {
 
   return stripe().checkout.sessions.create(params, options);
 }
+
+export type CustomChargeLine = {
+  /** Already net of this line's own discount. */
+  name: string;
+  qty: number;
+  lineTotalCents: number;
+};
+
+export type CustomChargeInput = {
+  clinicSlug: string;
+  practiceName: string;
+  orderId: string;
+  orderNo: string;
+  lines: CustomChargeLine[];
+  /** Order-level discount, shown to the customer as a discount. */
+  discountCents: number;
+  taxCents: number;
+  email: string;
+  successUrl: string;
+  cancelUrl: string;
+};
+
+/**
+ * A payment page for a charge the practitioner priced herself.
+ *
+ * TWO THINGS HERE EXIST TO KEEP STRIPE'S TOTAL EXACTLY EQUAL TO OURS, because
+ * app.shop_order_mark_paid refuses to settle a charge whose amount does not
+ * match what we recorded. That guard is worth keeping, so the arithmetic has to
+ * be right rather than close.
+ *
+ * 1. EVERY LINE IS QUANTITY ONE, priced at its own line total. The obvious
+ *    alternative — a per-unit price times a quantity — cannot represent a
+ *    discounted line without rounding: $10.00 x 3 less $1.00 is $29.00, and
+ *    there is no whole number of cents that multiplied by three gives it. The
+ *    quantity moves into the description, where it still reads correctly.
+ *
+ * 2. THE ORDER DISCOUNT IS A REAL STRIPE COUPON, not a negative line, because
+ *    Stripe has no negative line items. It also means the customer sees the
+ *    word "Discount" and the amount, which is what they are owed by anyone
+ *    giving them one.
+ */
+export async function createCustomChargeSession(input: CustomChargeInput) {
+  const client = stripe();
+
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = input.lines.map(l => ({
+    quantity: 1,
+    price_data: {
+      currency: 'usd',
+      unit_amount: l.lineTotalCents,
+      product_data: { name: l.qty > 1 ? `${l.name} (${l.qty})` : l.name }
+    }
+  }));
+
+  if (input.taxCents > 0) {
+    lineItems.push({
+      quantity: 1,
+      price_data: { currency: 'usd', unit_amount: input.taxCents, product_data: { name: 'Sales tax' } }
+    });
+  }
+
+  const params: Stripe.Checkout.SessionCreateParams = {
+    mode: 'payment',
+    line_items: lineItems,
+    customer_email: input.email,
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    metadata: {
+      order_id: input.orderId,
+      order_no: input.orderNo,
+      clinic_slug: input.clinicSlug,
+      // The webhook keys on this, so a custom charge settles down the same path
+      // as a shop order. One settlement path, not two.
+      kind: 'shop_order'
+    },
+    payment_intent_data: {
+      statement_descriptor_suffix:
+        input.practiceName.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 22).trim() || undefined,
+      metadata: { order_id: input.orderId, kind: 'shop_order' }
+    },
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7
+  };
+
+  if (input.discountCents > 0) {
+    // Idempotent on the order, so a retry reuses the coupon rather than
+    // littering the account with one per attempt.
+    const coupon = await client.coupons.create(
+      { amount_off: input.discountCents, currency: 'usd', duration: 'once', name: 'Discount' },
+      { idempotencyKey: `coupon_${input.orderId}` }
+    );
+    params.discounts = [{ coupon: coupon.id }];
+  }
+
+  return client.checkout.sessions.create(params, { idempotencyKey: `charge_${input.orderId}` });
+}

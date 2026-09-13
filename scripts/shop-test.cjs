@@ -201,6 +201,94 @@ async function cannotRead(label, table) {
   }
 
   /* =====================================================================
+     4b. THE HAPPY PATH ACTUALLY WORKS
+     =====================================================================
+     Every other check in this file ends in a deliberate refusal, and for a
+     while that was the entire suite. It was green while app.shop_order_create
+     was broken on its success path — `p_email::citext` could not resolve under
+     `search_path = ''`, so the first real customer would have seen checkout
+     fail with "type citext does not exist".
+
+     Nothing caught it because no test ever reached the insert: the refusals all
+     raise earlier, and the one check that would have gone through was blocked
+     by the practice having no sales tax rate set.
+
+     A suite of refusals proves the guards and says nothing about whether the
+     thing works. So this one places a real order end to end. It sets a tax rate
+     to get past the not-configured guard and puts the original back afterwards,
+     in a finally, so an interrupted run cannot leave the shop misconfigured. */
+  console.log('\nAN ORDER CAN ACTUALLY BE PLACED');
+
+  const { Client } = require('pg');
+  const ref = process.env.SUPABASE_PROJECT_REF;
+  const dbpw = process.env.SUPABASE_DB_PASSWORD;
+
+  if (!ref || !dbpw || !product) {
+    console.log('  — skipped: no database credentials to set a tax rate with.');
+  } else {
+    const region = process.env.SUPABASE_REGION || 'us-east-1';
+    const admin = new Client({
+      connectionString: `postgresql://postgres.${ref}:${encodeURIComponent(dbpw)}@aws-0-${region}.pooler.supabase.com:6543/postgres`
+    });
+    await admin.connect();
+
+    const { rows: before } = await admin.query(
+      `select sales_tax_bps from clinic where slug = 'medbar-loveland'`);
+    const original = before[0]?.sales_tax_bps ?? 0;
+
+    try {
+      await admin.query(
+        `update clinic set sales_tax_bps = 670 where slug = 'medbar-loveland'`);
+
+      const placed = await rpc('shop_order_create', {
+        p_clinic_slug: 'medbar-loveland',
+        p_items: [{ product_id: product.id, qty: 2 }],
+        p_name: 'Storefront Happy Path',
+        p_email: 'shop-happy@example.invalid'
+      });
+
+      if (placed.status >= 400) {
+        bad('an order goes all the way through', JSON.stringify(placed.body).slice(0, 220));
+      } else {
+        const o = placed.body;
+        const expectSub = product.price_cents * 2;
+        const expectTax = Math.round((expectSub * 670) / 10000);
+
+        if (o.subtotal_cents === expectSub) ok('the database priced it', `${o.subtotal_cents} cents`);
+        else bad('the database priced it', `expected ${expectSub}, got ${o.subtotal_cents}`);
+
+        if (o.tax_cents === expectTax) ok('tax is computed from the practice rate', `${o.tax_cents} cents at 6.70%`);
+        else bad('tax is computed from the practice rate', `expected ${expectTax}, got ${o.tax_cents}`);
+
+        if (o.total_cents === expectSub + expectTax) ok('the total adds up');
+        else bad('the total adds up', `${o.subtotal_cents} + ${o.tax_cents} != ${o.total_cents}`);
+
+        if (o.order_no && /^\d{6}-\d{4}$/.test(o.order_no)) ok('it gets an order number', o.order_no);
+        else bad('it gets an order number', String(o.order_no));
+
+        // And the session can be attached, which is the other half of checkout.
+        const attached = await rpc('shop_order_attach_session', {
+          p_order: o.order_id, p_session: 'cs_test_happy_path'
+        });
+        if (attached.status < 300) ok('a payment session can be attached');
+        else bad('a payment session can be attached', JSON.stringify(attached.body).slice(0, 160));
+      }
+    } finally {
+      await admin.query(
+        `update clinic set sales_tax_bps = $1 where slug = 'medbar-loveland'`, [original]);
+      await admin.query(
+        `delete from shop_order where contact_email = 'shop-happy@example.invalid'`);
+
+      const { rows: after } = await admin.query(
+        `select sales_tax_bps from clinic where slug = 'medbar-loveland'`);
+      if (after[0]?.sales_tax_bps === original) ok('the tax rate was put back', `${original} bps`);
+      else bad('the tax rate was put back', `left at ${after[0]?.sales_tax_bps}, should be ${original}`);
+
+      await admin.end();
+    }
+  }
+
+  /* =====================================================================
      5. THE SERVICE-ROLE CLIENT HAS EXACTLY ONE IMPORTER
      ===================================================================== */
   console.log('\nTHE SERVICE-ROLE CLIENT IS CONTAINED');

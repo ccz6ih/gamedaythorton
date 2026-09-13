@@ -53,6 +53,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { href: '/console/safety', label: 'Safety queue', icon: '⚠', when: hasModule(clinic, 'safety_queue') },
     { href: '/console/treatments', label: 'Treatment records', icon: '✎', when: hasModule(clinic, 'treatment_records') },
     { group: 'Money' },
+    { href: '/console/charge', label: 'Take a payment', icon: '＄' },
     { href: '/console/packages', label: 'Packages', icon: '◱', when: hasModule(clinic, 'packages') },
     { href: '/console/payments', label: 'Payments', icon: '⌗' },
     // Only where there is a shop to have orders in. A men's health clinic with
@@ -75,7 +76,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
               <img
                 src={brand.logoUrl}
                 alt={clinic?.name ?? 'Clinic'}
-                style={{ maxHeight: 'var(--brand-logo-height, 36px)', maxWidth: '100%', objectFit: 'contain' }}
+                style={{ height: 'auto', maxHeight: 'var(--brand-logo-height, 75px)', maxWidth: '180px', objectFit: 'contain' }}
               />
             ) : (
               <>

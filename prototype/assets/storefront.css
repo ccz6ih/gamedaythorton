@@ -109,7 +109,7 @@
    reads as a smudge. A stacked mark needs its height measured against its own
    line count, so this is roughly half again as tall. */
 .sf-mark img {
-  height: clamp(3.1rem, 5.2vw, 4.25rem);
+  height: clamp(5.25rem, 8.5vw, 7.5rem);
   width: auto;
   display: block;
 }
