@@ -26,12 +26,12 @@ async function signOut() {
   'use server';
   const supabase = await serverClient();
   await supabase.auth.signOut();
-  redirect('/sign-in');
+  redirect('/admin');
 }
 
 export default async function PortalPage() {
   const viewer = await currentViewer();
-  if (!viewer) redirect('/sign-in?next=/portal');
+  if (!viewer) redirect('/admin?next=/portal');
   if (viewer.kind !== 'patient') redirect('/console');
 
   const clinic = await getClinic();

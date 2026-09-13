@@ -24,7 +24,7 @@ export default async function RootPage() {
           membership and treatment practices.
         </p>
 
-        <Link className="btn primary block" href="/sign-in">Sign in</Link>
+        <Link className="btn primary block" href="/admin">Sign in</Link>
 
         <div className="cred-list">
           <div className="lbl">Also here</div>

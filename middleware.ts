@@ -79,6 +79,10 @@ const ALWAYS_OPEN = [
 /** Past the gate, but readable before signing in. */
 const ANONYMOUS_OK = [
   '/',
+  // The staff sign-in. /sign-in is the old path and still redirects here, so
+  // both have to be reachable without a session — a sign-in page that requires
+  // a session is a locked door with the key inside.
+  '/admin',
   '/sign-in',
   '/auth/callback',
   '/about-pilot',     // the compliance explainer must never require a login
@@ -197,7 +201,7 @@ export async function middleware(request: NextRequest) {
 
   if (!user && !isExactlyOrUnder(pathname, ANONYMOUS_OK)) {
     const url = request.nextUrl.clone();
-    url.pathname = '/sign-in';
+    url.pathname = '/admin';
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
     return NextResponse.redirect(url);
   }

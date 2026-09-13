@@ -30,7 +30,7 @@ async function savePanel(formData: FormData) {
   'use server';
 
   const viewer = await currentViewer();
-  if (!viewer || viewer.kind !== 'staff') redirect('/sign-in');
+  if (!viewer || viewer.kind !== 'staff') redirect('/admin');
 
   const patientId = String(formData.get('patient_id') ?? '');
   const drawnAt = String(formData.get('drawn_at') ?? '');

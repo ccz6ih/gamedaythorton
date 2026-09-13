@@ -21,12 +21,12 @@ async function signOut() {
   'use server';
   const supabase = await serverClient();
   await supabase.auth.signOut();
-  redirect('/sign-in');
+  redirect('/admin');
 }
 
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const viewer = await currentViewer();
-  if (!viewer) redirect('/sign-in?next=/console');
+  if (!viewer) redirect('/admin?next=/console');
   if (viewer.kind !== 'staff') redirect('/portal');
 
   const clinic = await getClinic();

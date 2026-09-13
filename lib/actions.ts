@@ -22,7 +22,7 @@ import { currentViewer, type StaffContext } from '@/lib/supabase/server';
 
 export async function requireStaff(): Promise<StaffContext> {
   const viewer = await currentViewer();
-  if (!viewer) redirect('/sign-in');
+  if (!viewer) redirect('/admin');
   if (viewer.kind !== 'staff') redirect('/portal');
   return viewer;
 }
