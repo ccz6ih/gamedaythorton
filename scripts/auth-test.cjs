@@ -24,11 +24,29 @@ const ACCOUNTS = [
   // and a test that fails on normal use gets ignored, which is worse than no
   // test. The property being checked is "sees their own clinic's people and
   // nobody else's", which the clinic check below enforces.
-  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday', minPatients: 1 },
-  { email: 'jamie@medbar.pilot.invalid', kind: 'staff', clinic: 'Med Bar', minPatients: 1 },
+  //
+  // GAMEDAY IS RETIRED. Its staff_user rows are inactive and its clinic is
+  // unlisted and deactivated (scripts/retire-clinic.cjs). So its owner now sees
+  // NOTHING — app.is_staff() requires an active staff row, and clinic_public
+  // requires an active clinic. That is the retirement working, and it is
+  // asserted here rather than deleted, because "a retired tenant's staff can
+  // still read its records" is exactly the bug this would otherwise hide.
+  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday',
+    retired: true, expectPatients: 0, expectClinics: 0 },
+
+  // The Med Bar's owner signs in with her REAL address now, not a .pilot.invalid
+  // one. Read from the environment so rotating her password or her email does
+  // not silently break this suite — and so her credentials are not written into
+  // a file in a public repository.
+  { email: process.env.MEDBAR_OWNER_EMAIL ?? 'themedbar.co@gmail.com',
+    password: process.env.MEDBAR_OWNER_PASSWORD,
+    kind: 'staff', clinic: 'Med Bar', minPatients: 1,
+    optional: !process.env.MEDBAR_OWNER_PASSWORD },
+
   // A client seeing exactly one row — their own — stays an exact number. That
   // one IS the invariant, and "at least one" would pass while leaking.
-  { email: 'gregory@gameday.pilot.invalid', kind: 'patient', clinic: 'Gameday', expectPatients: 1 },
+  { email: 'gregory@gameday.pilot.invalid', kind: 'patient', clinic: 'Gameday',
+    retired: true, expectPatients: 1, expectClinics: 0 },
   { email: 'delphine@medbar.pilot.invalid', kind: 'patient', clinic: 'Med Bar', expectPatients: 1 }
 ];
 
@@ -36,11 +54,11 @@ let pass = 0, fail = 0;
 const ok = (m, n) => { pass++; console.log(`  ✓ ${m}${n ? '  ' + n : ''}`); };
 const bad = (m, e) => { fail++; console.log(`  ✗ ${m}`); if (e) console.log('      ' + e); };
 
-async function signIn(email) {
+async function signIn(email, password) {
   const r = await fetch(`${URL}/auth/v1/token?grant_type=password`, {
     method: 'POST',
     headers: { apikey: KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password: PW })
+    body: JSON.stringify({ email, password: password ?? PW })
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(`${r.status} ${j.error_description || j.msg || j.error || JSON.stringify(j)}`);
@@ -65,8 +83,15 @@ async function get(token, pathAndQuery) {
 
   const tokens = {};
   for (const a of ACCOUNTS) {
+    // An account whose password this machine does not hold is skipped rather
+    // than failed. The owner's real credential belongs in her head and in a
+    // password manager, not in every developer's .env.local.
+    if (a.optional) {
+      console.log(`  — skipped ${a.email} (set MEDBAR_OWNER_PASSWORD to include it)`);
+      continue;
+    }
     try {
-      tokens[a.email] = await signIn(a.email);
+      tokens[a.email] = await signIn(a.email, a.password);
       ok(`sign in ${a.email}`);
     } catch (err) {
       bad(`sign in ${a.email}`, err.message);
@@ -78,29 +103,38 @@ async function get(token, pathAndQuery) {
     if (!t) continue;
 
     const pat = await get(t, 'patient?select=id,first_name,last_name,clinic_id');
+    const expectExact = a.expectPatients !== undefined;
+
     if (!Array.isArray(pat.body)) {
       bad(`${a.email} can read patient`, `${pat.status} ${JSON.stringify(pat.body).slice(0, 120)}`);
-    } else if (a.kind === 'patient'
-        ? pat.body.length === a.expectPatients
-        : pat.body.length >= a.minPatients) {
-      ok(`${a.email} sees ${pat.body.length} patient row(s)`,
-        a.kind === 'patient'
+    } else if (expectExact ? pat.body.length === a.expectPatients : pat.body.length >= a.minPatients) {
+      const what = a.retired && a.kind === 'staff'
+        ? '= nothing, because the tenant is retired'
+        : a.kind === 'patient' && pat.body[0]
           ? `= only ${pat.body[0].first_name} ${pat.body[0].last_name}`
-          : '= own tenant only');
+          : '= own tenant only';
+      ok(`${a.email} sees ${pat.body.length} patient row(s)`, what);
     } else {
       bad(`${a.email} patient visibility`,
-        a.kind === 'patient'
+        expectExact
           ? `expected exactly ${a.expectPatients}, saw ${pat.body.length}`
           : `expected at least ${a.minPatients}, saw ${pat.body.length}`);
     }
 
-    // Exactly one clinic must be visible, and it must be the right one.
+    // One clinic visible, and the right one — unless the tenant is retired, in
+    // which case NO clinic must be visible. A retired practice whose staff can
+    // still list it is a retirement that did not happen.
     const cl = await get(t, 'clinic_public?select=name,practice_type');
-    if (Array.isArray(cl.body) && cl.body.length === 1 && cl.body[0].name.includes(a.clinic.split(' ')[0])) {
-      ok(`${a.email} sees only ${cl.body[0].name}`, cl.body[0].practice_type);
+    const seen = Array.isArray(cl.body) ? cl.body : [];
+    const names = seen.map(c => c.name).join(', ');
+
+    if (a.expectClinics === 0) {
+      if (seen.length === 0) ok(`${a.email} sees no clinic`, 'retired tenant, correctly invisible');
+      else bad(`${a.email} sees no clinic`, `still sees: ${names}`);
+    } else if (seen.length === 1 && seen[0].name.includes(a.clinic.split(' ')[0])) {
+      ok(`${a.email} sees only ${seen[0].name}`, seen[0].practice_type);
     } else {
-      bad(`${a.email} sees only their own clinic`,
-        Array.isArray(cl.body) ? cl.body.map(c => c.name).join(', ') : JSON.stringify(cl.body).slice(0, 120));
+      bad(`${a.email} sees only their own clinic`, names || JSON.stringify(cl.body).slice(0, 120));
     }
   }
 

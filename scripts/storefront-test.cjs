@@ -54,12 +54,28 @@ async function cannotRead(label, table, select = '*') {
   /* ------------------------------------------------- what must be visible -- */
   console.log('WHAT A VISITOR SHOULD SEE');
 
+  /**
+   * At least one, not at least two.
+   *
+   * This asserted two until Gameday was retired, which is the wrong shape for
+   * the property being tested: what matters is that a listed practice IS
+   * readable and an unlisted one is NOT — a count is an accident of how many
+   * tenants happen to exist this week. The isolation half is covered by the
+   * check immediately below and by the cross-tenant attempt in db-test.cjs.
+   */
   const { body: clinics } = await anon('clinic?select=slug,name,practice_type,listed&order=name');
-  if (Array.isArray(clinics) && clinics.length >= 2) {
+  if (Array.isArray(clinics) && clinics.length >= 1) {
     ok('listed clinics are readable', clinics.map(c => c.slug).join(', '));
   } else {
     bad('listed clinics are readable', JSON.stringify(clinics).slice(0, 160));
   }
+
+  // Retiring a tenant must actually remove it from the public surface, not just
+  // from the navigation. This is the check that would have caught
+  // medbarco.com/c/gameday-thornton serving a second clinic's page.
+  const retired = (clinics || []).some(c => c.slug === 'gameday-thornton');
+  if (!retired) ok('a retired tenant is invisible to the public');
+  else bad('a retired tenant is invisible to the public', 'gameday-thornton is still listed');
 
   const listedOnly = Array.isArray(clinics) && clinics.every(c => c.listed === true);
   if (listedOnly) ok('every clinic returned is one that opted in');
@@ -126,10 +142,30 @@ async function cannotRead(label, table, select = '*') {
   /* -------------------------------------------------------- write paths -- */
   console.log('\nWRITE PATHS');
 
+  /**
+   * DO NOT CREATE WHAT YOU CANNOT REMOVE.
+   *
+   * These checks insert real rows into a live practice's enquiry list to prove
+   * the public form works. That is only acceptable while the harness can
+   * reliably delete them again — and anon deliberately cannot, so deletion
+   * needs the service role key.
+   *
+   * Without it the write checks are SKIPPED rather than run. Skipping loses
+   * coverage; running would put rows named "Live Enquiry Test" in front of the
+   * owner as though a customer had got in touch, and she has no way to tell
+   * which of her enquiries are real. Lost coverage is recoverable by setting
+   * one variable; her trust in the enquiry list is not.
+   */
+  const canCleanUp = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+
   const clinicId = await anon('clinic?select=id&slug=eq.medbar-loveland');
   const cid = Array.isArray(clinicId.body) && clinicId.body[0] ? clinicId.body[0].id : null;
 
-  if (cid) {
+  if (!canCleanUp) {
+    console.log('  — skipped: SUPABASE_SERVICE_ROLE_KEY is not set, so these rows');
+    console.log('    could not be removed from the practice’s live enquiry list.');
+    console.log('    Set it in .env.local to run the write checks.');
+  } else if (cid) {
     const enquiry = await anon('lead', {
       method: 'POST',
       headers: { Prefer: 'return=minimal' },
@@ -194,7 +230,11 @@ async function cannotRead(label, table, select = '*') {
   // regress to that without somebody noticing.
   console.log('\nENQUIRY NOTIFICATION LOG');
 
-  if (cid) {
+  // Same rule as the write paths above: these insert automation_run rows into a
+  // live practice's history, and only the service role can take them out again.
+  if (!canCleanUp) {
+    console.log('  — skipped: no SUPABASE_SERVICE_ROLE_KEY to clean up with.');
+  } else if (cid) {
     const logRow = (over = {}) => anon('automation_run', {
       method: 'POST',
       body: JSON.stringify({
@@ -238,15 +278,28 @@ async function cannotRead(label, table, select = '*') {
   }
   /* ------------------------------------------------------------ cleanup -- */
   console.log('\nCLEANUP');
-  // anon cannot delete its own test rows by design, so this needs the staff path.
+  /**
+   * anon cannot delete its own test rows by design, so cleanup needs elevated
+   * access. It uses the SERVICE ROLE KEY rather than signing in as the owner.
+   *
+   * It used to sign in as jamie@medbar.pilot.invalid with PILOT_DEMO_PASSWORD.
+   * That broke the moment she was given a real login — and it broke silently in
+   * the worst possible way: the assertions above still passed, so the suite
+   * reported 32 of 34, while four rows named "Live Enquiry Test" sat in the
+   * practice's real enquiry list looking like customers who had got in touch.
+   *
+   * A test harness must never depend on a real person's credentials. Those
+   * change, and when they do the harness starts leaving litter in a live
+   * business's data instead of failing loudly.
+   */
   try {
-    const pw = process.env.PILOT_DEMO_PASSWORD;
-    const tokenRes = await fetch(`${URL_SB}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: { apikey: KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'jamie@medbar.pilot.invalid', password: pw })
-    });
-    const { access_token } = await tokenRes.json();
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) {
+      // Nothing was written, so there is nothing to clean and nothing to fail.
+      console.log('  — nothing to clean: the write checks were skipped.');
+      throw { skip: true };
+    }
+    const access_token = serviceKey;
     /**
      * Removes BOTH test shapes, matched on name as well as email.
      *
@@ -255,17 +308,31 @@ async function cannotRead(label, table, select = '*') {
      * left four "Live Enquiry Test" rows exactly that way — the cleanup only
      * knew about the row with a test email address.
      */
-    const auth = { apikey: KEY, Authorization: `Bearer ${access_token}` };
+    const auth = { apikey: serviceKey, Authorization: `Bearer ${access_token}` };
     const del = await fetch(
       `${URL_SB}/rest/v1/lead?or=(email.eq.storefront-test@example.invalid,name.like.*Test*)`,
       { method: 'DELETE', headers: auth });
     await fetch(
       `${URL_SB}/rest/v1/automation_run?rule_key=eq.storefront_enquiry_email`,
       { method: 'DELETE', headers: auth });
-    if (del.ok) ok('test enquiry removed', 'via the staff path, since anon cannot delete');
-    else bad('test enquiry removed', `${del.status}`);
+
+    // Confirm it is actually gone rather than trusting a 2xx. The previous
+    // version reported success from a status code alone, which is how four
+    // rows survived a run that said it had cleaned up.
+    const left = await fetch(
+      `${URL_SB}/rest/v1/lead?select=id&or=(email.eq.storefront-test@example.invalid,name.like.*Test*)`,
+      { headers: auth });
+    const remaining = await left.json().catch(() => []);
+
+    if (del.ok && Array.isArray(remaining) && remaining.length === 0) {
+      ok('test enquiry removed', 'and verified gone');
+    } else if (!del.ok) {
+      bad('test enquiry removed', `delete returned ${del.status}`);
+    } else {
+      bad('test enquiry removed', `${remaining.length} test row(s) still in the practice’s list`);
+    }
   } catch (err) {
-    bad('test enquiry removed', err.message);
+    if (!err || !err.skip) bad('test enquiry removed', err && err.message);
   }
 
   console.log('\n' + '─'.repeat(64));
