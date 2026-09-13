@@ -26,6 +26,32 @@
    ========================================================================== */
 
 .sf {
+  /* ------------------------------------------------------------------------
+     RE-DERIVE THE ACCENT CHAIN HERE. This is not redundant with tokens.css.
+
+     tokens.css declares `--gd-accent: var(--brand-accent)` on :root, so it
+     RESOLVES on :root — to the default red. A descendant that overrides
+     `--brand-accent` (which is exactly what the storefront layout does per
+     clinic) does not change it, because descendants inherit the already
+     computed value, not the expression.
+
+     The symptom was The Med Bar's page rendering Gameday's red buttons while
+     the brand kit said rose gold, and it shipped because the test asserted
+     `--brand-accent` appeared in the HTML — the input — rather than the token
+     the buttons actually use. Restating the derivations inside .sf makes them
+     resolve against the clinic's own value.
+     ------------------------------------------------------------------------ */
+  --gd-accent:        var(--brand-accent);
+  --gd-accent-hover:  color-mix(in srgb, var(--brand-accent) 82%, white);
+  --gd-accent-press:  color-mix(in srgb, var(--brand-accent) 82%, black);
+  --gd-accent-dim:    color-mix(in srgb, var(--brand-accent) 14%, transparent);
+  --gd-accent-line:   color-mix(in srgb, var(--brand-accent) 38%, transparent);
+  --gd-font:          var(--brand-font);
+  --gd-r-sm:          calc(var(--brand-radius) * 0.6);
+  --gd-r-md:          var(--brand-radius);
+  --gd-r-lg:          calc(var(--brand-radius) * 1.6);
+  --gd-ring:          0 0 0 3px var(--gd-accent-dim);
+
   --sf-measure: 38rem;
   --sf-gutter: clamp(1.25rem, 5vw, 3.5rem);
   --sf-max: 72rem;

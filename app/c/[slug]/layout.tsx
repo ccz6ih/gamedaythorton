@@ -51,7 +51,12 @@ export default async function StorefrontLayout({ children, params }: Props) {
   const style: React.CSSProperties & Record<string, string> = {} as never;
   if (brand.accent) style['--brand-accent'] = brand.accent;
   if (brand.accentInk) style['--brand-accent-ink'] = brand.accentInk;
-  if (brand.radius) style['--brand-radius'] = brand.radius;
+  // The brand kit stores radius as a number (14), and CSS needs a unit —
+  // `calc(14 * 0.6)` is invalid and silently drops the whole declaration.
+  if (brand.radius !== undefined && brand.radius !== null && String(brand.radius) !== '') {
+    const r = String(brand.radius);
+    style['--brand-radius'] = /^\d+(\.\d+)?$/.test(r) ? `${r}px` : r;
+  }
   if (brand.font) style['--brand-font'] = brand.font;
   if (brand.displayFont) style['--brand-display-font'] = brand.displayFont;
 

@@ -303,14 +303,45 @@ async function req(url, opts = {}) {
     // near-black with rose gold, so both practices render dark. What must
     // stay true is that they do not look like the same business — which is
     // the actual failure mode of the template this replaces.
+    //
+    // THIS CHECK USED TO PASS WHILE THE PAGE WAS WRONG. It asserted that
+    // --brand-accent differed in the HTML, which was true, while every button
+    // rendered in the default red: tokens.css declares
+    // `--gd-accent: var(--brand-accent)` on :root, so it resolves there, and a
+    // descendant overriding --brand-accent inherits the already-computed value.
+    // Asserting the input proves nothing about the output, so the derived
+    // token is now checked too.
     const accentOf = h => (h.match(/--brand-accent:\s*([^;"]+)/) || [])[1];
     const spaAccent = accentOf(spaHtml);
     const gdAccent = accentOf(gdHtml);
     if (spaAccent && gdAccent && spaAccent.trim() !== gdAccent.trim()) {
-      ok('each practice renders in its own brand', `${spaAccent.trim()} vs ${gdAccent.trim()}`);
+      ok('each practice sets its own brand accent', `${spaAccent.trim()} vs ${gdAccent.trim()}`);
     } else {
-      bad('each practice renders in its own brand',
+      bad('each practice sets its own brand accent',
         `both resolved to ${spaAccent || 'no accent'} — the template is showing through`);
+    }
+
+    // The derivation has to happen in the storefront's own scope, or the
+    // buttons keep the default. Checked in the stylesheet the page loads.
+    const cssHref = (spaHtml.match(/href="([^"]+\.css[^"]*)"/) || [])[1];
+    if (cssHref) {
+      const cssRes = await fetch(BASE + (cssHref.startsWith('http') ? new URL(cssHref).pathname : cssHref));
+      const css = cssRes.ok ? await cssRes.text() : '';
+      // Whitespace-insensitive: the built CSS is minified, the source is not.
+      const flat = css.replace(/\s+/g, '');
+      const scoped = flat.includes('.sf{') && /\.sf\{[^}]*--gd-accent:var\(--brand-accent\)/.test(flat);
+      if (scoped) ok('the accent is re-derived inside the storefront', 'so buttons use the clinic colour');
+      else bad('the accent is re-derived inside the storefront',
+        'buttons will render in the default accent regardless of the brand kit');
+    }
+
+    // Radius reaches CSS with a unit. A bare number makes calc() invalid, and
+    // an invalid calc drops the whole declaration silently.
+    const radius = (spaHtml.match(/--brand-radius:\s*([^;"]+)/) || [])[1];
+    if (!radius || /(px|rem|em|%)$/.test(radius.trim())) {
+      ok('brand radius carries a unit', radius ? radius.trim() : 'not set');
+    } else {
+      bad('brand radius carries a unit', `"${radius.trim()}" makes calc() invalid`);
     }
     // The page carries a real business name and real prices, so it must say
     // what it is or it can be mistaken for that business's live site.

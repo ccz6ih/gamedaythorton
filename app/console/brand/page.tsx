@@ -78,7 +78,9 @@ async function saveBrand(formData: FormData) {
     if (surface) brand.surface = surface;
 
     const radius = text(formData, 'radius');
-    if (radius) brand.radius = Number(radius);
+    // Stored as a number for the editor's select, given a unit at render time.
+    // Storing "14px" here instead would work but breaks the select's matching.
+    if (radius !== null) brand.radius = Number(radius);
 
     const font = text(formData, 'font');
     if (font) { brand.font = font; brand.displayFont = font; }
