@@ -14,6 +14,7 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { currentViewer, serverClient } from '@/lib/supabase/server';
 import { getClinic, getPortalHome, thenVsNow, checkinAverage, hasModule } from '@/lib/db/queries';
 import { Brand, vocab } from '@/components/Brand';
@@ -21,6 +22,7 @@ import { PilotBanner } from '@/components/PilotBanner';
 import { dateLabel, timeLabel, money, num, signed, relative, titleCase, daysUntil } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Your Account · The Med Bar' };
 
 async function signOut() {
   'use server';

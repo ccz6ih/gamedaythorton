@@ -26,9 +26,69 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const clinic = await getStorefront(slug);
+  const brand = (clinic?.brand ?? {}) as Record<string, string>;
+
+  if (!clinic) return { title: 'Not found' };
+
+  const name = clinic.name;
+  const where = clinic.address_city && clinic.address_state
+    ? `${clinic.address_city}, ${clinic.address_state}`
+    : clinic.location_name ?? '';
+
+  /**
+   * The title says WHAT and WHERE, not just who.
+   *
+   * "The Med Bar · Loveland" is what the practice calls itself and tells a
+   * stranger nothing. Somebody scanning a search result or a row of tabs needs
+   * to know it is a med spa and that it is near them — those two facts are what
+   * make the difference between a click and a scroll past.
+   */
+  const description = clinic.tagline
+    ?? clinic.intro
+    ?? `Aesthetics, lashes and regenerative treatments${where ? ` in ${where}` : ''}.`;
+
+  /**
+   * A DRAWN favicon rather than the practice's logo.
+   *
+   * Her mark is a white stacked lockup on transparent. At the 16px a tab gets,
+   * its three words are about two pixels tall each, and on a light tab bar
+   * white-on-transparent is simply invisible — which is what pointing the icon
+   * at the logo produced. The SVG carries her colours instead, which is what
+   * anybody actually recognises at that size.
+   */
+  const logo = brand.logoUrl || '/brand/medbar-logo-white.png';
+
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
+
   return {
-    title: clinic ? `${clinic.name}${clinic.location_name ? ' · ' + clinic.location_name : ''}` : 'Not found',
-    description: clinic?.tagline ?? undefined,
+    ...(base ? { metadataBase: new URL(base) } : {}),
+    title: {
+      default: `${name}${where ? ` · ${where}` : ''}`,
+      template: `%s · ${name}`
+    },
+    description,
+    icons: {
+      icon: [
+        { url: '/brand/medbar-favicon.svg', type: 'image/svg+xml' },
+        { url: logo }
+      ],
+      apple: logo
+    },
+    // Social cards. Without these a shared link renders as a bare URL with no
+    // picture, which on a business whose whole proposition is how things look
+    // is worse than not being shared at all.
+    openGraph: {
+      type: 'website',
+      siteName: name,
+      title: `${name}${where ? ` · ${where}` : ''}`,
+      description,
+      locale: 'en_US'
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${name}${where ? ` · ${where}` : ''}`,
+      description
+    },
     // Still noindex while this is a pilot. A storefront carrying a real
     // practice's name and prices must not appear in search results next to
     // the business's actual site until the practice says it is live.

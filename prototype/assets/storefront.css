@@ -1440,3 +1440,18 @@ a.sf-card:hover { border-color: var(--gd-accent); }
   .sf-product { grid-template-columns: 1fr; }
   .sf-product-main { aspect-ratio: 4 / 3; }
 }
+
+/* The full biography on the about page. Set at a comfortable reading measure
+   rather than the full card width — nine paragraphs across 70 characters is a
+   wall, and this is the page somebody chose to open. */
+.sf-story { margin-top: var(--gd-5); }
+.sf-story p {
+  margin: 0 0 var(--gd-4);
+  max-width: 62ch;
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+}
+.sf-story p:first-child {
+  font-size: var(--gd-step-1);
+  color: var(--gd-text);
+}

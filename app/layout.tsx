@@ -14,7 +14,19 @@ import '../prototype/assets/storefront.css';
 import './app-extras.css';
 
 export const metadata: Metadata = {
-  title: 'Pilot — synthetic data only',
+  title: {
+    default: 'The Med Bar · Aesthetics & Wellness',
+    template: '%s · The Med Bar'
+  },
+  description: 'The Med Bar — cash-pay aesthetics in Loveland, CO. Skin, lashes, and regenerative treatments.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/brand/medbar-logo-white.png', media: '(prefers-color-scheme: dark)' },
+      { url: '/brand/medbar-logo-black.png', media: '(prefers-color-scheme: light)' }
+    ],
+    apple: '/brand/medbar-logo-white.png'
+  },
   // Belt and braces alongside the X-Robots-Tag header in next.config.mjs.
   robots: { index: false, follow: false, nocache: true },
   referrer: 'no-referrer'

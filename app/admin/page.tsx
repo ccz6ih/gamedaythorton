@@ -25,11 +25,14 @@
 
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import type { Metadata } from 'next';
 import { serverClient } from '@/lib/supabase/server';
 import { getStorefront } from '@/lib/db/storefront';
 import { Brand } from '@/components/Brand';
 import { clinicForHost } from '../../storefront-domains.mjs';
 import type { Clinic } from '@/lib/db/queries';
+
+export const metadata: Metadata = { title: 'Staff Sign In · The Med Bar' };
 
 async function signIn(formData: FormData) {
   'use server';

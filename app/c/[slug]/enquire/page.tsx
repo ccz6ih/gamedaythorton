@@ -22,12 +22,14 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import type { Metadata } from 'next';
 import { createServerClient } from '@supabase/ssr';
 import { getStorefront, getStorefrontServices } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { sendEnquiryEmail } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Book & Enquire' };
 
 /** The exact words shown next to the checkbox. Stored with the row, versioned. */
 const CONSENT_V = 'sms-v1';

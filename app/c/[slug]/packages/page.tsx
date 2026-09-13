@@ -12,11 +12,13 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront, getStorefrontPackages } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Treatment Packages' };
 
 export default async function StorefrontPackages({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

@@ -20,11 +20,13 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ClearCart } from '@/components/ClearCart';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Order Confirmed' };
 
 export default async function Thanks({
   params, searchParams

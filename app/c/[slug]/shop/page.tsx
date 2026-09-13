@@ -22,6 +22,7 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront, getStorefrontProducts } from '@/lib/db/storefront';
 import { shopTaxBps, shopTracksStock, checkoutAvailable } from '@/lib/db/shop';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
@@ -29,6 +30,7 @@ import { AddToCart } from '@/components/AddToCart';
 import { money, titleCase } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Shop' };
 
 export default async function Shop({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

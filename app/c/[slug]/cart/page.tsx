@@ -8,12 +8,14 @@
  */
 
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { CartClient } from '@/components/CartClient';
 import { shopTaxBps, checkoutAvailable } from '@/lib/db/shop';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Basket' };
 
 export default async function CartPage({
   params, searchParams

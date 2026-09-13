@@ -76,7 +76,10 @@ export type StorefrontProvider = {
   name: string;
   credentials: string | null;
   role_label: string | null;
+  /** Two or three sentences, shown beside the portrait. */
   bio: string | null;
+  /** The full biography, for the about page. Migration 0024. */
+  story: string | null;
   /**
    * Two meanings, discriminated by a leading slash:
    *   '/practitioners/x.jpg'  a public marketing asset served from /public
@@ -168,7 +171,7 @@ export async function getStorefrontProviders(clinicId: string): Promise<Storefro
   const supabase = anonClient();
   const { data } = await supabase
     .from('provider_public')
-    .select('id, name, credentials, role_label, bio, photo_path')
+    .select('id, name, credentials, role_label, bio, story, photo_path')
     .eq('clinic_id', clinicId)
     .order('sort_order');
 

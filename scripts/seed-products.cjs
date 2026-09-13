@@ -25,38 +25,101 @@ const { Client } = require('pg');
 
 const slug = process.argv[2] ?? 'medbar-loveland';
 
-/** name, price in dollars, stock on hand. Brand is the same for all of these. */
+/** name, price in dollars, stock on hand, category, description, details */
 const GREEN_ENVEE = [
-  ['Acne Rescue Kit', 84.00, 2],
-  ['Clear Repair Serum', 72.50, 1],
-  ['Flora Elixir', 72.50, 0],
-  ['Glow C+ Brightening Serum', 91.00, 0],
-  ['H.A. Collagen Boosting Serum', 83.00, 0],
-  ['Hydrate Facial Mist', 33.00, 2],
-  ['Illuminate Enzyme Cleansing Powder', 42.50, 1],
-  ['Mandelic Resurfacing Serum 8%', 81.00, 0],
-  ['Post Peel Kit', 87.00, 0],
-  ['Protect Antioxidant Moisturizer', 66.00, 0],
-  ['Pumpkin Glycolic Peel 3%', 53.00, 0],
-  ['Purify Cleansing Oil', 37.00, 0],
-  ['Refine Polishing Facial Scrub', 45.50, 0],
-  ['Renew Eye Complex', 68.00, 0],
-  ['Restore Hydration Masque', 63.00, 0],
-  ['Retinal Renewal Complex', 121.00, 0],
-  ['Revitalize Eye Gel', 68.00, 0],
-  ['Vahati Herb Infused Healing Oil', 71.60, 0]
+  [
+    'Acne Rescue Kit', 84.00, 2, 'kits',
+    'Complete 4-step clarifying regimen formulated with organic botanicals, willow bark, and tea tree to calm breakouts, clear congested pores, and restore balance.',
+    'Includes Clarify Cleansing Gel, Clear Complexion Masque, Flora Elixir, and Clear Repair Serum. Specifically designed for oily, combination, and acne-prone skin types.'
+  ],
+  [
+    'Clear Repair Serum', 72.50, 1, 'serums',
+    'Lightweight clarifying serum with botanical willow bark, niacinamide, and prebiotic ferment to soothe active blemishes, refine pores, and promote even tone.',
+    'Apply 2–3 drops morning and evening to clean skin before moisturizing. Helps reduce redness and decongest without stripping natural moisture.'
+  ],
+  [
+    'Flora Elixir', 72.50, 0, 'serums',
+    'Restorative probiotic essence mist crafted with nutrient-dense plant waters to balance skin flora, calm redness, and deliver immediate hydration.',
+    'Mist over face and neck after cleansing or throughout the day as an instant refreshing hydration boost.'
+  ],
+  [
+    'Glow C+ Brightening Serum', 91.00, 0, 'serums',
+    'High-potency antioxidant serum featuring stable Vitamin C, kakadu plum, and ferulic acid to brighten dull tone, fade hyperpigmentation, and boost collagen.',
+    'Apply 3–4 drops each morning to clean skin. Follow with moisturizer and daily broad-spectrum SPF.'
+  ],
+  [
+    'H.A. Collagen Boosting Serum', 83.00, 0, 'serums',
+    'Multi-molecular hyaluronic acid serum with snow mushroom and vegan peptides to deeply hydrate, plump fine lines, and strengthen elasticity.',
+    'Apply morning and night to slightly damp skin for optimal moisture binding. Excellent following peels or microneedling.'
+  ],
+  [
+    'Hydrate Facial Mist', 33.00, 2, 'hydration',
+    'Refreshing botanical face mist infused with rosewater, aloe, and soothing chamomile to calm irritation and restore moisture balance on contact.',
+    'Spritz generously over face and neck after cleansing, post-treatment, or over makeup throughout the day.'
+  ],
+  [
+    'Illuminate Enzyme Cleansing Powder', 42.50, 1, 'exfoliants',
+    'Water-activated micro-exfoliating powder combining papaya, pineapple enzymes, and rice bran to polish away dull cells for instant radiance.',
+    'Dispense into wet hands, lather into a creamy foam, and massage gently over damp skin for 60 seconds before rinsing with lukewarm water.'
+  ],
+  [
+    'Mandelic Resurfacing Serum 8%', 81.00, 0, 'serums',
+    'Gentle AHA resurfacing treatment with 8% mandelic and lactic acids to smooth rough texture, clear pores, and brighten post-blemish discoloration.',
+    'Ideal for sensitive, acne-prone, and reactive skin. Apply 3–4 drops in the evening 2–4 times weekly.'
+  ],
+  [
+    'Post Peel Kit', 87.00, 0, 'kits',
+    'Calming recovery system formulated with barrier-repair lipids and soothing botanicals to accelerate healing following chemical peels or clinical facials.',
+    'Includes gentle botanical cleanser, soothing essence mist, restorative moisture balm, and antioxidant protection to support optimal recovery.'
+  ],
+  [
+    'Protect Antioxidant Moisturizer', 66.00, 0, 'hydration',
+    'Daily protective cream rich in CoQ10, green tea, and plant ceramides to shield against environmental stress, soothe inflammation, and seal in hydration.',
+    'Massage 1–2 pumps onto clean face and neck morning and evening. Perfect for normal, combination, and sensitive skin.'
+  ],
+  [
+    'Pumpkin Glycolic Peel 3%', 53.00, 0, 'exfoliants',
+    'Nutrient-rich enzyme peel with organic pumpkin puree, 3% glycolic acid, and honey to dissolve dead surface buildup and reveal glowing, luminous skin.',
+    'Apply a thin layer to clean skin for 5–10 minutes depending on tolerance. Rinse thoroughly with cool water. Use 1–2 times weekly.'
+  ],
+  [
+    'Purify Cleansing Oil', 37.00, 0, 'exfoliants',
+    'Luxurious botanical oil cleanser that melts away makeup, sunscreen, and daily impurities while nourishing the lipid barrier.',
+    'Massage 2–3 pumps onto dry skin, emulsify with warm water, and rinse clean. Follow with a water-based cleanser if double cleansing.'
+  ],
+  [
+    'Refine Polishing Facial Scrub', 45.50, 0, 'exfoliants',
+    'Gentle dual-action physical and enzymatic scrub with micro-jojoba beads and fruit enzymes to smooth texture without micro-tears.',
+    'Gently massage onto damp skin in circular motions for 1–2 minutes, avoiding the eye area. Rinse thoroughly. Use 1–2 times per week.'
+  ],
+  [
+    'Renew Eye Complex', 68.00, 0, 'hydration',
+    'Targeted peptide eye cream with caffeine and botanical extracts to diminish dark circles, reduce under-eye puffiness, and firm delicate contours.',
+    'Gently pat half a pump around the orbital bone morning and night using your ring finger.'
+  ],
+  [
+    'Restore Hydration Masque', 63.00, 0, 'hydration',
+    'Deeply replenishing gel-cream masque with hyaluronic acid and blue tansy to soothe thirsty, sensitized, or sun-exposed skin.',
+    'Apply generously to face and neck. Leave on for 15–20 minutes, then rinse or leave on overnight as an intensive recovery treatment.'
+  ],
+  [
+    'Retinal Renewal Complex', 121.00, 0, 'serums',
+    'Advanced encapsulated retinaldehyde (Vitamin A) with bakuchiol to stimulate cellular renewal, refine lines, and clarify tone with superior tolerance.',
+    'Apply 1–2 pumps in the evening to clean, dry skin 2–3 nights weekly, building to nightly use as tolerated. Always wear daily SPF.'
+  ],
+  [
+    'Revitalize Eye Gel', 68.00, 0, 'hydration',
+    'Cooling, depuffing eye gel infused with green tea, cucumber, and marine peptides to revive tired eyes and reduce morning puffiness.',
+    'Dab lightly around eye area morning and night. Store in refrigerator for an enhanced cooling and depuffing sensation.'
+  ],
+  [
+    'Vahati Herb Infused Healing Oil', 71.60, 0, 'hydration',
+    'Sacred multi-correctional face oil with cold-pressed moringa, rosehip, and calendula to calm reactivity, heal dry patches, and impart a dewy glow.',
+    'Warm 3–4 drops in palms and gently press into face, neck, and décolleté as the finishing step in your skincare ritual.'
+  ]
 ];
 
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
-/** A rough grouping so the shop is browsable. Nothing clinical is claimed. */
-function categorise(name) {
-  if (/kit/i.test(name)) return 'kits';
-  if (/serum|complex|elixir/i.test(name)) return 'serums';
-  if (/peel|scrub|powder|cleansing/i.test(name)) return 'exfoliants';
-  if (/moisturizer|masque|mist|oil|gel/i.test(name)) return 'hydration';
-  return 'skincare';
-}
 
 (async () => {
   const ref = process.env.SUPABASE_PROJECT_REF;
@@ -75,19 +138,21 @@ function categorise(name) {
   const clinic = rows[0];
 
   let n = 0;
-  for (const [name, price, stock] of GREEN_ENVEE) {
+  for (const [name, price, stock, category, desc, details] of GREEN_ENVEE) {
     await db.query(
       `insert into product
          (clinic_id, name, slug, brand, category, price_cents, stock_qty,
-          online, active, sort_order, synthetic)
-       values ($1,$2,$3,'Green Envee',$4,$5,$6,true,true,$7,false)
+          description, details, online, active, sort_order, synthetic)
+       values ($1,$2,$3,'Green Envee',$4,$5,$6,$7,$8,true,true,$9,false)
        on conflict (clinic_id, name) do update
          set price_cents = excluded.price_cents,
              stock_qty   = excluded.stock_qty,
              brand       = excluded.brand,
-             category    = excluded.category`,
-      [clinic.id, name, slugify(name), categorise(name),
-       Math.round(price * 100), stock, n]
+             category    = excluded.category,
+             description = coalesce(excluded.description, product.description),
+             details     = coalesce(excluded.details, product.details)`,
+      [clinic.id, name, slugify(name), category,
+       Math.round(price * 100), stock, desc, details, n]
     );
     n++;
   }

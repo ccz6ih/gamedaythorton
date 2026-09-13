@@ -11,11 +11,19 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { currentViewer, serverClient } from '@/lib/supabase/server';
 import { getClinic, hasModule } from '@/lib/db/queries';
 import { Brand, vocab } from '@/components/Brand';
 import { PilotBanner } from '@/components/PilotBanner';
 import { titleCase } from '@/lib/format';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Console · The Med Bar',
+    template: '%s · The Med Bar'
+  }
+};
 
 async function signOut() {
   'use server';

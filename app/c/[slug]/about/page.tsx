@@ -9,11 +9,13 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront, getStorefrontProviders, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { initials, phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'About' };
 
 export default async function StorefrontAbout({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -62,6 +64,19 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
                           on a practitioner&rsquo;s behalf.
                         </p>
                       )}
+
+                    {/* The long version, in full, for a reader who has come
+                        this far. It is the thing that actually distinguishes
+                        this practice from the one down the road, so it is not
+                        hidden behind a "read more" that most people never
+                        press — the about page IS the read-more. */}
+                    {p.story && (
+                      <div className="sf-story">
+                        {p.story.split('\n\n').map((para, i) => (
+                          <p key={i}>{para}</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </article>
               ))}

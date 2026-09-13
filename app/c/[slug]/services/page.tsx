@@ -26,12 +26,14 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getStorefront, getStorefrontServices, groupByCategory } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { priceLabel, titleCase, money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Services & Pricing' };
 
 /** Category order the practice would read out, not alphabetical. */
 const CATEGORY_ORDER = [
