@@ -64,6 +64,16 @@ export type StorefrontProvider = {
   credentials: string | null;
   role_label: string | null;
   bio: string | null;
+  /**
+   * Two meanings, discriminated by a leading slash:
+   *   '/practitioners/x.jpg'  a public marketing asset served from /public
+   *   'providers/x.jpg'       a private storage object needing a signed URL
+   *
+   * A practitioner's headshot on a public storefront is deliberately public and
+   * is not PHI. A patient progress photo is the opposite and never appears
+   * here. docs/16-media-pipeline.md keeps them apart; this comment keeps the
+   * next reader from applying the wrong rule to the wrong one.
+   */
   photo_path: string | null;
 };
 

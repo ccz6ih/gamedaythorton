@@ -140,7 +140,9 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
               {providers.slice(0, 2).map(p => (
                 <article className="sf-person" key={p.id}>
                   <div className="sf-portrait">
-                    <span className="initials" aria-hidden="true">{initials(p.name)}</span>
+                    {p.photo_path?.startsWith('/')
+                      ? <img src={p.photo_path} alt={p.name} width={480} height={600} />
+                      : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
                   </div>
                   <div>
                     <h3>{p.name}{p.credentials ? `, ${p.credentials}` : ''}</h3>

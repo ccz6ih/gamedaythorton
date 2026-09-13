@@ -109,7 +109,10 @@ const providers = [
     credentials: null,   // TODO discovery — do not invent a credential
     role_label: 'Owner',
     bio: null,           // TODO discovery — do not write a bio on her behalf
-    photo_path: null,
+    // Supplied by the client. A leading slash means /public — a marketing
+    // asset, deliberately world-readable, and not PHI. Patient photos are
+    // private storage objects and never take this shape.
+    photo_path: '/practitioners/jamie-salazar.jpg',
     hours: [],
     active: true,
     sort_order: 0

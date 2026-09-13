@@ -249,6 +249,25 @@ async function req(url, opts = {}) {
     ok('the storefront is not indexable', 'it carries a real practice name');
   } else bad('the storefront is not indexable', 'it could appear in search beside their real site');
 
+  // A marketing image referenced by a PUBLIC page has to load without a
+  // session. It did not: middleware sent it to /sign-in and the headshot
+  // rendered broken for exactly the people the storefront exists for — while
+  // looking perfect to anyone testing it signed in. That is how it would have
+  // shipped, so it gets a check that runs with no cookie at all.
+  const headshot = await fetch(BASE + '/practitioners/jamie-salazar.jpg', { redirect: 'manual' });
+  if (headshot.status === 200 && (headshot.headers.get('content-type') || '').startsWith('image/')) {
+    ok('a practitioner photo loads with no session', `${Math.round(Number(headshot.headers.get('content-length') || 0) / 1024)}kB`);
+  } else {
+    bad('a practitioner photo loads with no session',
+      `status ${headshot.status} — a public page cannot render a gated image`);
+  }
+
+  const portrait = await req('/c/medbar-loveland/about', { headers: gateCookie() });
+  if (portrait.status === 200) {
+    const html = await portrait.text();
+    if (/jamie-salazar\.jpg/.test(html)) ok('the storefront actually references the photo');
+    else bad('the storefront actually references the photo', 'it fell back to initials');
+  }
 
   /* ------------------------------------------------------------- public -- */
   console.log('\nPUBLIC SURFACE');

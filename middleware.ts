@@ -185,5 +185,20 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image).*)']
+  /**
+   * Static assets skip the middleware entirely.
+   *
+   * `/practitioners/*` is a public marketing image referenced by the public
+   * storefront, so an anonymous visitor must be able to load it. Without this
+   * exclusion the middleware sent it to /sign-in and the headshot rendered as
+   * a broken image for exactly the people the page exists for — and it looked
+   * fine to anyone testing while signed in, which is how it would have shipped.
+   *
+   * Only non-sensitive asset paths belong here. Patient media is never served
+   * from /public; it lives in private storage behind short-TTL signed URLs.
+   * docs/16-media-pipeline.md.
+   */
+  matcher: [
+    '/((?!_next/static|_next/image|practitioners|brand|favicon.ico|robots.txt).*)'
+  ]
 };
