@@ -92,6 +92,24 @@ setting was forgotten.
 Payments are optional. With no Stripe keys the app runs; checkout is simply not
 available.
 
+### Notifications
+
+| Variable | Notes |
+|---|---|
+| `NOTIFY_EMAIL_ENABLED` | `true` delivers storefront enquiry emails. **Default off** |
+| `RESEND_API_KEY` | The credential. Without it nothing sends even when the switch is on |
+| `NOTIFY_EMAIL_FROM` | The from address on delivered mail |
+
+**Both** the switch and the key are required, deliberately. One condition would
+mean a key arriving in an environment could by itself start sending mail about
+named people to a third party.
+
+Every notification is recorded in `automation_run` whether or not it is
+delivered, so the console always shows what the system tried to do. The subject
+line goes through `notificationPreview()` and says something needs attention,
+never what — that rule gets *more* important when sending is on, because the
+message then actually travels.
+
 ### Deliberately absent
 
 **No SMS or email credentials.** `PILOT_MODE` logs every message instead of

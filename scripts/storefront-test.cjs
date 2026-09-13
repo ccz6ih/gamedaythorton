@@ -182,6 +182,50 @@ async function cannotRead(label, table, select = '*') {
     bad('found the clinic to test writes against');
   }
 
+  /* ------------------------------------------ the enquiry notification -- */
+  // The storefront runs as anon, and automation_run is staff-only by default,
+  // so logging a notification was refused by RLS — silently, because the call
+  // site swallows notification failures on purpose. The feature looked wired
+  // up and logged nothing, permanently. These checks exist so it cannot
+  // regress to that without somebody noticing.
+  console.log('\nENQUIRY NOTIFICATION LOG');
+
+  if (cid) {
+    const logRow = (over = {}) => anon('automation_run', {
+      method: 'POST',
+      body: JSON.stringify({
+        clinic_id: cid,
+        rule_key: 'storefront_enquiry_email',
+        channel: 'email',
+        status: 'logged_not_sent',
+        payload_preview: 'The Med Bar: something needs your attention.',
+        synthetic: true,
+        ...over
+      })
+    });
+
+    const wrote = await logRow();
+    if (wrote.status < 300) ok('the form can record that it notified the practice');
+    else bad('the form can record that it notified the practice',
+      `${wrote.status} — notifications will be invisible`);
+
+    const otherRule = await logRow({ rule_key: 'anything_else' });
+    if (otherRule.status >= 400) ok('but only under the storefront rule', 'not a general write into automation history');
+    else bad('but only under the storefront rule', 'anon can write arbitrary automation records');
+
+    const notSynthetic = await logRow({ synthetic: false });
+    if (notSynthetic.status >= 400) ok('and the pilot guard still applies');
+    else bad('and the pilot guard still applies');
+
+    const readBack = await anon('automation_run?select=id&limit=3');
+    if (readBack.status >= 400 || (Array.isArray(readBack.body) && readBack.body.length === 0)) {
+      ok('and it cannot read the practice\u2019s automation history back');
+    } else {
+      bad('and it cannot read the practice\u2019s automation history back');
+    }
+  } else {
+    bad('found the clinic to test notification logging against');
+  }
   /* ------------------------------------------------------------ cleanup -- */
   console.log('\nCLEANUP');
   // anon cannot delete its own test rows by design, so this needs the staff path.

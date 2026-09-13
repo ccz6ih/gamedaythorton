@@ -24,6 +24,7 @@ import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { getStorefront, getStorefrontServices } from '@/lib/db/storefront';
+import { sendEnquiryEmail } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,6 +103,33 @@ async function submit(formData: FormData) {
       error.message.includes('PILOT MODE')
         ? 'This is a preview site and is not accepting real enquiries yet.'
         : 'Something went wrong sending that. Please call the practice.')}`);
+  }
+
+  // Tell the practice. Recorded either way; delivered only when sending is on.
+  // Deliberately after the insert and never allowed to fail the submission — a
+  // visitor whose request was saved must not see an error because a mail
+  // provider was slow.
+  try {
+    const { data: routing } = await supabase
+      .from('clinic')
+      .select('lead_email')
+      .eq('id', clinic.id)
+      .maybeSingle();
+
+    await sendEnquiryEmail({
+      clinicId: clinic.id,
+      to: (routing?.lead_email as string | null) ?? null,
+      clinicName: clinic.name,
+      name,
+      contact: [phoneNo, email].filter(Boolean).join(' · '),
+      interest: interest || null,
+      message: message || null,
+      synthetic: true
+    });
+  } catch {
+    // Swallowed on purpose. The enquiry is already saved and visible in the
+    // console; a notification failure is an operational problem, not the
+    // visitor's, and they have already been told their request went through.
   }
 
   redirect(`/c/${slug}/enquire?sent=1`);

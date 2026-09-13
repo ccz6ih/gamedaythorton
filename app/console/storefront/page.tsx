@@ -18,6 +18,7 @@ import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase/server';
 import { getClinic } from '@/lib/db/queries';
 import { requireRole, text, bool, formMessage } from '@/lib/actions';
+import { emailEnabled, emailStatus } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -235,14 +236,22 @@ export default async function StorefrontSettings({
                 <div className="hint">For the &ldquo;someone just enquired&rdquo; nudge, not the message itself.</div>
               </div>
 
-              <div className="note-band warn">
-                <b>Nothing is actually sent yet.</b> While the pilot is on, every
-                message is written to the activity log instead of being delivered
-                — the log shows exactly what would have gone out and to whom.
-                Sending needs signed agreements with a messaging provider first.
-                Requests are never lost: they are all on{' '}
+              <div className={`note-band${emailEnabled() ? '' : ' warn'}`}>
+                <b>{emailEnabled() ? 'Email is being sent.' : 'Nothing is sent yet.'}</b>{' '}
+                {emailStatus()} Every message is recorded either way, so the
+                activity log always shows what the system tried to do. Requests
+                are never lost regardless: they are all on{' '}
                 <Link href="/console/clients" className="banner-link">your clients list</Link>.
               </div>
+
+              {!emailEnabled() && (
+                <p className="muted" style={{ fontSize: '.82rem', lineHeight: 1.6 }}>
+                  Turning it on takes two settings on the hosting environment —{' '}
+                  <code>NOTIFY_EMAIL_ENABLED</code> and a provider key. Two rather
+                  than one so a key arriving in an environment cannot by itself
+                  start sending mail about named people.
+                </p>
+              )}
             </div>
           </section>
 
