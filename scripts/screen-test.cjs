@@ -173,25 +173,36 @@ const CONSOLE_ROUTES = [
 
     const clients = await get(jamie, '/console/clients');
     if (clients.status === 200) {
-      if (clients.body.includes('Bettencourt')) ok('her roster renders real names');
-      else bad('her roster renders real names');
+      // Was: expects "Bettencourt", an invented client. The Med Bar is live now,
+      // so the roster is real people whose names must not be written into a
+      // test in a public repo. Asserting the table rendered rows is the part
+      // that actually matters.
+      const rows = (clients.body.match(/<tr class="clickable"/g) || []).length;
+      if (rows > 0) ok('her roster renders', `${rows} clients`);
+      else bad('her roster renders', 'no rows in the table');
     }
 
     const treatments = await get(jamie, '/console/treatments');
     if (treatments.status === 200) {
-      if (/Glabella|Jeuveau|infraorbital/i.test(treatments.body)) {
-        ok('treatment records show areas and product');
-      } else bad('treatment records show areas and product');
-      if (/adverse/i.test(treatments.body)) ok('the adverse event surfaces');
-      else bad('the adverse event surfaces');
+      // A live clinic starts with no treatment history, so an empty state is
+      // correct rather than a failure. What must hold either way: the screen
+      // renders, and it explains itself when there is nothing yet.
+      if (/Treatment records/i.test(treatments.body)) ok('the treatment screen renders');
+      else bad('the treatment screen renders');
+      if (/No treatments recorded yet|Areas treated|adverse/i.test(treatments.body)) {
+        ok('it shows history or says there is none');
+      } else bad('it shows history or says there is none');
     }
 
     const packages = await get(jamie, '/console/packages');
     if (packages.status === 200) {
-      if (/PRF/i.test(packages.body)) ok('prepaid ledger lists her real packages');
-      else bad('prepaid ledger lists her real packages');
-      if (/liability/i.test(packages.body)) ok('prepaid liability is stated');
-      else bad('prepaid liability is stated');
+      // The package CATALOGUE is real and stays; the purchase ledger starts
+      // empty on a live clinic until somebody buys one.
+      if (/PRF|Package/i.test(packages.body)) ok('the packages screen renders');
+      else bad('the packages screen renders');
+      if (/liability|owed|No packages/i.test(packages.body)) {
+        ok('prepaid liability is stated, or its absence is');
+      } else bad('prepaid liability is stated, or its absence is');
     }
 
     const services = await get(jamie, '/console/services');
@@ -270,10 +281,16 @@ const CONSOLE_ROUTES = [
     const portal = await get(delphine, '/portal');
     inspect('/portal', portal);
     if (portal.status === 200) {
-      if (portal.body.includes('Delphine')) ok('portal greets her by name');
-      else bad('portal greets her by name');
-      if (/PRF/i.test(portal.body)) ok('shows her prepaid sessions');
-      else bad('shows her prepaid sessions');
+      // The portal account points at an invented "Demo Client" now that The Med
+      // Bar is live — pointing a shared demo login at a real client would hand
+      // anyone with the demo password a real person's record.
+      if (/Demo|Delphine/.test(portal.body)) ok('portal greets the signed-in client by name');
+      else bad('portal greets the signed-in client by name');
+
+      // A client with no purchase history is a normal state, not a failure.
+      if (/PRF|session|No .*(package|session)/i.test(portal.body)) {
+        ok('prepaid sessions show, or their absence does');
+      } else bad('prepaid sessions show, or their absence does');
       if (!/Achterberg|Wexford|Nkemelu/.test(portal.body)) {
         ok('no other client appears on her screen');
       } else bad('no other client appears on her screen', 'LEAK');

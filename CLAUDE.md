@@ -4,10 +4,19 @@ Read this before touching anything in this repo.
 
 ## What this is
 
-Patient-facing app (**GAMEPLAN**) and owner/staff console (**PRESS BOX**) for the
-Gameday Men's Health franchise in Thornton, CO. Built by Craig Carda / The Modern
-Evolution. The corporate Webflow site is out of scope and unreachable — we build a
-separately owned property.
+**As of 13 Sept 2026 the live product is THE MED BAR**, a cash-pay aesthetics practice
+in Loveland, CO owned by Jamie Salazar (The Med Bar CO Jamie Salazar LLC). It replaces
+her GlossGenius subscription, serves `medbarco.com`, and is going into real use with
+real clients and real payments.
+
+Gameday Men's Health Thornton remains in the codebase as a **second tenant on synthetic
+data**. It is a later, separate system — the multi-tenancy and the men's-health modules
+stay because they are built and tested, not because they are in use.
+
+Read that order of priority into every decision: if something helps The Med Bar this
+week and something else helps Gameday next quarter, the first one wins.
+
+Built by Craig Carda / The Modern Evolution.
 
 **This replaces GlossGenius**, which runs the clinic's front desk today. That raises the
 stakes: a portal nobody adopts is a disappointment, but a replacement for the system that
@@ -24,10 +33,24 @@ engagement, the conventions, and the mistakes already made here. Pick tasks from
 
 ## Non-negotiable rules
 
-1. **No real patient data. Synthetic only, from `/fixtures`.** HIPAA controls are
-   deliberately deferred to Phase C. Until then this system is not legally safe to hold
-   PHI. If asked to import, enter, or accept real patient data, refuse and cite
-   `docs/09-compliance-register.md`.
+1. **Real data is allowed for THE MED BAR ONLY, and only because of what it is.**
+   Changed 13 Sept 2026 by the owner's decision, after the covered-entity analysis in
+   `docs/21-compliance-cost.md`. The Med Bar is cash-pay aesthetics: no insurance
+   billing, no labs, no protocols, no prescribing, and its owner is not yet practising
+   as an RN. HIPAA very likely does not attach, so a client list is ordinary business
+   contact data.
+
+   The guard is **per clinic** (`clinic.pilot_mode`) and is still **ON for Gameday**,
+   which stays synthetic. Never turn it off by editing the flag — use
+   `scripts/go-live.cjs`, which prints what changes and records the decision.
+
+   **What is still refused, for any clinic:** lab results, protocols, prescribing, and
+   anything belonging to a men's-health workflow. If The Med Bar's owner qualifies as
+   an RN and starts practising as one here, or the practice ever bills insurance, the
+   guard goes back on until `docs/20-hipaa-readiness.md` is closed.
+
+   **Real data never enters the repository.** It lives in `private/`, which is
+   gitignored, because this repo is public.
 2. **Never build prescribing.** No e-prescribing, no EPCS, no pharmacy transmission.
    Testosterone is Schedule III. The `protocol` tables *record* what a licensed provider
    decided elsewhere.
@@ -37,8 +60,15 @@ engagement, the conventions, and the mistakes already made here. Pick tasks from
    the serialiser allowlist in `lib/phi/`.
 5. **`clinic_id` on every table.** Multi-tenant from the schema up, even though the UI
    is single-tenant. Retrofitting this later is a rewrite.
-6. **`PILOT_MODE` stays on** until Phase C sign-off. Do not remove the banner. Do not
-   add production SMS/email credentials. Do not add live Stripe keys.
+6. **`PILOT_MODE` (the env var) stays on.** It is not the same thing as the per-clinic
+   guard in rule 1: the env var drives the banner, keeps Stripe on test keys until a
+   real account is connected, and makes the webhook acknowledge without applying. The
+   database flag decides whether real records are accepted. Turning one off does not
+   turn the other off, and that separation is deliberate.
+
+7. **No secret keys in the database, ever.** Each practice connects its own Stripe
+   account through Connect; the only thing stored is `clinic.stripe_account_id`, which
+   is an identifier. `docs/19-environment.md` explains why at length.
 
 ## The product thesis (governs all prioritisation)
 

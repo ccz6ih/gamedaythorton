@@ -47,3 +47,8 @@ scoping/feedback-*.raw.md
 .vercel/
 
 .vercel
+
+# Real client data. See private/README.md — the repo is public.
+private/*
+!private/.gitignore
+!private/README.md

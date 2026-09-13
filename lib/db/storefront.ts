@@ -83,6 +83,20 @@ export type StorefrontProvider = {
   photo_path: string | null;
 };
 
+export type StorefrontProduct = {
+  id: string;
+  name: string;
+  slug: string | null;
+  brand: string | null;
+  category: string;
+  description: string | null;
+  details: string | null;
+  price_cents: number;
+  /** Real on-hand count. The shop says "out of stock" rather than inventing availability. */
+  stock_qty: number;
+  image_path: string | null;
+};
+
 export type StorefrontPackage = {
   id: string;
   name: string;
@@ -163,6 +177,21 @@ export async function getStorefrontPackages(clinicId: string): Promise<Storefron
     .order('price_cents');
 
   return (data as unknown as StorefrontPackage[]) ?? [];
+}
+
+/** The shop. Online and active only; stock is shown rather than filtered on. */
+export async function getStorefrontProducts(clinicId: string): Promise<StorefrontProduct[]> {
+  const supabase = anonClient();
+  const { data } = await supabase
+    .from('product')
+    .select('id, name, slug, brand, category, description, details, price_cents, stock_qty, image_path')
+    .eq('clinic_id', clinicId)
+    .eq('active', true)
+    .eq('online', true)
+    .order('sort_order')
+    .order('name');
+
+  return (data as unknown as StorefrontProduct[]) ?? [];
 }
 
 /**

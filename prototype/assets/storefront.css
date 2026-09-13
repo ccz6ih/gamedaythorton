@@ -665,3 +665,78 @@
   height: 1px;
   overflow: hidden;
 }
+
+/* ------------------------------------------------------------------ shop -- */
+/* A grid, unlike the service menu, because a product is chosen by looking at it
+   and a service is chosen by comparing a column of prices. Same system, two
+   jobs, two treatments. */
+.sf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--gd-5);
+}
+
+.sf-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  background: var(--gd-surface);
+  overflow: hidden;
+}
+
+.sf-card-img {
+  aspect-ratio: 1;
+  background: var(--gd-surface-raised);
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* No photograph yet: the initial in the brand face, rather than a grey box or
+   a stock image of somebody else's product. */
+.sf-card-img span {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-3);
+  color: var(--gd-accent);
+  opacity: .5;
+}
+
+.sf-card-body { padding: var(--gd-4) var(--gd-4) var(--gd-2); flex: 1; }
+.sf-card-brand {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-0);
+  line-height: 1.25;
+  margin: 0 0 var(--gd-2);
+  text-wrap: balance;
+}
+.sf-card-desc {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.5;
+  color: var(--gd-text-muted);
+}
+.sf-card-desc.dim { color: var(--gd-text-dim); font-style: italic; }
+
+.sf-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  padding: var(--gd-3) var(--gd-4) var(--gd-4);
+  margin-top: auto;
+}
+.sf-card-price {
+  font-size: var(--gd-step-1);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}

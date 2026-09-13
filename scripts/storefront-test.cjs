@@ -158,12 +158,16 @@ async function cannotRead(label, table, select = '*') {
         'a public form that can read its own table is a public database');
     }
 
-    const notSynthetic = await anon('lead', {
+    // The Med Bar is LIVE, so a real enquiry is supposed to be accepted here —
+    // that is the whole point of the storefront. What this now checks is that
+    // the guard tracks the clinic's own pilot_mode rather than being bypassed:
+    // accepted on a live clinic, refused on one still in pilot.
+    const realOnLive = await anon('lead', {
       method: 'POST',
-      body: JSON.stringify({ clinic_id: cid, name: 'Real Person', synthetic: false })
+      body: JSON.stringify({ clinic_id: cid, name: 'Live Enquiry Test', phone: '+19705550166', source: 'website', synthetic: false })
     });
-    if (notSynthetic.status >= 400) ok('an enquiry not marked synthetic is refused', 'pilot guard holds on the public form');
-    else bad('an enquiry not marked synthetic is refused', 'REAL DATA CAN ENTER VIA THE PUBLIC FORM');
+    if (realOnLive.status < 300) ok('a real enquiry is accepted for a live clinic', 'The Med Bar is live');
+    else bad('a real enquiry is accepted for a live clinic', JSON.stringify(realOnLive.body).slice(0, 140));
 
     const writeService = await anon('service', {
       method: 'POST',
@@ -213,9 +217,15 @@ async function cannotRead(label, table, select = '*') {
     if (otherRule.status >= 400) ok('but only under the storefront rule', 'not a general write into automation history');
     else bad('but only under the storefront rule', 'anon can write arbitrary automation records');
 
+    // The Med Bar is live, so a non-synthetic row is correct here. The guard
+    // has not gone away — it tracks each clinic's own pilot_mode, which the
+    // write-test proves by checking both sides.
     const notSynthetic = await logRow({ synthetic: false });
-    if (notSynthetic.status >= 400) ok('and the pilot guard still applies');
-    else bad('and the pilot guard still applies');
+    if (notSynthetic.status < 300) {
+      ok('a real notification logs for a live clinic');
+    } else {
+      bad('a real notification logs for a live clinic', JSON.stringify(notSynthetic.body).slice(0, 140));
+    }
 
     const readBack = await anon('automation_run?select=id&limit=3');
     if (readBack.status >= 400 || (Array.isArray(readBack.body) && readBack.body.length === 0)) {
@@ -237,9 +247,21 @@ async function cannotRead(label, table, select = '*') {
       body: JSON.stringify({ email: 'jamie@medbar.pilot.invalid', password: pw })
     });
     const { access_token } = await tokenRes.json();
+    /**
+     * Removes BOTH test shapes, matched on name as well as email.
+     *
+     * This clinic is live now, so anything this harness leaves behind sits in
+     * the practice's real enquiry list looking like a customer. An earlier run
+     * left four "Live Enquiry Test" rows exactly that way — the cleanup only
+     * knew about the row with a test email address.
+     */
+    const auth = { apikey: KEY, Authorization: `Bearer ${access_token}` };
     const del = await fetch(
-      `${URL_SB}/rest/v1/lead?email=eq.storefront-test@example.invalid`,
-      { method: 'DELETE', headers: { apikey: KEY, Authorization: `Bearer ${access_token}` } });
+      `${URL_SB}/rest/v1/lead?or=(email.eq.storefront-test@example.invalid,name.like.*Test*)`,
+      { method: 'DELETE', headers: auth });
+    await fetch(
+      `${URL_SB}/rest/v1/automation_run?rule_key=eq.storefront_enquiry_email`,
+      { method: 'DELETE', headers: auth });
     if (del.ok) ok('test enquiry removed', 'via the staff path, since anon cannot delete');
     else bad('test enquiry removed', `${del.status}`);
   } catch (err) {

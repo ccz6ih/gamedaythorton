@@ -85,6 +85,29 @@ const ANONYMOUS_OK = [
   '/c'                // also listed here, for when STOREFRONT_PRIVATE is on
 ];
 
+/**
+ * The storefront paths that exist at the ROOT of a practice's own domain.
+ *
+ * next.config.mjs rewrites these to /c/<slug>/…, but middleware runs BEFORE
+ * rewrites — it sees "/" and "/shop", not the destination. Without this the
+ * gate challenges a customer landing on medbarco.com, which is the one visitor
+ * who must never see a passcode box.
+ *
+ * Kept deliberately short and explicit rather than "anything not /console":
+ * a new private area added later should be private by default, not public
+ * because a wildcard already covered it.
+ */
+const STOREFRONT_ROOT = [
+  '/', '/services', '/packages', '/about', '/shop', '/enquire'
+];
+
+function isStorefrontRoot(pathname: string) {
+  // Only meaningful when some clinic is actually serving the root — on a host
+  // with no primary clinic these paths are ordinary app routes.
+  if (!process.env.PRIMARY_CLINIC_SLUG) return false;
+  return STOREFRONT_ROOT.includes(pathname) || pathname.startsWith('/shop/');
+}
+
 function isUnder(pathname: string, paths: string[]) {
   return paths.some(p => pathname === p || pathname.startsWith(p === '/' ? '/' : p + '/'));
 }
@@ -114,7 +137,8 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/assets') ||
-    isExactlyOrUnder(pathname, ALWAYS_OPEN)
+    isExactlyOrUnder(pathname, ALWAYS_OPEN) ||
+    isStorefrontRoot(pathname)
   ) {
     return NextResponse.next();
   }

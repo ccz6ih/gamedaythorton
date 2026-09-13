@@ -19,8 +19,15 @@ const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const PW = process.env.PILOT_DEMO_PASSWORD;
 
 const ACCOUNTS = [
-  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday', expectPatients: 30 },
-  { email: 'jamie@medbar.pilot.invalid', kind: 'staff', clinic: 'Med Bar', expectPatients: 9 },
+  // Staff counts are a MINIMUM, not an exact number. The Med Bar is live with
+  // real clients now, so a hardcoded total breaks every time somebody books —
+  // and a test that fails on normal use gets ignored, which is worse than no
+  // test. The property being checked is "sees their own clinic's people and
+  // nobody else's", which the clinic check below enforces.
+  { email: 'owner@gameday.pilot.invalid', kind: 'staff', clinic: 'Gameday', minPatients: 1 },
+  { email: 'jamie@medbar.pilot.invalid', kind: 'staff', clinic: 'Med Bar', minPatients: 1 },
+  // A client seeing exactly one row — their own — stays an exact number. That
+  // one IS the invariant, and "at least one" would pass while leaking.
   { email: 'gregory@gameday.pilot.invalid', kind: 'patient', clinic: 'Gameday', expectPatients: 1 },
   { email: 'delphine@medbar.pilot.invalid', kind: 'patient', clinic: 'Med Bar', expectPatients: 1 }
 ];
@@ -73,11 +80,18 @@ async function get(token, pathAndQuery) {
     const pat = await get(t, 'patient?select=id,first_name,last_name,clinic_id');
     if (!Array.isArray(pat.body)) {
       bad(`${a.email} can read patient`, `${pat.status} ${JSON.stringify(pat.body).slice(0, 120)}`);
-    } else if (pat.body.length === a.expectPatients) {
+    } else if (a.kind === 'patient'
+        ? pat.body.length === a.expectPatients
+        : pat.body.length >= a.minPatients) {
       ok(`${a.email} sees ${pat.body.length} patient row(s)`,
-        a.kind === 'patient' ? `= only ${pat.body[0].first_name} ${pat.body[0].last_name}` : '= own tenant only');
+        a.kind === 'patient'
+          ? `= only ${pat.body[0].first_name} ${pat.body[0].last_name}`
+          : '= own tenant only');
     } else {
-      bad(`${a.email} sees ${a.expectPatients} patient row(s)`, `saw ${pat.body.length}`);
+      bad(`${a.email} patient visibility`,
+        a.kind === 'patient'
+          ? `expected exactly ${a.expectPatients}, saw ${pat.body.length}`
+          : `expected at least ${a.minPatients}, saw ${pat.body.length}`);
     }
 
     // Exactly one clinic must be visible, and it must be the right one.

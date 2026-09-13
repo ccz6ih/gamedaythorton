@@ -126,6 +126,20 @@ export default async function PortalPage() {
               </section>
             )}
 
+            {/* A practice that has just moved systems has clients with no history
+                here yet, and every one of them opens this page for the first
+                time. An omitted section reads as a broken page; saying there is
+                nothing yet reads as a new page. */}
+            {openPackages.length === 0 && (
+              <section className="card" style={{ marginTop: '1rem' }}>
+                <div className="eyebrow">Prepaid</div>
+                <p className="muted" style={{ fontSize: '.9rem', margin: 0 }}>
+                  No prepaid sessions on your account. If you buy a package it
+                  shows here, with how many sessions are left.
+                </p>
+              </section>
+            )}
+
             {openPackages.length > 0 && (
               <section className="card accent" style={{ marginTop: '1rem' }}>
                 <div className="eyebrow">Prepaid and waiting for you</div>

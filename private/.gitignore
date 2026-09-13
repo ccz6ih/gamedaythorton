@@ -1,0 +1,4 @@
+# Everything here is real and must never reach a public repository.
+*
+!.gitignore
+!README.md

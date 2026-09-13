@@ -20,7 +20,10 @@ export default function NotFound() {
           If you got here from a link inside the app, that is our bug and worth
           mentioning — a navigation link should never lead to a dead end.
         </p>
-        <Link className="btn primary block" href="/console">Back to the console</Link>
+        {/* "Back to the console" is wrong for the person most likely to be here.
+        On a practice's own domain this page is reached by a customer who
+        mistyped a URL, not by staff. */}
+    <Link className="btn primary block" href="/">Back to the home page</Link>
         <Link className="btn ghost block" href="/" style={{ marginTop: '.6rem' }}>Start again</Link>
       </div>
     </main>

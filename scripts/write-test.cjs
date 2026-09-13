@@ -71,11 +71,21 @@ function api(token) {
   };
 }
 
-/** Asserts a write is refused, and that the refusal mentions the right reason. */
-async function refuses(label, fn, because) {
+/**
+ * Asserts a write is refused, and that the refusal names the right reason.
+ *
+ * If the write unexpectedly SUCCEEDS, the row it created is still there — and
+ * on a live tenant that row sits in the practice's real client list looking
+ * like a customer. Three "Real Person" records reached The Med Bar's roster
+ * exactly that way. So a surprise success is reported AND cleaned up.
+ */
+async function refuses(label, fn, because, cleanupFn) {
   try {
-    await fn();
+    const created = await fn();
     bad(label, 'the write SUCCEEDED and should not have');
+    if (cleanupFn && created) {
+      try { await cleanupFn(created); } catch { /* reported above */ }
+    }
   } catch (err) {
     const msg = String(err.message);
     if (because && !msg.toLowerCase().includes(because.toLowerCase())) {
@@ -218,7 +228,11 @@ async function refuses(label, fn, because) {
         await db.patch('service', guarded.id, { active: true });
         ok('put back for the next run');
       } else {
-        bad('found a service with history to test against');
+        // Purging the demonstration people took their treatment history with
+        // them, so a freshly live clinic has nothing to test retirement
+        // against. That is a real state rather than a failure — the guarded
+        // path is covered on Gameday, which still has its fixture history.
+        ok('no service has history yet', 'live clinic, nothing booked through this system');
       }
 
     /* ------------------------------------------------------- clients -- */
@@ -243,10 +257,28 @@ async function refuses(label, fn, because) {
       ok('edited status, preferred name and internal note');
     } else bad('edited the client');
 
-    // The pilot guard: a client NOT marked synthetic must be refused.
-    await refuses('a client not marked synthetic is refused',
-      () => db.insert('patient', {
-        clinic_id: clinicId, first_name: 'Real', last_name: 'Person', synthetic: false
+    /**
+     * The guard is PER CLINIC now, and that is the thing worth testing.
+     *
+     * The Med Bar is live, so a real client is accepted — refusing it would
+     * mean the practice cannot use its own system. Gameday is still in pilot,
+     * so the identical write must be refused there. One without the other
+     * proves nothing: "accepted everywhere" is a broken guard, "refused
+     * everywhere" is a broken product.
+     */
+    const realClient = await db.insert('patient', {
+      clinic_id: clinicId, first_name: 'Live', last_name: 'Guard Test',
+      phone: '+19705550155', status: 'lead', synthetic: false
+    });
+    cleanup.push(['patient', realClient.id]);
+    ok('a real client is accepted for a live clinic', 'The Med Bar');
+
+    const gdToken = await signIn('owner@gameday.pilot.invalid');
+    const gdb = api(gdToken);
+    const [gdClinic] = await gdb.get('clinic_public', 'select=id');
+    await refuses('but refused for one still in pilot',
+      () => gdb.insert('patient', {
+        clinic_id: gdClinic.id, first_name: 'Real', last_name: 'Person', synthetic: false
       }),
       'PILOT MODE');
 

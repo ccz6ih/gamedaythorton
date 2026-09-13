@@ -60,16 +60,53 @@ export default async function StorefrontLayout({ children, params }: Props) {
   if (brand.font) style['--brand-font'] = brand.font;
   if (brand.displayFont) style['--brand-display-font'] = brand.displayFont;
 
+  /**
+   * Surface colours, when the practice wants a ground of its own.
+   *
+   * "dark" in tokens.css is a neutral near-black, which is right for a men's
+   * health clinic and wrong for a practice whose whole identity is plants and
+   * brass. Rather than add a second named theme for every brand that comes
+   * along, the kit can set the four surface values directly and everything
+   * else — borders, text, the accent chain — still derives from them.
+   */
+  const SURFACE_KEYS: [string, string][] = [
+    ['bg', '--gd-bg'],
+    ['surfaceColor', '--gd-surface'],
+    ['surfaceRaised', '--gd-surface-raised'],
+    ['borderColor', '--gd-border']
+  ];
+  for (const [key, token] of SURFACE_KEYS) {
+    if (brand[key]) style[token] = brand[key];
+  }
+
   const hours = hoursLines(clinic.hours);
   const nav = [
     { href: `/c/${slug}`, label: 'Home' },
     { href: `/c/${slug}/services`, label: 'Services' },
+    { href: `/c/${slug}/shop`, label: 'Shop' },
     { href: `/c/${slug}/packages`, label: 'Packages' },
     { href: `/c/${slug}/about`, label: 'About' }
   ];
 
+  /**
+   * The display face, loaded here rather than in the root layout so the console
+   * does not pay for it and the strict no-external-origins policy still covers
+   * everything private. The CSP for these paths allows exactly these two hosts
+   * and nothing else — see next.config.mjs.
+   *
+   * Every face named in the brand kit needs a real fallback, because this link
+   * can fail and the page still has to read.
+   */
+  const needsCormorant = /Cormorant/i.test(String(brand.displayFont ?? brand.font ?? ''));
+
   return (
     <div className="sf" data-surface={surface} style={style}>
+      {needsCormorant && (
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        />
+      )}
       <nav className="sf-nav" aria-label="Storefront">
         <div className="sf-nav-inner">
           <Link href={`/c/${slug}`} className="sf-mark">
