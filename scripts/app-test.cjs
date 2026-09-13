@@ -18,15 +18,20 @@
  *   scripts/auth-test.cjs instead. The signed-in UI still needs a human to click
  *   through it.
  *
- * Run:  node scripts/app-test.cjs [baseUrl]
+ * Run:  node scripts/app-test.cjs [baseUrl] [passcode]
  *       (start the server first: npm run build && npm start)
+ *
+ * The passcode argument matters when testing a deployed environment: production
+ * has its own PILOT_PASSCODE, which is deliberately not the local one. Without
+ * it every gated check fails with a 307 to /gate — which is the gate working
+ * correctly, but reads like six broken features.
  */
 
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env.local') });
 
 const BASE = (process.argv[2] || 'http://localhost:3000').replace(/\/$/, '');
-const PASSCODE = process.env.PILOT_PASSCODE;
+const PASSCODE = process.argv[3] || process.env.PILOT_PASSCODE;
 
 let pass = 0, fail = 0;
 const ok = (m, n) => { pass++; console.log(`  ✓ ${m}${n ? '  ' + n : ''}`); };
