@@ -97,7 +97,11 @@
   align-items: center;
   gap: var(--gd-2);
 }
-.sf-mark img { height: var(--brand-logo-height); width: auto; }
+.sf-mark img {
+  height: clamp(2rem, 4vw, 2.6rem);
+  width: auto;
+  display: block;
+}
 .sf-nav a.sf-link {
   color: var(--gd-text-muted);
   text-decoration: none;
@@ -961,9 +965,16 @@
 /* One light section against the dark ground, the way the original alternated.
    Tokens are re-pointed rather than colours rewritten, so everything inside —
    menu rows, chips, prices — follows without knowing it moved. */
+/* LITERAL VALUES, NOT var(--gd-text).
+   The first version wrote `--gd-bg: var(--gd-text)` and then redefined
+   `--gd-text` in the same block. Custom properties resolve against the final
+   value in scope, so both came out #16201A — dark text on a dark ground, and
+   the whole section rendered as nothing but its gold icons. It looked like a
+   broken page and it was two characters of cleverness. */
 .sf-section.sf-invert {
-  --gd-bg: var(--gd-text);
-  --gd-surface: var(--gd-text);
+  --gd-bg: #EFE7DA;
+  --gd-surface: #EFE7DA;
+  --gd-surface-raised: #E5DBCB;
   --gd-text: #16201A;
   --gd-text-muted: rgba(22,32,26,.66);
   --gd-text-dim: rgba(22,32,26,.5);

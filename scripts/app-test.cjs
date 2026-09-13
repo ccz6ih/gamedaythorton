@@ -367,6 +367,70 @@ async function req(url, opts = {}) {
     else bad('no client names on the public page', 'CLIENT DATA ON AN UNAUTHENTICATED PAGE');
   }
 
+  /* -------------------------------------------------- can it be SEEN -- */
+  // Every check so far proved content reaches the HTML. None proved it was
+  // visible, and a whole section shipped rendering nothing but its icons:
+  // `--gd-bg: var(--gd-text)` sat in the same block that redefined --gd-text,
+  // so both resolved to the same dark colour. The markup was perfect.
+  console.log('\nIS IT ACTUALLY VISIBLE');
+
+  const visRes = await req('/c/medbar-loveland', { headers: gateCookie() });
+  const visHtml = visRes.status === 200 ? await visRes.text() : '';
+  const cssHref2 = (visHtml.match(/href="([^"]+\.css[^"]*)"/) || [])[1];
+  if (cssHref2) {
+    const cssPath = cssHref2.startsWith('http') ? new URL(cssHref2).pathname + new URL(cssHref2).search : cssHref2;
+    const sheet = await (await fetch(BASE + cssPath)).text();
+
+    // Any rule setting both a background and a text colour must not set them
+    // to the same value. Checked on the shipped, minified stylesheet, because
+    // that is what the browser actually gets.
+    const clashes = [];
+    for (const block of sheet.match(/\.[^{}]*\{[^{}]*\}/g) || []) {
+      const bg = (block.match(/--gd-bg:\s*([^;}]+)/) || [])[1];
+      const fg = (block.match(/--gd-text:\s*([^;}]+)/) || [])[1];
+      if (bg && fg && bg.trim().toLowerCase() === fg.trim().toLowerCase()) {
+        clashes.push(block.slice(0, block.indexOf('{')) + ' -> ' + bg.trim());
+      }
+      // The same mistake in its other shape: a var() pointing at a token the
+      // same block redefines.
+      if (bg && /^var\(--gd-text\)$/.test(bg.trim()) && fg) {
+        clashes.push(block.slice(0, block.indexOf('{')) + ' -> --gd-bg references --gd-text');
+      }
+    }
+    if (clashes.length === 0) {
+      ok('no rule paints text the same colour as its background');
+    } else {
+      bad('no rule paints text the same colour as its background', clashes.join(' | '));
+    }
+
+    // Anything that animates in must END visible. `both` fill on a keyframe
+    // starting at opacity 0 leaves content invisible if the animation never
+    // runs — a crawler, a failed hydration, an unsupported property.
+    const risky = [];
+    for (const kf of sheet.match(/@keyframes\s+[\w-]+\{[\s\S]*?\}\s*\}/g) || []) {
+      const name = (kf.match(/@keyframes\s+([\w-]+)/) || [])[1];
+      if (!name) continue;
+      if (!/(?:to|100%)\{[^}]*opacity:\s*0(?!\.)/.test(kf)) continue;
+
+      // A keyframe that ends hidden is fine on decoration and fatal on
+      // content, so find out WHAT uses it rather than banning the shape.
+      // The centrifuge's whole-blood layer is supposed to disappear — that is
+      // the separation the animation exists to show.
+      const users = (sheet.match(new RegExp('\.[^{}]*\{[^{}]*animation:\s*' + name + '[^{}]*\}', 'g')) || [])
+        .map(r => r.slice(0, r.indexOf('{')));
+      const contentUsers = users.filter(sel => !/sf-cent/.test(sel));
+      if (contentUsers.length) risky.push(`${name} on ${contentUsers.join(', ')}`);
+    }
+    if (risky.length === 0) {
+      ok('no animation leaves CONTENT hidden', 'decorative fades allowed');
+    } else {
+      bad('no animation leaves CONTENT hidden', risky.join(' | '));
+    }
+  }
+
+  // The inverted section is the one that broke. Assert it explicitly.
+  if (/sf-invert/.test(visHtml)) ok('the light section is on the page');
+  else bad('the light section is on the page');
   const unknown = await req('/c/no-such-clinic', { headers: gateCookie() });
   if (unknown.status === 404) {
     ok('an unknown or unlisted practice is a 404', 'not a 403, which would confirm it exists');
