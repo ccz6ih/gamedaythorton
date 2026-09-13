@@ -42,3 +42,8 @@ yarn-error.log*
 # Session feedback captures that may contain notes taken in-clinic.
 # Commit these deliberately after review, not by accident.
 scoping/feedback-*.raw.md
+
+# Vercel CLI local link (contains project/org ids)
+.vercel/
+
+.vercel
