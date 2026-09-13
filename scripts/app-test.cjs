@@ -214,11 +214,17 @@ async function req(url, opts = {}) {
     }
   }
 
-  // Open to the world is not the same as indexed by the world.
+  // Indexing is decided by the page, not the header — a live practice wants to
+  // be found and a pilot tenant must not be, and one header cannot know which
+  // clinic it is serving. So the storefront header must NOT say noindex, or it
+  // would override the meta tag and keep her out of search regardless.
   const openHead = await req('/c/medbar-loveland');
-  if (/noindex/i.test(openHead.headers.get('x-robots-tag') || '')) {
-    ok('public but still not indexable', 'it carries a real practice name');
-  } else bad('public but still not indexable');
+  if (!/noindex/i.test(openHead.headers.get('x-robots-tag') || '')) {
+    ok('the storefront leaves indexing to the page', openHead.headers.get('x-robots-tag') || 'unset');
+  } else {
+    bad('the storefront leaves indexing to the page',
+      'a noindex header overrides the meta tag');
+  }
 
   const rb = await (await req('/robots.txt')).text();
   if (/Disallow:\s*\/\s*$/m.test(rb)) ok('robots.txt still disallows everything');
@@ -289,7 +295,10 @@ async function req(url, opts = {}) {
 
     // The source copy sprinkles emoji mid-sentence. On a medical price list it
     // reads as unfinished, so it was stripped — and must stay stripped.
-    const emoji = (html.match(/\p{Extended_Pictographic}/gu) || []).filter(c => c !== '®');
+    // ® and © are legitimate marks, not decoration. The rule is about the
+    // emoji sprinkled mid-sentence in the source copy.
+    const emoji = (html.match(/\p{Extended_Pictographic}/gu) || [])
+      .filter(c => c !== '®' && c !== '©');
     if (emoji.length === 0) ok('no emoji in the menu copy');
     else bad('no emoji in the menu copy', `found ${[...new Set(emoji)].join(' ')}`);
   }
@@ -343,10 +352,16 @@ async function req(url, opts = {}) {
     } else {
       bad('brand radius carries a unit', `"${radius.trim()}" makes calc() invalid`);
     }
-    // The page carries a real business name and real prices, so it must say
-    // what it is or it can be mistaken for that business's live site.
-    if (/Not the practice/i.test(spaHtml)) ok('the storefront says it is a preview');
-    else bad('the storefront says it is a preview', 'it could be mistaken for the live site');
+    // The Med Bar is a live business now, so its page should NOT carry a preview
+    // notice — and Gameday, still a pilot tenant, must. One storefront saying
+    // the right thing is not enough; the two have to differ.
+    if (!/Preview of a booking site/i.test(spaHtml)) {
+      ok('a live practice does not call itself a preview');
+    } else bad('a live practice does not call itself a preview');
+
+    if (/Preview of a booking site/i.test(gdHtml)) {
+      ok('a pilot tenant still says it is a preview', 'it carries a real name and real prices');
+    } else bad('a pilot tenant still says it is a preview', 'it could be mistaken for the live site');
 
     if (!/Bettencourt/i.test(spaHtml)) ok('no client names on the public page');
     else bad('no client names on the public page', 'CLIENT DATA ON AN UNAUTHENTICATED PAGE');
@@ -357,10 +372,26 @@ async function req(url, opts = {}) {
     ok('an unknown or unlisted practice is a 404', 'not a 403, which would confirm it exists');
   } else bad('an unknown or unlisted practice is a 404', `status ${unknown.status}`);
 
-  const sfHead = await req('/c/medbar-loveland', { headers: gateCookie() });
-  if (/noindex/i.test(sfHead.headers.get('x-robots-tag') || '')) {
-    ok('the storefront is not indexable', 'it carries a real practice name');
-  } else bad('the storefront is not indexable', 'it could appear in search beside their real site');
+  // Indexing is per tenant and lives in the page's own meta tag, because a
+  // header cannot know which clinic it is serving. A header saying noindex
+  // would override a meta tag saying index, which is exactly the bug this
+  // replaced: her site insisted it was indexable while the header said no.
+  const liveMeta = await req('/c/medbar-loveland', { headers: gateCookie() });
+  const pilotMeta = await req('/c/gameday-thornton', { headers: gateCookie() });
+  if (liveMeta.status === 200 && pilotMeta.status === 200) {
+    const liveHtml = await liveMeta.text();
+    const pilotHtml = await pilotMeta.text();
+    const robots = h => (h.match(/<meta name="robots" content="([^"]*)"/) || [])[1] ?? '';
+    if (/^index/.test(robots(liveHtml))) ok('a live practice is indexable', robots(liveHtml));
+    else bad('a live practice is indexable', `got "${robots(liveHtml)}"`);
+    if (/noindex/.test(robots(pilotHtml))) ok('a pilot tenant is not', robots(pilotHtml));
+    else bad('a pilot tenant is not', `got "${robots(pilotHtml)}"`);
+  }
+
+  const strictHead = await req('/console');
+  if (/noindex/i.test(strictHead.headers.get('x-robots-tag') || '')) {
+    ok('everything private is still header-noindexed');
+  } else bad('everything private is still header-noindexed');
 
   // A marketing image referenced by a PUBLIC page has to load without a
   // session. It did not: middleware sent it to /sign-in and the headshot

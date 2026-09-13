@@ -29,7 +29,12 @@ export async function generateMetadata(
     // Still noindex while this is a pilot. A storefront carrying a real
     // practice's name and prices must not appear in search results next to
     // the business's actual site until the practice says it is live.
-    robots: { index: false, follow: false }
+    // A live practice wants to be found; a pilot tenant must not be. Driven by
+    // the clinic's own state rather than a build-wide constant, because those
+    // two things are now true at the same time in the same deployment.
+    robots: clinic?.live
+      ? { index: true, follow: true }
+      : { index: false, follow: false }
   };
 }
 
@@ -163,15 +168,23 @@ export default async function StorefrontLayout({ children, params }: Props) {
             </div>
           </div>
 
-          {/* This page carries a real practice's name and real prices. Saying
-              plainly what it is keeps it from being mistaken for their live
-              site — by a visitor or by us. */}
-          <p className="sf-pilot">
-            Preview of a booking site in development for {clinic.name}. Not the
-            practice&rsquo;s live website, not accepting real bookings, and not
-            indexed by search engines. All client records shown anywhere in this
-            system are invented. <Link href="/about-pilot">More about this pilot</Link>.
-          </p>
+          {clinic.live ? (
+            <p className="sf-pilot">
+              &copy; {new Date().getFullYear()} {clinic.legal_name ?? clinic.name}.
+              {' '}<Link href={`/c/${slug}/about`}>About</Link>
+              {' · '}<Link href={`/c/${slug}/enquire`}>Contact</Link>
+            </p>
+          ) : (
+            /* A pilot tenant carries a real practice's name and real prices, so
+               it says plainly what it is. A live practice does not need telling
+               that its own website is its website. */
+            <p className="sf-pilot">
+              Preview of a booking site in development for {clinic.name}. Not the
+              practice&rsquo;s live website, not accepting real bookings, and not
+              indexed by search engines. All client records shown anywhere in this
+              system are invented. <Link href="/about-pilot">More about this pilot</Link>.
+            </p>
+          )}
         </div>
       </footer>
     </div>

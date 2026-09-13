@@ -740,3 +740,286 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -.02em;
 }
+
+/* ==========================================================================
+   THE STAGE — hero, centrifuge, process rail
+   --------------------------------------------------------------------------
+   Adapted from the design Craig supplied. Two changes worth stating:
+
+   Colours come from the brand kit, never from here. The original hardcoded an
+   aubergine palette; this reads --gd-bg and --gd-accent, so the same markup is
+   green-and-gold for The Med Bar and whatever the next practice chooses.
+
+   The motion is CSS. The original used GSAP from a CDN, which the content
+   security policy blocks — and admitting a script origin for an animation is a
+   far larger concession than admitting a font, because a script can do anything
+   on the page and a font cannot.
+   ========================================================================== */
+
+.sf-stage {
+  position: relative;
+  padding-block: clamp(5rem, 12vw, 9rem) clamp(3rem, 7vw, 5.5rem);
+  overflow: hidden;
+}
+
+.sf-stage-grid {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+/* ------------------------------------------------------------- display -- */
+.sf-display {
+  font-family: var(--brand-display-font);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6.2vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -.018em;
+  margin: 0;
+  text-wrap: balance;
+}
+.sf-display .ln { display: block; overflow: hidden; }
+.sf-display .ln span {
+  display: block;
+  animation: sf-rise .95s cubic-bezier(.22,1,.36,1) both;
+}
+.sf-display .ln:nth-child(1) span { animation-delay: .30s; }
+.sf-display .ln:nth-child(2) span { animation-delay: .39s; }
+.sf-display .ln:nth-child(3) span { animation-delay: .48s; }
+.sf-display i { font-style: italic; color: var(--gd-accent); }
+
+.sf-display-sm {
+  font-family: var(--brand-display-font);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+  line-height: 1.12;
+  letter-spacing: -.012em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+@keyframes sf-rise { from { transform: translateY(110%); } to { transform: translateY(0); } }
+
+.sf-fade { animation: sf-fade-up .8s cubic-bezier(.22,1,.36,1) both; }
+@keyframes sf-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sf-lede {
+  margin-top: var(--gd-6);
+  max-width: 46ch;
+  color: var(--gd-text-muted);
+  font-size: var(--gd-step-1);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.sf-lede.sm { font-size: var(--gd-step-0); margin-top: var(--gd-4); }
+.sf-lede.centre { margin-inline: auto; text-align: center; }
+
+.sf-note-line {
+  margin-top: var(--gd-5);
+  font-size: var(--gd-step--2);
+  letter-spacing: .05em;
+  color: var(--gd-text-dim);
+}
+.sf-note-line.centre { text-align: center; }
+.sf-actions.centre { justify-content: center; }
+.sf-section.sf-centre { text-align: center; }
+.sf-section.sf-centre .sf-display-sm { max-width: 18ch; margin-inline: auto; }
+.sf-section.sf-bordered { border-top: 1px solid var(--gd-border); }
+
+/* ---------------------------------------------------------- centrifuge -- */
+.sf-cent {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  color: var(--gd-text);
+}
+.sf-cent-svg { width: 100%; height: auto; overflow: visible; }
+
+.sf-cent-halo {
+  position: absolute;
+  width: 74%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--gd-accent) 30%, transparent) 0%,
+    transparent 68%);
+  filter: blur(12px);
+  opacity: 0;
+  animation: sf-halo 1.2s ease-out 1.4s forwards, sf-breathe 4.5s ease-in-out 3.4s infinite;
+}
+@keyframes sf-halo   { to { opacity: 1; } }
+@keyframes sf-breathe {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.09); opacity: .72; }
+}
+
+/* The rotor spins down, the way a centrifuge actually does. */
+.sf-cent-ring {
+  transform-origin: 200px 200px;
+  animation: sf-spin 2.6s cubic-bezier(.15,.6,.25,1) both;
+}
+@keyframes sf-spin { from { transform: rotate(0); } to { transform: rotate(1440deg); } }
+
+.sf-cent-glass { fill: color-mix(in srgb, var(--gd-surface-raised) 100%, transparent); }
+
+/* Whole blood fades out as the separated layers arrive. */
+.sf-cent-whole {
+  fill: #6B3440;
+  animation: sf-out 1.1s linear 1s both;
+}
+.sf-cent-rbc {
+  fill: #7E2F38;
+  opacity: 0;
+  animation: sf-in 1.1s linear 1s both;
+}
+/* The gold layer — the part that goes back in — grows from nothing. */
+.sf-cent-prf {
+  fill: var(--gd-accent);
+  transform-origin: 200px 104px;
+  transform: scaleY(0);
+  animation: sf-fill 1.4s cubic-bezier(.4,0,.2,1) 1s both;
+}
+@keyframes sf-out  { to { opacity: 0; } }
+@keyframes sf-in   { to { opacity: 1; } }
+@keyframes sf-fill { to { transform: scaleY(1); } }
+
+.sf-cent-cap-rect {
+  fill: color-mix(in srgb, var(--gd-accent) 22%, var(--gd-surface-raised));
+  stroke: currentColor;
+  stroke-opacity: .22;
+  stroke-width: 1.2;
+}
+.sf-cent-label {
+  font-family: var(--gd-font);
+  font-size: 13px;
+  letter-spacing: 1.4px;
+  fill: currentColor;
+  fill-opacity: .42;
+  opacity: 0;
+  animation: sf-halo .8s ease-out 2s forwards;
+}
+
+/* ------------------------------------------------------- process rail -- */
+.sf-steps { margin-top: clamp(2.5rem, 5vw, 4rem); position: relative; padding-left: 3.5rem; }
+.sf-rail {
+  position: absolute;
+  left: .95rem; top: .5rem; bottom: .5rem;
+  width: 1px;
+  background: var(--gd-border);
+}
+.sf-step { position: relative; padding-bottom: var(--gd-10); }
+.sf-step:last-child { padding-bottom: 0; }
+.sf-dot {
+  position: absolute;
+  left: -3.05rem; top: .45rem;
+  width: .8rem; height: .8rem;
+  border-radius: 50%;
+  background: var(--gd-bg);
+  border: 1px solid var(--gd-border-strong);
+  transition: background .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+.sf-step h3 {
+  font-family: var(--brand-display-font);
+  font-weight: 400;
+  font-size: var(--gd-step-1);
+  margin: 0;
+  color: var(--gd-text-dim);
+  transition: color .45s ease;
+}
+.sf-step h3 .num {
+  font-family: var(--gd-font);
+  font-size: var(--gd-step--2);
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-right: .5em;
+  vertical-align: .18em;
+}
+.sf-step p {
+  margin: var(--gd-2) 0 0;
+  max-width: 50ch;
+  color: var(--gd-text-dim);
+  transition: color .45s ease;
+}
+
+/* Lit is the DEFAULT. ProcessRail dims the ones below the fold once its
+   observer runs, so with no JavaScript the page reads as finished prose
+   rather than four greyed-out paragraphs. */
+.sf-step.on h3 { color: var(--gd-text); }
+.sf-step.on p { color: var(--gd-text-muted); }
+.sf-step.on .sf-dot {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--gd-accent) 14%, transparent);
+}
+
+/* --------------------------------------------------------- inverted -- */
+/* One light section against the dark ground, the way the original alternated.
+   Tokens are re-pointed rather than colours rewritten, so everything inside —
+   menu rows, chips, prices — follows without knowing it moved. */
+.sf-section.sf-invert {
+  --gd-bg: var(--gd-text);
+  --gd-surface: var(--gd-text);
+  --gd-text: #16201A;
+  --gd-text-muted: rgba(22,32,26,.66);
+  --gd-text-dim: rgba(22,32,26,.5);
+  --gd-border: rgba(22,32,26,.14);
+  --gd-border-strong: rgba(22,32,26,.28);
+  background: var(--gd-bg);
+  color: var(--gd-text);
+}
+
+/* ------------------------------------------------------------- split -- */
+.sf-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+.sf-tiers { display: flex; flex-direction: column; margin-top: var(--gd-6); }
+.sf-tier {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--gd-4);
+  padding: var(--gd-4) 0;
+  border-bottom: 1px solid var(--gd-border);
+  flex-wrap: wrap;
+}
+.sf-tier span:first-child {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+}
+.sf-tier span:last-child {
+  color: var(--gd-text-muted);
+  font-size: var(--gd-step--1);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 860px) {
+  .sf-stage-grid { grid-template-columns: 1fr; }
+  .sf-cent { width: 62%; margin-inline: auto; }
+  .sf-split { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The finished state, not the journey. Everything that animates in must end
+     visible, or reduced motion becomes a blank page. */
+  .sf-display .ln span,
+  .sf-fade { animation: none; opacity: 1; transform: none; }
+  .sf-cent-ring,
+  .sf-cent-whole,
+  .sf-cent-rbc,
+  .sf-cent-prf,
+  .sf-cent-halo,
+  .sf-cent-label { animation: none; }
+  .sf-cent-whole { opacity: 0; }
+  .sf-cent-rbc { opacity: 1; }
+  .sf-cent-prf { transform: scaleY(1); }
+  .sf-cent-halo,
+  .sf-cent-label { opacity: 1; }
+}

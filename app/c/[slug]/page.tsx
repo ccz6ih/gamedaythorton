@@ -1,10 +1,22 @@
 /**
  * app/c/[slug]/page.tsx — the storefront home.
  *
- * Three jobs, in the order a visitor actually has them: what is this and where,
- * what does it cost, and what is it going to be like. The third is the one
- * every booking-page template skips, and it is the one a nervous first-timer is
- * really asking. docs/14-screen-specs.md P13.
+ * Built from the design Craig supplied, with three deliberate changes.
+ *
+ * 1. GREEN, NOT AUBERGINE. Her brand is plants and brass, so the ground is a
+ *    deep botanical green and the accent is the gold already in her kit. Every
+ *    colour reads from the brand kit rather than being written in here, so a
+ *    different practice renders the same markup in its own identity.
+ *
+ * 2. NO GSAP. The mockup pulls two scripts from a CDN. The content security
+ *    policy admits no external script origin, and opening one for an animation
+ *    is a far bigger concession than the font — a script can do anything on the
+ *    page. The centrifuge and the hero entrance are CSS keyframes; the
+ *    scroll-lit process rail is one IntersectionObserver.
+ *
+ * 3. DATA-DRIVEN. The mockup hardcodes six treatments and three lash tiers.
+ *    Here they come from the practice's own catalogue, so editing a price in
+ *    the console changes this page and the two cannot drift apart.
  */
 
 import Link from 'next/link';
@@ -13,9 +25,19 @@ import {
   getStorefront, getStorefrontServices, getStorefrontProviders, hoursLines
 } from '@/lib/db/storefront';
 import { ServiceIcon } from '@/components/ServiceIcon';
-import { priceLabel, initials } from '@/lib/format';
+import { Centrifuge } from '@/components/Centrifuge';
+import { ProcessRail } from '@/components/ProcessRail';
+import { priceLabel, initials, money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+
+/** How PRF actually works, in sequence. */
+const PROCESS = [
+  { n: '01', h: 'Draw', p: 'A small blood draw, done in the treatment room. Roughly the volume of a routine lab panel.' },
+  { n: '02', h: 'Spin', p: 'Your sample goes into the centrifuge. Spinning separates it into layers and concentrates the platelets, growth factors and fibrin into PRF.' },
+  { n: '03', h: 'Place', p: 'The PRF goes back where you need it — under the eyes, through microneedling channels, or worked into the scalp.' },
+  { n: '04', h: 'Build', p: 'Because it works with your own repair process, results develop over weeks rather than the same day. A series is often recommended.' }
+];
 
 export default async function StorefrontHome({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -31,51 +53,153 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
   const hours = hoursLines(clinic.hours);
   const facts = Object.entries(clinic.visit_facts ?? {});
 
-  // Lead with what people book most, not with whatever sorts first.
-  const featured = services.filter(s => s.online_bookable).slice(0, 6);
+  // Signature work leads: the regenerative and injectable side for a med spa.
+  const signature = services
+    .filter(s => s.online_bookable)
+    .filter(s => !isSpa || /injectable|paramedical|skin/.test(s.category))
+    .slice(0, 6);
+
+  // Lash tiers collapse to one line each: full set, then cheapest fill.
+  const lashes = services.filter(s => s.category === 'lashes');
+  const tiers = ['Classic', 'Hybrid', 'Volume']
+    .map(tier => {
+      const inTier = lashes.filter(s => s.name.includes(tier));
+      const full = inTier.find(s => /full set/i.test(s.name));
+      const fills = inTier
+        .filter(s => /fill/i.test(s.name))
+        .map(s => s.price_cents ?? 0)
+        .filter(Boolean);
+      return full ? { tier, full, from: fills.length ? Math.min(...fills) : null } : null;
+    })
+    .filter((t): t is { tier: string; full: typeof services[number]; from: number | null } => t !== null);
+
+  const consult = services.find(s => s.category === 'consult');
 
   return (
     <>
-      <header className="sf-hero">
-        <div className="sf-wrap">
-          <div className="sf-eyebrow">
-            {clinic.location_name ?? `${clinic.address_city}, ${clinic.address_state}`}
-          </div>
-          <h1>{clinic.tagline ?? clinic.name}</h1>
+      <section className="sf-stage">
+        <div className="sf-wrap sf-stage-grid">
+          <div>
+            <h1 className="sf-display">
+              <span className="ln"><span>The bar where</span></span>
+              <span className="ln"><span>the good stuff</span></span>
+              <span className="ln"><span>comes <i>from you</i>.</span></span>
+            </h1>
 
-          {clinic.intro && <p className="sf-tagline">{clinic.intro}</p>}
+            <p className="sf-lede sf-fade" style={{ animationDelay: '.95s' }}>
+              {clinic.intro ??
+                'Platelet-rich fibrin treatments — under-eyes, microneedling and hair restoration built on your own platelets, drawn and spun in the room. Plus lashes, facials and inkless scar revision.'}
+            </p>
 
-          <div className="sf-hero-meta">
-            {hours[0] && (
-              <span><b>{hours[0].days}</b> {hours[0].window}</span>
-            )}
-            {services.length > 0 && (
-              <span><b>{services.length}</b> {isSpa ? 'treatments' : 'services'}</span>
-            )}
-            {providers[0] && <span>with <b>{providers[0].name}</b></span>}
+            <div className="sf-actions sf-fade" style={{ animationDelay: '1.1s' }}>
+              <Link href={`/c/${slug}/enquire`} className="sf-btn primary">Book a treatment</Link>
+              {consult && (
+                <Link
+                  href={`/c/${slug}/enquire?service=${encodeURIComponent(consult.name)}`}
+                  className="sf-btn ghost"
+                >
+                  Free 15-minute consult
+                </Link>
+              )}
+            </div>
+
+            <p className="sf-note-line sf-fade" style={{ animationDelay: '1.25s' }}>
+              Consultation and candidacy assessment before every regenerative treatment.
+            </p>
           </div>
 
-          <div className="sf-actions">
-            <Link href={`/c/${slug}/enquire`} className="sf-btn primary">
-              Request an appointment
-            </Link>
-            <Link href={`/c/${slug}/services`} className="sf-btn ghost">
-              See {isSpa ? 'treatments' : 'services'} &amp; pricing
-            </Link>
-          </div>
+          <Centrifuge />
         </div>
-      </header>
+      </section>
 
-      {/* ------------------------------------------------------ what to expect -- */}
+      <section className="sf-section sf-bordered">
+        <div className="sf-wrap">
+          <div className="sf-section-head">
+            <h2>No lab. No second visit. One appointment, start to finish.</h2>
+            <p>
+              PRF is your own blood, concentrated. It never leaves the building,
+              and nothing synthetic is added to it.
+            </p>
+          </div>
+          <ProcessRail steps={PROCESS} />
+        </div>
+      </section>
+
+      {signature.length > 0 && (
+        <section className="sf-section sf-invert">
+          <div className="sf-wrap">
+            <div className="sf-section-head">
+              <h2>Signature treatments</h2>
+              <p>
+                Every regenerative service begins with a consultation to confirm
+                you are a candidate and to set a realistic plan.
+              </p>
+            </div>
+
+            <div className="sf-menu-group" style={{ marginTop: 'var(--gd-8)' }}>
+              {signature.map(s => (
+                <article className="sf-item" key={s.id}>
+                  <span className="sf-item-mark" aria-hidden="true">
+                    <ServiceIcon name={s.name} category={s.category} />
+                  </span>
+                  <div className="sf-item-body">
+                    <h3 className="sf-item-name">{s.name}</h3>
+                    {s.description && <p className="sf-item-desc">{s.description}</p>}
+                  </div>
+                  <div className="sf-item-price">
+                    <span className="amount">{priceLabel(s)}</span>
+                    <span className="dur">{s.duration_min} min</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
+              <Link href={`/c/${slug}/services`} className="sf-btn ghost">
+                All {services.length} treatments &amp; pricing
+              </Link>
+              <Link href={`/c/${slug}/shop`} className="sf-btn ghost">Shop</Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {tiers.length > 0 && (
+        <section className="sf-section sf-bordered">
+          <div className="sf-wrap sf-split">
+            <div>
+              <h2 className="sf-display-sm">UV-cured lashes, no adhesive cure time</h2>
+              <p className="sf-lede sm">
+                Every set is mapped to your natural lashes and eye shape. Fills stay
+                on a two- or three-week rhythm so the set never has to start over.
+              </p>
+            </div>
+            <div>
+              <div className="sf-tiers">
+                {tiers.map(t => (
+                  <div className="sf-tier" key={t.tier}>
+                    <span>{t.tier}</span>
+                    <span>
+                      {priceLabel(t.full)} full set
+                      {t.from ? ` · fills from ${money(t.from)}` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="sf-actions" style={{ marginTop: 'var(--gd-6)' }}>
+                <Link href={`/c/${slug}/services`} className="sf-btn ghost sm">Lash menu</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {facts.length > 0 && (
-        <section className="sf-section">
+        <section className="sf-section sf-bordered">
           <div className="sf-wrap">
             <div className="sf-section-head">
               <h2>What actually happens</h2>
-              <p>
-                The things worth knowing before a first visit, in plain language.
-                No surprises at the door.
-              </p>
+              <p>Worth knowing before a first visit. No surprises at the door.</p>
             </div>
             <dl className="sf-facts">
               {facts.map(([label, value]) => (
@@ -89,67 +213,15 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
         </section>
       )}
 
-      {/* ------------------------------------------------------------ featured -- */}
-      {featured.length > 0 && (
-        <section className="sf-section">
-          <div className="sf-wrap">
-            <div className="sf-section-head">
-              <h2>{isSpa ? 'Most booked' : 'Where people start'}</h2>
-              <p>
-                Prices shown the way they actually work — a range stays a range,
-                and per-unit pricing says so rather than pretending to be a
-                single number.
-              </p>
-            </div>
-
-            <div className="sf-menu-group">
-              {featured.map(s => (
-                <article className="sf-item" key={s.id}>
-                  {s.image_path ? (
-                    <img className="sf-item-photo" src={s.image_path} alt=""
-                      width={72} height={72} loading="lazy" />
-                  ) : (
-                    <span className="sf-item-mark" aria-hidden="true">
-                      <ServiceIcon name={s.name} category={s.category} />
-                    </span>
-                  )}
-                  <div className="sf-item-body">
-                    <h3 className="sf-item-name">
-                      {s.name}
-                      {s.is_membership && <span className="sf-chip accent">membership</span>}
-                      {s.requires_consent && <span className="sf-chip">consent form</span>}
-                    </h3>
-                    {s.description && <p className="sf-item-desc">{s.description}</p>}
-                  </div>
-                  <div className="sf-item-price">
-                    <span className="amount">{priceLabel(s)}</span>
-                    <span className="dur">{s.duration_min} min</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-              <Link href={`/c/${slug}/services`} className="sf-btn ghost">
-                Full menu — {services.length} {isSpa ? 'treatments' : 'services'}
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* --------------------------------------------------------------- who -- */}
       {providers.length > 0 && (
-        <section className="sf-section">
+        <section className="sf-section sf-bordered">
           <div className="sf-wrap">
-            <div className="sf-section-head">
-              <h2>Who you&rsquo;ll see</h2>
-            </div>
+            <div className="sf-section-head"><h2>Who you&rsquo;ll see</h2></div>
             <div className="sf-people">
               {providers.slice(0, 2).map(p => (
                 <article className="sf-person" key={p.id}>
                   <div className="sf-portrait">
-                    {p.photo_path?.startsWith('/')
+                    {p.photo_path && /^(\/|https?:)/.test(p.photo_path)
                       ? <img src={p.photo_path} alt={p.name} width={480} height={600} />
                       : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
                   </div>
@@ -158,45 +230,36 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                     {p.role_label && <p className="role">{p.role_label}</p>}
                     {p.bio
                       ? <p className="bio">{p.bio}</p>
-                      : (
-                        // We do not write a practitioner's biography for them,
-                        // and we never invent credentials. The gap is visible
-                        // so it gets filled by the person it belongs to.
-                        <p className="sf-pending">
-                          Biography and credentials to be supplied by the practice.
-                        </p>
-                      )}
+                      : <p className="sf-pending">Biography to be supplied by the practice.</p>}
                   </div>
                 </article>
               ))}
             </div>
-            {providers.length > 2 && (
-              <div className="sf-actions" style={{ marginTop: 'var(--gd-6)' }}>
-                <Link href={`/c/${slug}/about`} className="sf-btn ghost">Meet the team</Link>
-              </div>
-            )}
           </div>
         </section>
       )}
 
-      {/* ------------------------------------------------------------- close -- */}
-      <section className="sf-section">
+      <section className="sf-section sf-centre">
         <div className="sf-wrap">
-          <div className="sf-section-head">
-            <h2>Ready when you are</h2>
-            <p>
-              {clinic.booking_note ??
-                'Send a request and the practice will confirm a time that works. No card required to ask.'}
-            </p>
-          </div>
-          <div className="sf-actions">
+          <h2 className="sf-display-sm">Start with fifteen minutes.</h2>
+          <p className="sf-lede centre">
+            {clinic.booking_note ??
+              'Bring your questions and whatever you have already tried. We will talk through what is realistic, what it costs, and whether you are a candidate — at no charge, with nothing booked at the end unless you want it.'}
+          </p>
+          <div className="sf-actions centre">
             <Link href={`/c/${slug}/enquire`} className="sf-btn primary">
-              Request an appointment
+              {consult ? 'Book the free consult' : 'Request an appointment'}
             </Link>
             {clinic.phone_voice && (
               <a href={`tel:${clinic.phone_voice}`} className="sf-btn ghost">Call the practice</a>
             )}
           </div>
+          {hours[0] && (
+            <p className="sf-note-line centre">
+              {hours[0].days} &middot; {hours[0].window}
+              {clinic.location_name ? ` · ${clinic.location_name}` : ''}
+            </p>
+          )}
         </div>
       </section>
     </>

@@ -66,8 +66,28 @@ const nextConfig = {
       .map(d => d.startsWith('font-src') ? `${d} https://fonts.gstatic.com` : d)
       .join('; ');
 
+    /**
+     * NO X-Robots-Tag on the storefront.
+     *
+     * A header cannot know which clinic is being served, and the answer differs
+     * per tenant: a live practice wants to be found, a pilot tenant must not
+     * be. The page's own robots meta tag is rendered from the clinic record and
+     * gets it right — but a header saying noindex OVERRIDES a meta tag saying
+     * index, so leaving it here would have quietly kept her site out of search
+     * while the page insisted otherwise.
+     *
+     * Everything private keeps the header, in the strict block below.
+     */
     const commonHeaders = [
-      { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+      // Explicitly permissive, because headers ACCUMULATE: the strict block
+      // above already set noindex, and simply omitting the key here leaves that
+      // in place. Her page would have kept insisting it was indexable in its
+      // meta tag while the header quietly said otherwise.
+      //
+      // This is safe for a pilot tenant too. Where a meta tag and a header
+      // disagree, crawlers take the more restrictive of the two — so Gameday's
+      // "noindex" meta still wins over this "all".
+      { key: 'X-Robots-Tag', value: 'all' },
       { key: 'Referrer-Policy', value: 'no-referrer' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'X-Frame-Options', value: 'DENY' },

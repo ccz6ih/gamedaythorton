@@ -39,6 +39,13 @@ export type StorefrontClinic = {
   tagline: string | null;
   intro: string | null;
   booking_note: string | null;
+  legal_name: string | null;
+  /**
+   * The website presents as a live business: no preview notice, indexable.
+   * Distinct from the database's pilot guard, which is private and stays that
+   * way — a practice can have real records while its site is still in review.
+   */
+  live: boolean;
 };
 
 export type StorefrontService = {
@@ -129,12 +136,14 @@ export async function getStorefront(slug: string): Promise<StorefrontClinic | nu
     .select(
       'id, slug, name, location_name, practice_type, modules, ' +
       'address_line1, address_line2, address_city, address_state, address_zip, address_note, ' +
-      'phone_voice, phone_text, email, hours, brand, visit_facts, tagline, intro, booking_note'
+      'phone_voice, phone_text, email, hours, brand, visit_facts, tagline, intro, booking_note, legal_name, site_live'
     )
     .eq('slug', slug)
     .maybeSingle();
 
-  return (data as unknown as StorefrontClinic) ?? null;
+  if (!data) return null;
+  const row = data as unknown as StorefrontClinic & { site_live?: boolean };
+  return { ...row, live: row.site_live === true };
 }
 
 /** The menu. Active services, ordered the way the practice ordered them. */
