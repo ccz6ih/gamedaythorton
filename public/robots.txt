@@ -1,0 +1,8 @@
+# This deployment is a pre-compliance pilot. It must not be indexed by anything,
+# ever. Reinforced by the X-Robots-Tag header in next.config.mjs, because a
+# robots.txt is a request and a header is an instruction.
+#
+# docs/06-architecture.md, docs/09-compliance-register.md
+
+User-agent: *
+Disallow: /

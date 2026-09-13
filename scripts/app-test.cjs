@@ -1,0 +1,187 @@
+/**
+ * app-test.cjs
+ * HTTP smoke test against a running server. Checks the things that protect this
+ * deployment and the things that would make it a dead link.
+ *
+ * WHAT THIS PROVES
+ *   - the pilot gate actually gates (no cookie, no access)
+ *   - the middleware sends unauthenticated users to sign-in rather than rendering
+ *     a page that would query for data
+ *   - the security headers are present on real responses, not just in config
+ *   - nothing is indexable
+ *   - the Phase A prototype is served alongside the app
+ *   - the Stripe webhook refuses unsigned requests
+ *
+ * WHAT THIS CANNOT PROVE
+ *   Signed-in screens. Forging @supabase/ssr's session cookies is not worth the
+ *   fragility, so RLS and data access are proven at the API level by
+ *   scripts/auth-test.cjs instead. The signed-in UI still needs a human to click
+ *   through it.
+ *
+ * Run:  node scripts/app-test.cjs [baseUrl]
+ *       (start the server first: npm run build && npm start)
+ */
+
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env.local') });
+
+const BASE = (process.argv[2] || 'http://localhost:3000').replace(/\/$/, '');
+const PASSCODE = process.env.PILOT_PASSCODE;
+
+let pass = 0, fail = 0;
+const ok = (m, n) => { pass++; console.log(`  ✓ ${m}${n ? '  ' + n : ''}`); };
+const bad = (m, e) => { fail++; console.log(`  ✗ ${m}`); if (e) console.log('      ' + e); };
+
+const gateCookie = () => (PASSCODE ? { cookie: `gd_pilot_gate=${PASSCODE}` } : {});
+
+async function req(url, opts = {}) {
+  return fetch(BASE + url, { redirect: 'manual', ...opts });
+}
+
+(async () => {
+  console.log(`\nAPP SMOKE TEST  ${BASE}\n`);
+
+  try {
+    await fetch(BASE, { redirect: 'manual' });
+  } catch {
+    console.error(`  Cannot reach ${BASE}. Start the server first:\n    npm run build && npm start\n`);
+    process.exit(1);
+  }
+
+  /* ------------------------------------------------------------- the gate -- */
+  console.log('PILOT GATE');
+
+  const noCookie = await req('/console');
+  if ([302, 307, 308].includes(noCookie.status) && (noCookie.headers.get('location') || '').includes('/gate')) {
+    ok('no passcode cookie is sent to the gate', `${noCookie.status} → /gate`);
+  } else {
+    bad('no passcode cookie is sent to the gate', `got ${noCookie.status} → ${noCookie.headers.get('location')}`);
+  }
+
+  const gatePage = await req('/gate');
+  const gateHtml = await gatePage.text();
+  if (gatePage.status === 200 && /passcode/i.test(gateHtml)) ok('the gate itself renders');
+  else bad('the gate itself renders', `status ${gatePage.status}`);
+
+  if (/not public yet/i.test(gateHtml)) ok('the gate explains why it exists');
+  else bad('the gate explains why it exists');
+
+  const withCookie = await req('/console', { headers: gateCookie() });
+  const loc = withCookie.headers.get('location') || '';
+  if ([302, 307, 308].includes(withCookie.status) && loc.includes('/sign-in')) {
+    ok('past the gate but unauthenticated goes to sign-in', `${withCookie.status} → /sign-in`);
+  } else {
+    bad('past the gate but unauthenticated goes to sign-in', `got ${withCookie.status} → ${loc}`);
+  }
+
+  const badCode = await req('/console', { headers: { cookie: 'gd_pilot_gate=wrong' } });
+  if ((badCode.headers.get('location') || '').includes('/gate')) ok('a wrong passcode does not pass');
+  else bad('a wrong passcode does not pass', badCode.headers.get('location') || String(badCode.status));
+
+  /* ------------------------------------------------------------ sign-in -- */
+  console.log('\nSIGN-IN');
+
+  const signIn = await req('/sign-in', { headers: gateCookie() });
+  const signInHtml = await signIn.text();
+  if (signIn.status === 200) ok('sign-in renders');
+  else bad('sign-in renders', `status ${signIn.status}`);
+
+  if (/jamie@medbar\.pilot\.invalid/.test(signInHtml)) {
+    ok('pilot accounts are listed', 'so a demo can start in seconds');
+  } else {
+    bad('pilot accounts are listed');
+  }
+
+  if (!new RegExp(String(process.env.PILOT_DEMO_PASSWORD || '___nope___')).test(signInHtml)) {
+    ok('the demo password is NOT in the page source');
+  } else {
+    bad('the demo password is NOT in the page source', 'it is being rendered to the browser');
+  }
+
+  /* ------------------------------------------------------------ headers -- */
+  console.log('\nSECURITY HEADERS');
+
+  const headerTarget = await req('/sign-in', { headers: gateCookie() });
+  const checks = [
+    ['x-robots-tag', /noindex/i, 'noindex'],
+    ['referrer-policy', /no-referrer/i, 'no-referrer'],
+    ['x-content-type-options', /nosniff/i, 'nosniff'],
+    ['x-frame-options', /DENY/i, 'DENY'],
+    ['content-security-policy', /default-src 'self'/, "default-src 'self'"],
+    ['cache-control', /no-store/, 'no-store']
+  ];
+  for (const [header, pattern, label] of checks) {
+    const value = headerTarget.headers.get(header) || '';
+    if (pattern.test(value)) ok(`${header}`, label);
+    else bad(`${header} (${label})`, value || 'absent');
+  }
+
+  const csp = headerTarget.headers.get('content-security-policy') || '';
+  // The rule that matters most: nothing third-party may execute behind login.
+  if (!/googletagmanager|google-analytics|facebook|hotjar|fullstory|segment/i.test(csp)) {
+    ok('no analytics or session-replay origin is allowed', 'docs/06 rule 2');
+  } else {
+    bad('no analytics or session-replay origin is allowed', csp);
+  }
+  if (/frame-ancestors 'none'/.test(csp)) ok('the app cannot be framed');
+  else bad("frame-ancestors 'none'");
+
+  /* ------------------------------------------------------------- robots -- */
+  console.log('\nDISCOVERABILITY');
+
+  const robots = await req('/robots.txt');
+  const robotsText = await robots.text();
+  if (/Disallow:\s*\/\s*$/m.test(robotsText)) ok('robots.txt disallows everything');
+  else bad('robots.txt disallows everything', robotsText.slice(0, 80));
+
+  /* ---------------------------------------------------------- prototype -- */
+  console.log('\nPHASE A PROTOTYPE');
+
+  const proto = await req('/prototype/index.html', { headers: gateCookie() });
+  if (proto.status === 200) {
+    const html = await proto.text();
+    if (/Pilot — synthetic data only/.test(html)) ok('prototype is served with its banner intact');
+    else ok('prototype is served', 'banner text not found in shell (it renders client-side)');
+  } else {
+    bad('prototype is served at /prototype/index.html', `status ${proto.status}`);
+  }
+
+  const protoData = await req('/prototype/demo-data.js', { headers: gateCookie() });
+  if (protoData.status === 200) {
+    const len = (await protoData.text()).length;
+    ok('prototype dataset is served', `${Math.round(len / 1024)} KB`);
+  } else {
+    bad('prototype dataset is served', `status ${protoData.status}`);
+  }
+
+  /* ------------------------------------------------------------ webhook -- */
+  console.log('\nSTRIPE WEBHOOK');
+
+  const unsigned = await req('/api/stripe/webhook', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...gateCookie() },
+    body: JSON.stringify({ type: 'payment_intent.succeeded' })
+  });
+  if (unsigned.status === 400 || unsigned.status === 503) {
+    const body = await unsigned.json().catch(() => ({}));
+    ok('an unsigned webhook is refused', `${unsigned.status} ${body.error ?? ''}`);
+  } else {
+    bad('an unsigned webhook is refused', `status ${unsigned.status} — it should never be trusted`);
+  }
+
+  /* ------------------------------------------------------------- public -- */
+  console.log('\nPUBLIC SURFACE');
+
+  const about = await req('/about-pilot', { headers: gateCookie() });
+  const aboutHtml = await about.text();
+  if (about.status === 200 && /no HIPAA controls/i.test(aboutHtml)) {
+    ok('the compliance explainer is reachable in one tap');
+  } else {
+    bad('the compliance explainer is reachable', `status ${about.status}`);
+  }
+
+  console.log('\n' + '─'.repeat(64));
+  if (fail) { console.log(`${fail} of ${pass + fail} app checks FAILED\n`); process.exit(1); }
+  console.log(`All ${pass} app checks passed.`);
+  console.log('Signed-in screens are not covered here — click through those.\n');
+})();

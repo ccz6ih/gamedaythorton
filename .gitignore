@@ -8,6 +8,12 @@ node_modules/
 out/
 dist/
 build/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Build output: the prototype is copied here by scripts/copy-prototype.cjs so it
+# can be served at /prototype. The source of truth stays in prototype/.
+public/prototype/
 
 # Environment — never commit. PILOT_MODE config lives in .env.example only.
 .env

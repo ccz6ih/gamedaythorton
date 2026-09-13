@@ -50,17 +50,38 @@ The goal of Phase A/B is a **functional pilot the owner and staff can actually c
 through and react to** — so we harvest real requirements instead of guessing — then
 scope the production build against what they tell us.
 
-## Run the pilot
+## Two things run here
+
+**The live app** — Next.js + Supabase, multi-tenant, real auth, real row-level
+security. Two synthetic practices in it: a men's-health clinic and a med spa.
 
 ```bash
-node scripts/generate-fixtures.cjs     # build the synthetic dataset
-node scripts/smoke-test.cjs            # 69 checks across all 27 screens
+npm install
+cp .env.example .env.local     # fill it in — docs/19-environment.md
+npm run db:migrate && npm run db:seed && npm run db:users
+npm run dev                    # http://localhost:3000
 ```
 
-Then open `prototype/index.html` in a browser. No install, no build, no server.
-Or `node scripts/serve.cjs` for an http origin a phone can reach.
+**The Phase A prototype** — 27 screens, no backend, opens from a double-clicked
+file. Still the design reference, and served by the app at `/prototype/index.html`.
 
-`prototype/README.md` has the demo walkthrough, the roster, and how to brand it.
+```bash
+npm run fixtures && npm run smoke
+```
+
+Then open `prototype/index.html`. `prototype/README.md` has the demo walkthrough.
+
+## Verify it
+
+```bash
+npm run verify        # fixtures + 72 prototype checks + typecheck
+npm run test:db       # 35 database control checks
+npm run test:auth     # 16 sign-in + RLS checks through the real API
+npm run test:app      # 21 HTTP checks (server must be running)
+```
+
+`test:db` includes the deliberate cross-tenant read and write attempt that
+`docs/06-architecture.md` requires — proof rather than assumption.
 
 ## Docs
 
@@ -85,6 +106,8 @@ Or `node scripts/serve.cjs` for an http origin a phone can reach.
 | `docs/16-media-pipeline.md` | Logos, headshots, clinic photos, progress photos |
 | `docs/17-agent-playbook.md` | **Rules of engagement for anyone building on this** |
 | `docs/18-decisions.md` | Decision record — why it is built this way |
+| `docs/19-environment.md` | **Env vars, database, deployment, common failures** |
+| `docs/20-hipaa-readiness.md` | **What is actually built vs what a BAA still requires** |
 | `prototype/README.md` | Run it, demo it, brand it |
 | `CLAUDE.md` | Context file for Claude Code agents working this repo |
 
@@ -111,9 +134,29 @@ gamedaythorton/
 - [x] Synthetic fixture dataset — 12 patients across the lifecycle
 - [x] **Clickable pilot (Phase A)** — 27 screens, brandable, accepts real images
 - [x] Build docs for other agents
-- [ ] Stage A finishing tasks (`docs/13-build-sequence.md`)
+- [x] **Supabase schema** — 33 tables, multi-tenant, practice-type aware, RLS on all
+- [x] **Compliance enforced in the database** — pilot-mode guard, no-PHI triggers,
+      append-only audit log, double-booking and package-overdraw impossible
+- [x] **Two live tenants seeded** — Gameday Thornton (men's health) and The Med Bar
+      (med spa), 956 rows, all synthetic
+- [x] **Working app** — auth, RLS-scoped console and patient portal, Stripe
+      scaffolding, deployable
+- [ ] Port the remaining prototype screens (`docs/13-build-sequence.md` stage B)
 - [ ] Owner/staff feedback session — Gate A
 - [ ] Production scope + proposal
+
+### Two practices, one platform
+
+| | Gameday Thornton | The Med Bar |
+|---|---|---|
+| Type | Men's health / TRT | Med spa |
+| Clinical loop | labs → protocol → dose → recheck | treatment → series → interval |
+| Evidence of progress | lab trends + weekly scores | before/after photos |
+| Revenue | monthly membership | per-service + prepaid series |
+| Pricing | flat | per-unit, from-price, free consult |
+
+`clinic.practice_type` drives a module map, so neither sees the other's screens.
+That is why the schema carries both clinical models rather than one.
 
 ### Open blockers
 

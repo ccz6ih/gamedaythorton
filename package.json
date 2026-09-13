@@ -12,12 +12,17 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "fixtures": "node scripts/generate-fixtures.cjs",
+    "fixtures": "node scripts/generate-fixtures.cjs && node scripts/generate-medbar-fixtures.cjs",
     "smoke": "node scripts/smoke-test.cjs",
     "db:migrate": "node scripts/db-migrate.cjs",
     "db:seed": "node scripts/db-seed.cjs",
-    "db:reset": "node scripts/db-migrate.cjs --reset && node scripts/db-seed.cjs",
-    "verify": "npm run fixtures && npm run smoke && npm run typecheck"
+    "db:users": "node scripts/db-users.cjs",
+    "db:reset": "node scripts/db-migrate.cjs --reset && node scripts/db-seed.cjs && node scripts/db-users.cjs",
+    "test:db": "node scripts/db-test.cjs",
+    "test:auth": "node scripts/auth-test.cjs",
+    "test:app": "node scripts/app-test.cjs",
+    "verify": "npm run fixtures && npm run smoke && npm run typecheck",
+    "verify:all": "npm run verify && npm run test:db && npm run test:auth"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

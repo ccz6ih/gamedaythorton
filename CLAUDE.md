@@ -108,12 +108,46 @@ hard-code a themed noun — call `GD.brand.word()`. Every derived metric belongs
 
 ## Current status
 
-Docs complete. Synthetic dataset built. **Phase A clickable pilot built** — 27 screens,
-brandable, accepts real images for practitioners, the clinic, and patients.
+Phase A prototype built (27 screens, no backend). **Production foundation also built and
+live**: Supabase schema (33 tables, RLS on every one), auth, a staff console and patient
+portal reading real data, Stripe scaffolding, deployed via Vercel.
 
-Next: the Stage A finishing tasks in `docs/13-build-sequence.md`, then the Gate A feedback
-session per `docs/10-demo-script.md`. **Gate A output replaces our phase ordering** — do
-not start Phase B from the build sequence before that session has happened.
+**Two tenants, two clinical models.** `clinic.practice_type` drives a module map:
+
+| | `mens_health` | `med_spa` |
+|---|---|---|
+| Example | Gameday Thornton | The Med Bar (Jamie Salazar, Loveland) |
+| Clinical loop | labs → protocol → dose → recheck | treatment → series → interval |
+| Tables | `analyte`, `lab_panel`, `protocol*`, `checkin` | `treatment_record`, `treatment_detail` |
+| Money | membership | prepaid `service_package` series |
+
+Never assume labs and protocols exist. Check `hasModule(clinic, 'labs')`. Showing a med spa
+a lab-entry screen — or calling her clients "patients" — reads as software built for
+somebody else.
+
+Next: port the remaining prototype screens (`docs/13-build-sequence.md` stage B), then the
+Gate A feedback session per `docs/10-demo-script.md`. **Gate A output replaces our phase
+ordering.**
+
+## Compliance is enforced by the database, not by convention
+
+Read `docs/20-hipaa-readiness.md` before touching anything near PHI.
+
+- While `clinic.pilot_mode` is true, **every PHI table rejects rows not marked
+  `synthetic`**. If a write fails with "PILOT MODE", that is the control working.
+- **Payment descriptors and Stripe metadata** are trigger-checked for clinical terms. Build
+  them with `paymentDescriptor()` / `stripeMetadata()` from `lib/phi`, never by hand.
+- **Notification previews** are trigger-checked too. Use `notificationPreview()`.
+- `audit_log` is append-only and records which columns changed, not their values.
+- Double-booking and package over-redemption are impossible at the schema level.
+- `lib/stripe.ts` refuses to initialise with a live key while `PILOT_MODE` is on.
+
+Verify with `npm run test:db` (35 checks, includes a deliberate cross-tenant attempt) and
+`npm run test:auth` (16 checks through the real API). Both run against throwaway data and
+clean up after themselves.
+
+**Migrations are append-only.** Never edit an applied file in `supabase/migrations/`; add a
+new one. `0007` and `0008` exist for that reason.
 
 ## Open blockers
 

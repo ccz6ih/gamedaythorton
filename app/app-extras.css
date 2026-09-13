@@ -1,0 +1,136 @@
+/* ==========================================================================
+   app-extras.css
+   The handful of layout pieces the production app needs that the prototype's
+   markup did not. Everything else comes from prototype/assets/app.css.
+
+   Same rule applies: no literal colour, radius, or font here. Tokens only.
+   ========================================================================== */
+
+/* --------------------------------------------------------- centred forms -- */
+.auth-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--gd-6) var(--gd-4);
+}
+.auth-card {
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-lg);
+  padding: var(--gd-8);
+  width: min(420px, 100%);
+  box-shadow: var(--gd-shadow);
+}
+.auth-card h1 {
+  font-size: var(--gd-step-1);
+  font-weight: 700;
+  margin-bottom: var(--gd-2);
+}
+.auth-card .lede {
+  font-size: .88rem;
+  color: var(--gd-text-muted);
+  line-height: 1.55;
+  margin-bottom: var(--gd-5);
+}
+.auth-card .field + .field { margin-top: var(--gd-4); }
+.auth-card .btn { margin-top: var(--gd-5); }
+
+/* Demo credentials block. Visible on purpose: a pilot nobody can sign in to is
+   not a pilot. It disappears when PILOT_MODE is off. */
+.cred-list {
+  margin-top: var(--gd-5);
+  border-top: 1px solid var(--gd-border);
+  padding-top: var(--gd-4);
+  display: grid;
+  gap: var(--gd-2);
+}
+.cred-list button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gd-3);
+  width: 100%;
+  background: var(--gd-surface-sunken);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  padding: .5rem .7rem;
+  cursor: pointer;
+  color: inherit;
+  font-size: .8rem;
+  text-align: left;
+  min-height: 44px;
+}
+.cred-list button:hover { border-color: var(--gd-accent); }
+.cred-list .who { font-weight: 600; }
+.cred-list .what { color: var(--gd-text-dim); font-size: .74rem; }
+
+/* ------------------------------------------------------------ page header -- */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gd-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--gd-5);
+}
+.page-head h1 {
+  font-size: var(--gd-step-2);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.05;
+}
+.page-head .sub {
+  font-size: .86rem;
+  color: var(--gd-text-muted);
+  margin-top: .25rem;
+}
+
+/* ------------------------------------------------------------------ misc -- */
+.section-title {
+  font-size: .68rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--gd-text-dim);
+  font-weight: 800;
+  margin: var(--gd-8) 0 var(--gd-3);
+}
+.section-title:first-child { margin-top: 0; }
+
+.inline-form { display: contents; }
+
+.banner-link {
+  color: var(--gd-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.banner-link:hover { text-decoration: underline; }
+
+/* Tenant chip in the rail, so nobody demoing two practices loses track of which
+   one they are looking at. Getting that wrong in a clinical product is worse
+   than a cosmetic slip. */
+.tenant-chip {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--gd-surface-sunken);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  padding: .45rem .6rem;
+  font-size: .76rem;
+  margin-bottom: var(--gd-3);
+}
+.tenant-chip .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gd-accent); flex: none;
+}
+.tenant-chip .name { font-weight: 700; }
+.tenant-chip .type { color: var(--gd-text-dim); font-size: .68rem; }
+
+.mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
+
+.metric-note {
+  font-size: .74rem;
+  color: var(--gd-text-dim);
+  line-height: 1.45;
+  margin-top: .35rem;
+}
