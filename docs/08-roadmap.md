@@ -47,6 +47,17 @@ Does the franchise agreement permit an independent patient-facing system and ind
 payment processing? **If no, stop and redesign the approach.** Do not build first and
 ask later.
 
+**Three more, added Sept 2026** after finding that corporate already runs a custom EMR
+built with Lobbie and has announced a patient app:
+
+- Are franchisees **required** to use the corporate EMR, and does it expose an API?
+  (Lobbie advertises HL7/FHIR integration.)
+- What is the corporate patient app's **scope and timeline**? Scheduling, results and
+  messaging are lost ground; build around them, not against them.
+- Is the practice a **HIPAA covered entity** at all? Gameday does not bill insurance.
+  An attorney answers this in writing — it is the single largest cost variable in the
+  project. `21-compliance-cost.md`.
+
 ---
 
 ## PHASE A — Clickable pilot (2–3 weeks) — **BUILT**
@@ -202,9 +213,11 @@ has surfaced in a month of live use that only the old system could do. Only then
 |---|---|---|
 | Franchise agreement forbids independent patient system | **Critical** | Gate 0. Resolve before any build |
 | Real patient data enters pilot | **Critical** | `PILOT_MODE`, banner, test keys only, no live sending, written rule in README |
-| Vercel BAA cost kills the hosting plan | High | Decide host at Phase C start; alternatives priced in advance |
+| Vercel BAA cost kills the hosting plan | Low | Now $350/mo self-serve on Pro. Supabase's HIPAA floor is the larger cost; alternatives costed in `21-compliance-cost.md` |
+| Compliance cost exceeds the fee at one clinic | **High** | Real. Fixed cost, ~5–10 practices to break even. Client owns the hosting accounts and BAAs; we charge for work, not infrastructure. `22-commercial-model.md` |
+| Covered-entity status never established | **High** | Neither practice bills insurance, so HIPAA may not attach at all. Attorney answers it, in writing, before Phase C is costed |
 | No EMR API — manual entry forever | Medium | Already the design assumption. Make the entry grid genuinely good |
 | Staff do not adopt the console | High | Gate A and Gate B exist precisely for this. Shadow them; do not demo at them |
 | Owner wants "just two real patients" in pilot | High | Say no. Point at `09-compliance-register.md`. This is the most likely way this project goes wrong |
 | Scope creep from an enthusiastic owner | Medium | Backlog is the contract. New asks get scored and phased, not absorbed |
-| Corporate builds their own portal mid-build | Medium | Ask about roadmap at Gate 0. If they are, multi-tenant positioning becomes the play rather than the upside |
+| **Corporate has built their own EMR and a patient app is "coming soon"** | **MATERIALISED** | Confirmed Sept 2026: Gameday built a custom EMR with Lobbie; a patient app for scheduling, results and messaging is announced. Concede the record and the messaging app; hold the progress engine and retention economics, which nothing described covers. `22-commercial-model.md` |

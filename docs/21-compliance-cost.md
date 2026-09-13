@@ -8,6 +8,33 @@ Read `20-hipaa-readiness.md` for what is built. This is what the rest costs.
 
 ---
 
+## Ask this before costing anything
+
+**HIPAA attaches to a *covered entity*** — for a clinic, a provider who transmits
+health information electronically in connection with a HIPAA-standard transaction:
+a claim, an eligibility check, a prior authorisation. It is the *insurance
+transaction* that triggers it, not the presence of health records.
+
+**Gameday does not bill insurance** — their EMR was built around that fact. **The
+Med Bar is cash-pay aesthetics.** If neither ever performs a covered electronic
+transaction, neither may be a covered entity, and most of the bill below may not be
+legally required.
+
+Three things keep this honest:
+
+1. **It is contested and fact-specific.** Much of the compliance industry takes the
+   conservative position that any licensed provider storing records electronically
+   is covered. They are not being dishonest.
+2. **Not-HIPAA is not unregulated.** The FTC Health Breach Notification Rule reaches
+   health apps outside HIPAA; Colorado privacy law and medical-board retention rules
+   apply regardless.
+3. **An attorney answers this. An engineer does not.** Including this one.
+
+It costs an hour of legal time to ask and may remove $20k from the first year. It
+belongs first in the sequence, not after the hosting decision.
+
+---
+
 ## The headline
 
 > **Hosting is the smallest line item, and the one everybody optimises.**
@@ -97,6 +124,27 @@ Two corrections to what I told you earlier, both in your favour and against it:
 
 Migration cost: zero. This is the do-nothing option.
 
+#### What the Vercel attestation does and does not prove
+
+Vercel publishes independent Schellman attestations to account holders — the AI
+Cloud report as of 2025-06-30 and the Agentic Infrastructure Platform report as of
+2026-06-30 — opining that the security and breach-notification program conformed to
+the applicable HIPAA Security and HITECH implementation specifications, with **no
+exceptions noted** across ~164 controls.
+
+Four qualifications that matter:
+
+- **They are Type 1 reports.** Controls were designed and implemented *as of a
+  single date*. Operating effectiveness over a period is a Type 2, which these are
+  not. Do not describe them as one.
+- **The attestation is not the BAA.** The $350/mo Pro add-on is what produces a
+  signed agreement. Holding the report is not holding the contract.
+- **AWS and Microsoft are excluded from scope** as subservice organisations.
+- **They are restricted-use and watermarked per downloader.** Both state they should
+  not be used by anyone other than specified parties and prohibit redistribution.
+  Cite that Vercel maintains the attestation; do not forward the PDF. A client's
+  counsel can request it through Vercel.
+
 ### The cheaper paths
 
 | Option | Monthly | Migration effort | What you give up |
@@ -135,6 +183,12 @@ partly done — no prescribing, no insurance claims, no duplicate medical record
 Go further if the clinic will tolerate it: progress photographs are the highest
 sensitivity asset in the system and the hardest to delete convincingly. A version
 that does not store photos is materially cheaper to make compliant.
+
+**Gameday makes this concretely available.** Corporate already runs a purpose-built
+EMR (developed with Lobbie) covering labs, telehealth notes, inventory and
+charting. If the clinical record stays there and this system is the progress and
+retention layer, it holds a fraction of the PHI — and cost scales with what is
+held. See `22-commercial-model.md`.
 
 **2. Stay on synthetic data until the product is right.** Every month in pilot is a
 month not paying for compliance on features that might get cut. The pilot guard in
@@ -178,17 +232,19 @@ This is the item most likely to be discovered late, and it changes the economics
 
 ## What I would actually recommend
 
-1. **Stay in pilot.** Nothing here is urgent until a real patient exists, and the
+1. **Get the covered-entity question answered in writing**, by an attorney, before
+   costing anything. It is the cheapest step here and may remove most of the rest.
+2. **Stay in pilot.** Nothing here is urgent until a real patient exists, and the
    database currently refuses to let one exist.
-2. **Move the Supabase project to a US region now**, while it holds nothing that
+3. **Move the Supabase project to a US region now**, while it holds nothing that
    matters. Minutes today, a migration with PHI later.
-3. **Before Phase C, get three written quotes:** Supabase's HIPAA add-on, Render
+4. **Before Phase C, get three written quotes:** Supabase's HIPAA add-on, Render
    Scale for your actual workload, and Aptible. Then decide with real numbers
    rather than these ranges.
-4. **Budget $25k for the first year**, not $500/mo. If that number is a problem,
+5. **Budget $25k for the first year**, not $500/mo. If that number is a problem,
    the honest conversation is about scope — fewer PHI-bearing features — rather
    than about cheaper hosting.
-5. **Do the free HHS self-assessment in Phase B**, before spending anything. It
+6. **Do the free HHS self-assessment in Phase B**, before spending anything. It
    will tell you which of the expensive items you actually need and often reveals
    that the answer is fewer than you feared.
 

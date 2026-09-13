@@ -108,6 +108,8 @@ npm run test:app      # 21 HTTP checks (server must be running)
 | `docs/18-decisions.md` | Decision record — why it is built this way |
 | `docs/19-environment.md` | **Env vars, database, deployment, common failures** |
 | `docs/20-hipaa-readiness.md` | **What is actually built vs what a BAA still requires** |
+| `docs/21-compliance-cost.md` | **What compliance costs** — hosting vs the expensive two-thirds, and the covered-entity question to ask first |
+| `docs/22-commercial-model.md` | Internal — how this gets paid for, why one clinic never works, what corporate already built |
 | `prototype/README.md` | Run it, demo it, brand it |
 | `CLAUDE.md` | Context file for Claude Code agents working this repo |
 
