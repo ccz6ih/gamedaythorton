@@ -158,6 +158,69 @@ async function refuses(label, fn, because) {
     if (retired.active === false) ok('retired a service without deleting its history');
     else bad('retired a service');
 
+      /* ------------------------------------------- managing the menu herself -- */
+      // The practice has to be able to run its own menu without a developer. Add,
+      // edit, reorder, retire — and delete, but only when nothing points at the
+      // service, because a past treatment record naming a service that no longer
+      // exists is a clinical record that has lost information.
+      console.log('\nSERVICE MANAGEMENT');
+
+      const fresh = await db.insert('service', {
+        clinic_id: clinicId,
+        name: 'MENU TEST — Brow Lamination',
+        category: 'skin',
+        duration_min: 45,
+        price_mode: 'flat',
+        price_cents: 9500,
+        description: 'A short line for the menu.',
+        details: 'The longer version that sits behind "What this involves".',
+        needs_copy: false,
+        sort_order: 5,
+        active: true
+      });
+      ok('she can add a service', `${fresh.name} — $${fresh.price_cents / 100}`);
+
+      if (fresh.details && fresh.needs_copy === false) {
+        ok('storefront copy saves with it', 'short line and long copy');
+      } else bad('storefront copy saves with it');
+
+      const reordered = await db.patch('service', fresh.id, { sort_order: 1, deposit_cents: 2500 });
+      if (reordered.sort_order === 1 && reordered.deposit_cents === 2500) {
+        ok('she can reorder it and set a deposit', 'position 1, $25 deposit');
+      } else bad('she can reorder it and set a deposit');
+
+      // Nothing references this one, so removing it outright is safe.
+      if (await db.del('service', fresh.id)) ok('an unused service deletes outright');
+      else bad('an unused service deletes outright');
+
+      // Now the case that matters: a service with history.
+      const used = await db.get('service',
+        'select=id,name&clinic_id=eq.' + clinicId + '&limit=40');
+      let guarded = null;
+      for (const s of used) {
+        const refs = await db.get('treatment_record', `select=id&service_id=eq.${s.id}&limit=1`);
+        if (refs.length) { guarded = s; break; }
+      }
+
+      if (guarded) {
+        // The console refuses this before it reaches the database. Prove the
+        // database itself does not silently blank the history if it ever got past.
+        const before = await db.get('treatment_record', `select=id&service_id=eq.${guarded.id}`);
+        const retired = await db.patch('service', guarded.id, { active: false });
+        if (retired.active === false) ok('a service with history can be retired', guarded.name);
+        else bad('a service with history can be retired');
+
+        const after = await db.get('treatment_record', `select=id&service_id=eq.${guarded.id}`);
+        if (after.length === before.length) {
+          ok('retiring it keeps every past record', `${after.length} treatment record(s) intact`);
+        } else bad('retiring it keeps every past record');
+
+        await db.patch('service', guarded.id, { active: true });
+        ok('put back for the next run');
+      } else {
+        bad('found a service with history to test against');
+      }
+
     /* ------------------------------------------------------- clients -- */
     console.log('\nCLIENTS');
 

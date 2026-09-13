@@ -63,6 +63,14 @@ async function save(formData: FormData) {
       requires_consent: bool(formData, 'requires_consent'),
       requires_labs: bool(formData, 'requires_labs'),
       online_bookable: bool(formData, 'online_bookable'),
+      is_membership: bool(formData, 'is_membership'),
+      deposit_cents: money(formData, 'deposit_cents'),
+      // Storefront copy. `details` is the long version behind "What this
+      // involves"; needs_copy is cleared automatically once a description
+      // exists, so nobody has to remember to untick a box.
+      details: text(formData, 'details'),
+      needs_copy: !text(formData, 'description'),
+      sort_order: int(formData, 'sort_order', 0)!,
       active: bool(formData, 'active')
     };
 
@@ -80,6 +88,52 @@ async function save(formData: FormData) {
 
   revalidatePath('/console/services');
   redirect('/console/services?saved=1');
+}
+
+/**
+ * Permanently removes a service — but only when nothing points at it.
+ *
+ * A service that has been booked or performed is referenced by appointments and
+ * treatment records. Deleting it would either orphan that history or, worse,
+ * quietly blank the service name on a past treatment record, which is a
+ * clinical record losing information. So history wins: anything with a past
+ * gets retired instead, and the form only offers this button when the count is
+ * genuinely zero.
+ */
+async function destroy(formData: FormData) {
+  'use server';
+
+  const staff = await requireRole(['owner', 'admin']);
+  const id = requiredText(formData, 'id');
+  const supabase = await serverClient();
+
+  try {
+    const [appts, treatments, packages, items] = await Promise.all([
+      supabase.from('appointment').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('treatment_record').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('service_package').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('package_item').select('id', { count: 'exact', head: true }).eq('service_id', id)
+    ]);
+
+    const used =
+      (appts.count ?? 0) + (treatments.count ?? 0) + (packages.count ?? 0) + (items.count ?? 0);
+
+    if (used > 0) {
+      throw new Error(
+        `This service is used by ${used} existing record${used === 1 ? '' : 's'}. ` +
+        'Retire it instead — untick Active — so the history stays readable.'
+      );
+    }
+
+    const { error } = await supabase
+      .from('service').delete().eq('id', id).eq('clinic_id', staff.clinicId);
+    if (error) throw new Error(error.message);
+  } catch (err) {
+    redirect(`/console/services/${id}?error=${encodeURIComponent(formMessage(err))}`);
+  }
+
+  revalidatePath('/console/services');
+  redirect('/console/services?deleted=1');
 }
 
 export default async function ServiceFormPage({
@@ -111,6 +165,19 @@ export default async function ServiceFormPage({
   const categories = [...new Set((existing ?? []).map(s => String(s.category)))].sort();
 
   const mode = String(service?.price_mode ?? 'flat');
+
+  // How many records point at this service. Drives whether delete is offered,
+  // and — more useful — tells her WHY it is not.
+  let usedBy = 0;
+  if (!isNew) {
+    const [a, t, pk, pi] = await Promise.all([
+      supabase.from('appointment').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('treatment_record').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('service_package').select('id', { count: 'exact', head: true }).eq('service_id', id),
+      supabase.from('package_item').select('id', { count: 'exact', head: true }).eq('service_id', id)
+    ]);
+    usedBy = (a.count ?? 0) + (t.count ?? 0) + (pk.count ?? 0) + (pi.count ?? 0);
+  }
 
   return (
     <>
@@ -276,6 +343,61 @@ export default async function ServiceFormPage({
             </div>
           </section>
 
+          <section className="card">
+            <div className="card-head">
+              <div>
+                <h2>How it reads on your public page</h2>
+                <p>
+                  The short line goes in the menu. The longer version sits behind
+                  &ldquo;What this involves&rdquo;, so the menu stays scannable and
+                  the detail is one tap away.
+                </p>
+              </div>
+            </div>
+            <div className="stack">
+              <div className="field">
+                <label htmlFor="details">What this involves</label>
+                <textarea id="details" name="details" rows={5}
+                  defaultValue={String(service?.details ?? '')}
+                  placeholder="What is included, what to expect, whether a series is recommended." />
+                <div className="hint">
+                  Leave the price out of this — it is a field above, and repeating
+                  it here is how a page ends up showing two different numbers.
+                </div>
+              </div>
+
+              <div className="grid g2">
+                <div className="field">
+                  <label htmlFor="deposit_cents">Deposit</label>
+                  <input id="deposit_cents" name="deposit_cents" type="text" inputMode="decimal"
+                    defaultValue={service?.deposit_cents ? String(Number(service.deposit_cents) / 100) : ''}
+                    placeholder="0.00" />
+                  <div className="hint">Shown on the menu, and comes off the total.</div>
+                </div>
+                <div className="field">
+                  <label htmlFor="sort_order">Menu position</label>
+                  <input id="sort_order" name="sort_order" type="number"
+                    defaultValue={String(service?.sort_order ?? 0)} />
+                  <div className="hint">Lower shows first inside its category.</div>
+                </div>
+              </div>
+
+              <label className="switch">
+                <input type="checkbox" name="is_membership" defaultChecked={!!service?.is_membership} />
+                <span className="track" />
+                <span className="txt">This is a membership</span>
+              </label>
+
+              {!isNew && service?.needs_copy ? (
+                <div className="note-band warn">
+                  Marked as <b>awaiting copy</b>, so the public page currently says a
+                  description is to be supplied. Writing the short line above clears
+                  that automatically when you save.
+                </div>
+              ) : null}
+            </div>
+          </section>
+
           <div className="row" style={{ marginTop: 'var(--gd-5)' }}>
             <button className="btn primary" type="submit">
               {isNew ? 'Add service' : 'Save changes'}
@@ -283,6 +405,44 @@ export default async function ServiceFormPage({
             <Link className="btn ghost" href="/console/services">Cancel</Link>
           </div>
         </form>
+
+        {/* Deleting lives outside the edit form — a destructive action sharing a
+            submit button with an edit is how the wrong one gets pressed. */}
+        {!isNew && (
+          <section className="card" style={{ marginTop: 'var(--gd-8)' }}>
+            <div className="card-head">
+              <div>
+                <div className="eyebrow">Removing it</div>
+                <h2>Retire or delete</h2>
+              </div>
+            </div>
+
+            {usedBy > 0 ? (
+              <p className="muted" style={{ fontSize: '.9rem', lineHeight: 1.6 }}>
+                This service appears on <b>{usedBy}</b> existing record
+                {usedBy === 1 ? '' : 's'} — appointments, treatments or packages.
+                It cannot be deleted, because a past treatment record naming a
+                service that no longer exists is a clinical record that has lost
+                information. <b>Untick Active</b> above to take it off the menu and
+                stop new bookings; everything already recorded stays readable.
+              </p>
+            ) : (
+              <>
+                <p className="muted" style={{ fontSize: '.9rem', lineHeight: 1.6 }}>
+                  Nothing references this service yet, so it can be deleted
+                  outright. If it has ever been booked, retire it instead by
+                  unticking Active — that keeps the history.
+                </p>
+                <form action={destroy} style={{ marginTop: 'var(--gd-4)' }}>
+                  <input type="hidden" name="id" value={id} />
+                  <button className="btn danger" type="submit">
+                    Delete this service
+                  </button>
+                </form>
+              </>
+            )}
+          </section>
+        )}
       </div>
     </>
   );

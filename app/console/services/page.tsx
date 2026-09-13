@@ -17,9 +17,9 @@ export const dynamic = 'force-dynamic';
 export default async function ServicesPage({
   searchParams
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; deleted?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, deleted } = await searchParams;
   const clinic = await getClinic();
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
@@ -48,6 +48,11 @@ export default async function ServicesPage({
       </header>
 
       <div className="view wide">
+        {deleted && (
+          <div className="note-band" style={{ marginBottom: 'var(--gd-5)' }}>
+            Service deleted. Nothing referenced it, so no history was affected.
+          </div>
+        )}
         {saved && (
           <div className="note-band" style={{ borderLeftColor: 'var(--gd-in-range)', marginBottom: 'var(--gd-5)' }}>
             Saved.
