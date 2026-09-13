@@ -1,0 +1,40 @@
+{
+  "name": "gamedaythorton",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Patient app (GAMEPLAN) and clinic console (PRESS BOX). Multi-tenant, practice-type aware. PILOT MODE — synthetic data only until Phase C sign-off.",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "node scripts/copy-prototype.cjs && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "fixtures": "node scripts/generate-fixtures.cjs",
+    "smoke": "node scripts/smoke-test.cjs",
+    "db:migrate": "node scripts/db-migrate.cjs",
+    "db:seed": "node scripts/db-seed.cjs",
+    "db:reset": "node scripts/db-migrate.cjs --reset && node scripts/db-seed.cjs",
+    "verify": "npm run fixtures && npm run smoke && npm run typecheck"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^17.5.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1",
+    "typescript": "^5.7.3"
+  }
+}
