@@ -1,0 +1,74 @@
+[
+  {
+    "id": "mb_inv_jeuveau",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Jeuveau 100u vial",
+    "category": "injectable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "vial",
+    "unit_label": "unit",
+    "units_per_container": 100,
+    "reorder_threshold": 2
+  },
+  {
+    "id": "mb_inv_prf_tube",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "PRF collection tube",
+    "category": "consumable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "tube",
+    "unit_label": "tube",
+    "units_per_container": 1,
+    "reorder_threshold": 20
+  },
+  {
+    "id": "mb_inv_nuestrand",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Nue Strand serum",
+    "category": "topical",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "vial",
+    "unit_label": "vial",
+    "units_per_container": 1,
+    "reorder_threshold": 3
+  },
+  {
+    "id": "mb_inv_numbing",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Topical numbing cream 30g",
+    "category": "topical",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "tube",
+    "unit_label": "g",
+    "units_per_container": 30,
+    "reorder_threshold": 2
+  },
+  {
+    "id": "mb_inv_lash_adhesive",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Lash adhesive 5ml",
+    "category": "consumable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "bottle",
+    "unit_label": "ml",
+    "units_per_container": 5,
+    "reorder_threshold": 2
+  },
+  {
+    "id": "mb_inv_microneedle",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Microneedling cartridge 12-pin",
+    "category": "consumable",
+    "is_controlled": false,
+    "schedule": null,
+    "unit": "cartridge",
+    "unit_label": "cartridge",
+    "units_per_container": 1,
+    "reorder_threshold": 10
+  }
+]

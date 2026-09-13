@@ -1,0 +1,14 @@
+[
+  {
+    "id": "mb_prov_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Jamie Salazar",
+    "credentials": null,
+    "role_label": "Owner",
+    "bio": null,
+    "photo_path": null,
+    "hours": [],
+    "active": true,
+    "sort_order": 0
+  }
+]

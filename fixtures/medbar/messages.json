@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mb_msg_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "thread_id": "mb_thr_01",
+    "patient_id": "mb_07_adverse",
+    "sender_type": "patient",
+    "body": "The bruising is nearly gone but the left side still looks a bit fuller than the right. Is that normal at three weeks?",
+    "sent_at": "2026-09-13",
+    "synthetic": true
+  },
+  {
+    "id": "mb_msg_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "thread_id": "mb_thr_02",
+    "patient_id": "mb_08_expiring",
+    "sender_type": "patient",
+    "body": "I think I still have treatments left on the package I bought last year? Do they run out?",
+    "sent_at": "2026-09-12",
+    "synthetic": true
+  },
+  {
+    "id": "mb_msg_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "thread_id": "mb_thr_03",
+    "patient_id": "mb_02_lash",
+    "sender_type": "patient",
+    "body": "Can I move to Fridays for my fills?",
+    "sent_at": "2026-09-04",
+    "synthetic": true
+  },
+  {
+    "id": "mb_msg_04",
+    "clinic_id": "clinic_medbar_loveland",
+    "thread_id": "mb_thr_03",
+    "patient_id": "mb_02_lash",
+    "sender_type": "staff",
+    "body": "Of course — Fridays open at 10. I have moved your next one.",
+    "sent_at": "2026-09-05",
+    "synthetic": true
+  }
+]

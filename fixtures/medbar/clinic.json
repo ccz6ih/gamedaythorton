@@ -1,0 +1,71 @@
+{
+  "id": "clinic_medbar_loveland",
+  "slug": "medbar-loveland",
+  "name": "The Med Bar",
+  "location_name": "Loveland",
+  "practice_type": "med_spa",
+  "address_line1": "2362 West 44th Street",
+  "address_city": "Loveland",
+  "address_state": "CO",
+  "address_zip": "80538",
+  "phone_voice": null,
+  "phone_text": null,
+  "email": null,
+  "timezone": "America/Denver",
+  "hours": [
+    {
+      "day": "Mon",
+      "open": "08:00",
+      "close": "15:00"
+    },
+    {
+      "day": "Tue",
+      "open": null,
+      "close": null
+    },
+    {
+      "day": "Wed",
+      "open": "08:00",
+      "close": "15:00"
+    },
+    {
+      "day": "Thu",
+      "open": null,
+      "close": null
+    },
+    {
+      "day": "Fri",
+      "open": "10:00",
+      "close": "15:00"
+    },
+    {
+      "day": "Sat",
+      "open": null,
+      "close": null
+    },
+    {
+      "day": "Sun",
+      "open": null,
+      "close": null
+    }
+  ],
+  "brand": {
+    "clinicName": "The Med Bar",
+    "locationName": "Loveland",
+    "tagline": "Skin, lashes, and regenerative treatments.",
+    "accent": "#8a6a52",
+    "radius": 16,
+    "font": "serif",
+    "surface": "light",
+    "sportsVocabulary": false
+  },
+  "visit_facts": {
+    "parking": "TODO discovery — parking situation at 2362 W 44th St.",
+    "suite": "TODO discovery — suite number and how to find the door.",
+    "draw": "PRF treatments begin with a standard blood draw, about a minute.",
+    "duration": "Most treatments run 45–120 minutes. Your confirmation shows the exact length.",
+    "privacy": "Private treatment room. TODO discovery — confirm wording with the practice.",
+    "cost": "Price is confirmed before anything begins. Buy Now Pay Later is available in person for $50–$4,000."
+  },
+  "pilot_mode": true
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "mb_auto_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_02_lash",
+    "rule_key": "rebook_cadence",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "triggered_at": "2026-09-12",
+    "payload_preview": "The Med Bar: you are due for your next appointment. Book here: [link]",
+    "synthetic": true
+  },
+  {
+    "id": "mb_auto_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_08_expiring",
+    "rule_key": "package_expiring",
+    "channel": "email",
+    "status": "logged_not_sent",
+    "triggered_at": "2026-09-12",
+    "payload_preview": "The Med Bar: something on your account needs attention before it expires.",
+    "synthetic": true
+  },
+  {
+    "id": "mb_auto_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_09_lapsed",
+    "rule_key": "winback",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "triggered_at": "2026-09-09",
+    "payload_preview": "The Med Bar: it has been a while. Want to come in? [link]",
+    "synthetic": true
+  },
+  {
+    "id": "mb_auto_04",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_01_consult",
+    "rule_key": "intake_incomplete_t24",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "triggered_at": "2026-09-14",
+    "payload_preview": "The Med Bar: one quick form to finish before tomorrow. [link]",
+    "synthetic": true
+  },
+  {
+    "id": "mb_auto_05",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_07_adverse",
+    "rule_key": "post_treatment_checkin",
+    "channel": "sms",
+    "status": "logged_not_sent",
+    "triggered_at": "2026-08-24",
+    "payload_preview": "The Med Bar: how are you getting on? Reply any time.",
+    "synthetic": true
+  }
+]

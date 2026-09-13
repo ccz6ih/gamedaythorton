@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mb_ps_mb_04_series_done_face",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_04_series_done",
+    "series_type": "face",
+    "label": "PRF microneedling — texture and scarring",
+    "guide_version": "v1",
+    "capture_guide_ref": "guide_face_v1",
+    "synthetic": true
+  },
+  {
+    "id": "mb_ps_mb_03_series_mid_face",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_03_series_mid",
+    "series_type": "face",
+    "label": "PRF microneedling — in progress",
+    "guide_version": "v1",
+    "capture_guide_ref": "guide_face_v1",
+    "synthetic": true
+  },
+  {
+    "id": "mb_ps_mb_06_tattoo_treatment_area",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_06_tattoo",
+    "series_type": "treatment_area",
+    "label": "Paramedical tattoo — abdominal scar",
+    "guide_version": "v1",
+    "capture_guide_ref": "guide_treatment_area_v1",
+    "synthetic": true
+  },
+  {
+    "id": "mb_ps_mb_07_adverse_treatment_area",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_07_adverse",
+    "series_type": "treatment_area",
+    "label": "Under-eye — bruising resolution",
+    "guide_version": "v1",
+    "capture_guide_ref": "guide_treatment_area_v1",
+    "synthetic": true
+  }
+]

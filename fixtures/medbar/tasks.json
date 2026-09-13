@@ -1,0 +1,57 @@
+[
+  {
+    "id": "mb_task_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_07_adverse",
+    "title": "Follow up on bruising — Tabitha Nkemelu",
+    "priority": "high",
+    "due_on": "2026-09-18",
+    "source": "adverse_event",
+    "done": false,
+    "synthetic": true
+  },
+  {
+    "id": "mb_task_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_08_expiring",
+    "title": "Package expires in 8 weeks, 2 sessions unused — Saoirse Valdivia",
+    "priority": "high",
+    "due_on": "2026-09-21",
+    "source": "package_expiring",
+    "done": false,
+    "synthetic": true
+  },
+  {
+    "id": "mb_task_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_01_consult",
+    "title": "Consult tomorrow, intake not started — Renata Oyelaran",
+    "priority": "med",
+    "due_on": "2026-09-14",
+    "source": "intake_incomplete",
+    "done": false,
+    "synthetic": true
+  },
+  {
+    "id": "mb_task_04",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_09_lapsed",
+    "title": "No visit in 8 months — Beatriz Okonkwo",
+    "priority": "med",
+    "due_on": "2026-09-16",
+    "source": "at_risk",
+    "done": false,
+    "synthetic": true
+  },
+  {
+    "id": "mb_task_05",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": null,
+    "title": "Nue Strand serum expires in 25 days, 2 vials left",
+    "priority": "low",
+    "due_on": "2026-09-24",
+    "source": "inventory",
+    "done": false,
+    "synthetic": true
+  }
+]

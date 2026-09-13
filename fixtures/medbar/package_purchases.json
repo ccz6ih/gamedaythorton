@@ -1,0 +1,41 @@
+[
+  {
+    "id": "mb_pp_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_03_series_mid",
+    "package_id": "mb_pkg_02",
+    "package_name": "PRF Microneedling | 3 treatments",
+    "sessions_total": 3,
+    "price_paid_cents": 210000,
+    "purchased_at": "2026-08-03",
+    "expires_on": "2027-07-31",
+    "status": "active",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pp_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_04_series_done",
+    "package_id": "mb_pkg_02",
+    "package_name": "PRF Microneedling | 3 treatments",
+    "sessions_total": 3,
+    "price_paid_cents": 210000,
+    "purchased_at": "2026-05-25",
+    "expires_on": "2027-05-12",
+    "status": "complete",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pp_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_08_expiring",
+    "package_id": "mb_pkg_01",
+    "package_name": "PRF Eye Rejuvenation — Series of 3",
+    "sessions_total": 3,
+    "price_paid_cents": 120000,
+    "purchased_at": "2025-11-18",
+    "expires_on": "2026-11-09",
+    "status": "active",
+    "synthetic": true
+  }
+]

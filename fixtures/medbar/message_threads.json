@@ -1,0 +1,32 @@
+[
+  {
+    "id": "mb_thr_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_07_adverse",
+    "triage_tag": "clinical",
+    "status": "open",
+    "last_at": "2026-09-13",
+    "unread_staff": 1,
+    "synthetic": true
+  },
+  {
+    "id": "mb_thr_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_08_expiring",
+    "triage_tag": "billing",
+    "status": "open",
+    "last_at": "2026-09-12",
+    "unread_staff": 1,
+    "synthetic": true
+  },
+  {
+    "id": "mb_thr_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "patient_id": "mb_02_lash",
+    "triage_tag": "scheduling",
+    "status": "closed",
+    "last_at": "2026-09-05",
+    "unread_staff": 0,
+    "synthetic": true
+  }
+]

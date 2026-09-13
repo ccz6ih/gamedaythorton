@@ -1,0 +1,11 @@
+[
+  {
+    "id": "mb_stf_owner",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "Jamie Salazar",
+    "email": "owner@medbar.pilot.invalid",
+    "role": "owner",
+    "mfa_enabled": false,
+    "active": true
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "mb_td_001",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_001",
+    "patient_id": "mb_05_tox",
+    "sort_order": 0,
+    "area": "Glabella",
+    "units": 20,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "intramuscular"
+  },
+  {
+    "id": "mb_td_002",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_001",
+    "patient_id": "mb_05_tox",
+    "sort_order": 1,
+    "area": "Frontalis",
+    "units": 10,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "intramuscular"
+  },
+  {
+    "id": "mb_td_003",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_001",
+    "patient_id": "mb_05_tox",
+    "sort_order": 2,
+    "area": "Lateral orbicularis oculi",
+    "units": 12,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "subcutaneous"
+  },
+  {
+    "id": "mb_td_004",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_002",
+    "patient_id": "mb_05_tox",
+    "sort_order": 0,
+    "area": "Glabella",
+    "units": 20,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "intramuscular"
+  },
+  {
+    "id": "mb_td_005",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_002",
+    "patient_id": "mb_05_tox",
+    "sort_order": 1,
+    "area": "Frontalis",
+    "units": 12,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "intramuscular"
+  },
+  {
+    "id": "mb_td_006",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_002",
+    "patient_id": "mb_05_tox",
+    "sort_order": 2,
+    "area": "Lateral orbicularis oculi",
+    "units": 12,
+    "product_name": "Jeuveau",
+    "lot_id": "mb_lot_01",
+    "depth": "subcutaneous"
+  },
+  {
+    "id": "mb_td_007",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_003",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 0,
+    "area": "Full face",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "microneedling 1.0-1.5mm"
+  },
+  {
+    "id": "mb_td_008",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_003",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 1,
+    "area": "Cheeks — acne scarring",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "targeted 1.5mm"
+  },
+  {
+    "id": "mb_td_009",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_004",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 0,
+    "area": "Full face",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "microneedling 1.0-1.5mm"
+  },
+  {
+    "id": "mb_td_010",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_004",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 1,
+    "area": "Cheeks — acne scarring",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "targeted 1.5mm"
+  },
+  {
+    "id": "mb_td_011",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_005",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 0,
+    "area": "Full face",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "microneedling 1.0-1.5mm"
+  },
+  {
+    "id": "mb_td_012",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_005",
+    "patient_id": "mb_04_series_done",
+    "sort_order": 1,
+    "area": "Cheeks — acne scarring",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "technique": "targeted 1.5mm"
+  },
+  {
+    "id": "mb_td_013",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_006",
+    "patient_id": "mb_07_adverse",
+    "sort_order": 0,
+    "area": "Left infraorbital",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "depth": "subdermal"
+  },
+  {
+    "id": "mb_td_014",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_006",
+    "patient_id": "mb_07_adverse",
+    "sort_order": 1,
+    "area": "Right infraorbital",
+    "product_name": "PRF (autologous)",
+    "lot_id": "mb_lot_03",
+    "depth": "subdermal"
+  },
+  {
+    "id": "mb_td_015",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_007",
+    "patient_id": "mb_06_tattoo",
+    "sort_order": 0,
+    "area": "Abdominal scar — medial third",
+    "product_name": "Pigment blend 3N",
+    "technique": "micropigmentation"
+  },
+  {
+    "id": "mb_td_016",
+    "clinic_id": "clinic_medbar_loveland",
+    "treatment_record_id": "mb_tr_008",
+    "patient_id": "mb_06_tattoo",
+    "sort_order": 0,
+    "area": "Abdominal scar — medial third",
+    "product_name": "Pigment blend 3N",
+    "technique": "micropigmentation"
+  }
+]

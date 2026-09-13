@@ -1,0 +1,52 @@
+[
+  {
+    "id": "mb_pr_001",
+    "clinic_id": "clinic_medbar_loveland",
+    "purchase_id": "mb_pp_01",
+    "patient_id": "mb_03_series_mid",
+    "appointment_id": "mb_apt_009",
+    "sessions": 1,
+    "redeemed_at": "2026-08-03T08:00:00",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pr_002",
+    "clinic_id": "clinic_medbar_loveland",
+    "purchase_id": "mb_pp_02",
+    "patient_id": "mb_04_series_done",
+    "appointment_id": "mb_apt_010",
+    "sessions": 1,
+    "redeemed_at": "2026-06-08T08:00:00",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pr_003",
+    "clinic_id": "clinic_medbar_loveland",
+    "purchase_id": "mb_pp_02",
+    "patient_id": "mb_04_series_done",
+    "appointment_id": "mb_apt_011",
+    "sessions": 1,
+    "redeemed_at": "2026-07-13T08:00:00",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pr_004",
+    "clinic_id": "clinic_medbar_loveland",
+    "purchase_id": "mb_pp_02",
+    "patient_id": "mb_04_series_done",
+    "appointment_id": "mb_apt_012",
+    "sessions": 1,
+    "redeemed_at": "2026-08-17T08:00:00",
+    "synthetic": true
+  },
+  {
+    "id": "mb_pr_005",
+    "clinic_id": "clinic_medbar_loveland",
+    "purchase_id": "mb_pp_03",
+    "patient_id": "mb_08_expiring",
+    "appointment_id": "mb_apt_018",
+    "sessions": 1,
+    "redeemed_at": "2026-05-22T10:00:00",
+    "synthetic": true
+  }
+]

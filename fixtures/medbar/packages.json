@@ -1,0 +1,44 @@
+[
+  {
+    "id": "mb_pkg_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "PRF Eye Rejuvenation — Series of 3",
+    "description": "Series of 3 liquid PRF under-eye treatments to support natural collagen production and improve the appearance of crepey, tired or hollow-looking under-eyes.",
+    "service_id": "mb_svc_02",
+    "sessions": 3,
+    "price_cents": 120000,
+    "list_price_cents": 135000,
+    "interval_note": "Treatments scheduled several weeks apart.",
+    "expiry_days": 365,
+    "active": true,
+    "sort_order": 0
+  },
+  {
+    "id": "mb_pkg_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "PRF Microneedling | 3 treatments",
+    "description": "Customised PRF microneedling treatments to support collagen production and progressively improve tone, texture, fine lines, pores and acne scarring. PRF preparation included each time.",
+    "service_id": "mb_svc_03",
+    "sessions": 3,
+    "price_cents": 210000,
+    "list_price_cents": 240000,
+    "interval_note": "Treatments scheduled several weeks apart.",
+    "expiry_days": 365,
+    "active": true,
+    "sort_order": 1
+  },
+  {
+    "id": "mb_pkg_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "name": "PRF + Nue Strand Hair Restoration 3",
+    "description": "PRF, Nue Strand and scalp microneedling for hair restoration. Blood draw, PRF preparation and Nue Strand included each session.",
+    "service_id": "mb_svc_04",
+    "sessions": 3,
+    "price_cents": 210000,
+    "list_price_cents": 240000,
+    "interval_note": "Treatments scheduled several weeks apart.",
+    "expiry_days": 365,
+    "active": true,
+    "sort_order": 2
+  }
+]

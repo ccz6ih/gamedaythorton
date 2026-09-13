@@ -1,0 +1,72 @@
+[
+  {
+    "id": "mb_lot_01",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_jeuveau",
+    "lot_number": "SYN-JEU-8841",
+    "expiry_date": "2027-04-12",
+    "qty_received": 5,
+    "qty_remaining": 2,
+    "received_at": "2026-08-05"
+  },
+  {
+    "id": "mb_lot_02",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_jeuveau",
+    "lot_number": "SYN-JEU-9012",
+    "expiry_date": "2026-10-22",
+    "qty_received": 3,
+    "qty_remaining": 3,
+    "received_at": "2026-09-04"
+  },
+  {
+    "id": "mb_lot_03",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_prf_tube",
+    "lot_number": "SYN-PRF-3320",
+    "expiry_date": "2027-10-19",
+    "qty_received": 60,
+    "qty_remaining": 34,
+    "received_at": "2026-07-06"
+  },
+  {
+    "id": "mb_lot_04",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_nuestrand",
+    "lot_number": "SYN-NS-118",
+    "expiry_date": "2026-10-09",
+    "qty_received": 6,
+    "qty_remaining": 2,
+    "received_at": "2026-05-17"
+  },
+  {
+    "id": "mb_lot_05",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_numbing",
+    "lot_number": "SYN-NUM-77",
+    "expiry_date": "2027-07-11",
+    "qty_received": 8,
+    "qty_remaining": 5,
+    "received_at": "2026-07-21"
+  },
+  {
+    "id": "mb_lot_06",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_lash_adhesive",
+    "lot_number": "SYN-ADH-455",
+    "expiry_date": "2026-11-13",
+    "qty_received": 6,
+    "qty_remaining": 1,
+    "received_at": "2026-06-26"
+  },
+  {
+    "id": "mb_lot_07",
+    "clinic_id": "clinic_medbar_loveland",
+    "item_id": "mb_inv_microneedle",
+    "lot_number": "SYN-MN-902",
+    "expiry_date": "2028-01-27",
+    "qty_received": 50,
+    "qty_remaining": 31,
+    "received_at": "2026-07-11"
+  }
+]

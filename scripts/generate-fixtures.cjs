@@ -464,19 +464,47 @@ const fillerNames = ['R. Alcaraz', 'J. Pilcher', 'M. Treadaway', 'D. Osgood', 'K
   'S. Hallmark', 'T. Brogden', 'N. Cazares', 'P. Rennick', 'W. Duffield', 'A. Sloane', 'C. Yerkes',
   'F. Mattingly', 'G. Ravenel', 'H. Stoddard', 'L. Prewitt', 'B. Ockerman', 'E. Tarleton'];
 const fillerServices = ['svc_trt_cyp', 'svc_b12', 'svc_followup', 'svc_labdraw', 'svc_mic_b12', 'svc_glutathione', 'svc_nad', 'svc_bcomplex'];
+// Appointments are allocated against a per-provider, per-day cursor so nothing
+// overlaps. The production schema enforces this with a gist exclusion
+// constraint (supabase/migrations/0003), so a generator that emits overlapping
+// slots produces a dataset the real database will refuse — and the failure
+// arrives at seed time looking like a bug in the seeder rather than in here.
+const hhmm = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+const LUNCH_START = 12 * 60, LUNCH_END = 13 * 60, DAY_END = 17 * 60;
+
 let fillerIdx = 0;
 for (let dayOffset = -2; dayOffset <= 11; dayOffset++) {
   const d = new Date(TODAY.getTime() + dayOffset * 864e5);
   const dow = d.getUTCDay();
   if (dow === 0 || dow === 6) continue;                 // clinic closed weekends
-  const count = 4 + Math.floor(aRand() * 4);
-  const used = new Set();
-  for (let k = 0; k < count; k++) {
-    let slot = apptTimes[Math.floor(aRand() * apptTimes.length)];
-    if (used.has(slot)) continue;
-    used.add(slot);
+  const day = iso(d);
+
+  // Where each provider is free next, in minutes past midnight. Seeded
+  // appointments below are placed before filler, so start after the latest one
+  // already on the books for that provider that day.
+  const cursor = {};
+  ['prov_01', 'prov_02'].forEach(pid => {
+    const existing = appointments
+      .filter(a => a.provider_id === pid && a.starts_at.slice(0, 10) === day)
+      .map(a => {
+        const [h, m] = a.starts_at.slice(11, 16).split(':').map(Number);
+        return h * 60 + m + (a.duration_min || 30) + 10;
+      });
+    cursor[pid] = existing.length ? Math.max(...existing) : 9 * 60;
+  });
+
+  const target = 4 + Math.floor(aRand() * 4);
+  for (let k = 0; k < target; k++) {
+    const pid = aRand() < 0.6 ? 'prov_01' : 'prov_02';
     const svcId = fillerServices[Math.floor(aRand() * fillerServices.length)];
     const svc = services.find(s => s.id === svcId);
+    const dur = svc ? svc.duration_min : 20;
+
+    let start = cursor[pid] + Math.floor(aRand() * 3) * 5;   // small natural gaps
+    if (start < LUNCH_END && start + dur > LUNCH_START) start = LUNCH_END;
+    if (start + dur > DAY_END) continue;                     // day is full
+
+    cursor[pid] = start + dur + 10;                          // 10min turnaround
     const past = dayOffset < 0;
     appointments.push({
       id: `apt_f${String(++fillerIdx).padStart(3, '0')}`,
@@ -484,19 +512,43 @@ for (let dayOffset = -2; dayOffset <= 11; dayOffset++) {
       patient_id: null,
       patient_display: fillerNames[fillerIdx % fillerNames.length],
       service_id: svcId,
-      provider_id: aRand() < 0.6 ? 'prov_01' : 'prov_02',
-      starts_at: `${iso(d)}T${slot}:00`,
-      duration_min: svc ? svc.duration_min : 20,
+      provider_id: pid,
+      starts_at: `${day}T${hhmm(start)}:00`,
+      duration_min: dur,
       status: past ? (aRand() < 0.08 ? 'no_show' : 'complete') : 'booked',
       intake_complete: true,
       booking_channel: aRand() < 0.5 ? 'app' : 'staff',
       reason_code: 'routine',
-      room: k % 2 === 0 ? 'Room 1' : 'Room 2',
+      room: pid === 'prov_01' ? 'Room 1' : 'Room 2',
       filler: true
     });
   }
 }
 appointments.sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+
+// Fail loudly here rather than at seed time: any overlap for one provider is a
+// dataset the production schema will reject.
+(function assertNoOverlap() {
+  const byProvider = {};
+  appointments.forEach(a => {
+    if (!a.provider_id) return;
+    const [h, m] = a.starts_at.slice(11, 16).split(':').map(Number);
+    const start = h * 60 + m;
+    const key = a.provider_id + '|' + a.starts_at.slice(0, 10);
+    (byProvider[key] = byProvider[key] || []).push({ id: a.id, start, end: start + (a.duration_min || 30) });
+  });
+  const clashes = [];
+  Object.entries(byProvider).forEach(([key, list]) => {
+    list.sort((x, y) => x.start - y.start);
+    for (let i = 1; i < list.length; i++) {
+      if (list[i].start < list[i - 1].end) clashes.push(`${key}: ${list[i - 1].id} / ${list[i].id}`);
+    }
+  });
+  if (clashes.length) {
+    console.error('\n  Overlapping appointments generated:\n    ' + clashes.join('\n    ') + '\n');
+    process.exit(1);
+  }
+})();
 
 // ---------- intake submissions ----------
 const intakeTemplate = {
