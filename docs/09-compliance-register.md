@@ -61,7 +61,7 @@ Enforced technically, not by memory:
 
 | # | Item | Deferred to | Est. cost | Trigger |
 |---|---|---|---|---|
-| C01 | BAA — hosting | C | Vercel Enterprise, or migrate to AWS/Render/Fly | Any real PHI |
+| C01 | BAA — hosting | C | Vercel Pro + $350/mo add-on, or migrate to AWS/Render/Aptible. See `21-compliance-cost.md` | Any real PHI |
 | C02 | BAA — database | C | Supabase HIPAA add-on (verify current pricing) | Any real PHI |
 | C03 | BAA — file storage | C | Bundled with C02 | Any real photo or document |
 | C04 | BAA — SMS (Twilio) | C | Low | Any message to a real patient |

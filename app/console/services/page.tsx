@@ -8,12 +8,18 @@
  * only thing allowed to render a price.
  */
 
+import Link from 'next/link';
 import { getClinic, getServices, getPlans, getPackageCatalogue, hasModule } from '@/lib/db/queries';
 import { priceLabel, money, titleCase } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ServicesPage() {
+export default async function ServicesPage({
+  searchParams
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  const { saved } = await searchParams;
   const clinic = await getClinic();
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
@@ -38,10 +44,15 @@ export default async function ServicesPage() {
           <h1>Services &amp; pricing</h1>
         </div>
         <div className="spacer" />
-        <span className="pill">{services.length} services</span>
+        <Link className="btn primary" href="/console/services/new">Add a service</Link>
       </header>
 
       <div className="view wide">
+        {saved && (
+          <div className="note-band" style={{ borderLeftColor: 'var(--gd-in-range)', marginBottom: 'var(--gd-5)' }}>
+            Saved.
+          </div>
+        )}
         <div className="grid g4">
           <div className="stat">
             <div className="lab">Services</div>
@@ -139,12 +150,16 @@ export default async function ServicesPage() {
                     <th className="num">Price</th>
                     <th>Consent</th>
                     <th>Online</th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map(s => (
-                    <tr key={s.id}>
-                      <td><b>{s.name}</b></td>
+                    <tr key={s.id} style={s.active ? undefined : { opacity: 0.55 }}>
+                      <td>
+                        <Link href={`/console/services/${s.id}`}><b>{s.name}</b></Link>
+                        {!s.active && <span className="pill" style={{ marginLeft: '.4rem' }}>retired</span>}
+                      </td>
                       <td className="num">{s.duration_min}</td>
                       <td className="num dim">{s.buffer_after_min || '—'}</td>
                       <td className="num"><b>{priceLabel(s)}</b></td>
@@ -157,6 +172,9 @@ export default async function ServicesPage() {
                         {s.online_bookable
                           ? <span className="pill" data-tone="ok"><i className="dot" />yes</span>
                           : <span className="dim">no</span>}
+                      </td>
+                      <td>
+                        <Link className="btn sm ghost" href={`/console/services/${s.id}`}>Edit</Link>
                       </td>
                     </tr>
                   ))}

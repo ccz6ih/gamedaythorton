@@ -30,7 +30,7 @@ export default async function TreatmentsPage() {
           <h1>Treatment records</h1>
         </div>
         <div className="spacer" />
-        <span className="pill">{treatments.length} recorded</span>
+        <Link className="btn primary" href="/console/treatments/new">Record a treatment</Link>
       </header>
 
       <div className="view wide">
@@ -146,12 +146,12 @@ export default async function TreatmentsPage() {
         )}
 
         <div className="card">
-          <div className="eyebrow quiet">Not built yet</div>
+          <div className="eyebrow quiet">About the lot column</div>
           <p className="muted" style={{ fontSize: '.86rem', lineHeight: 1.6 }}>
-            This screen reads treatment records; it does not yet write them. The entry
-            form — pick areas, enter units, select the lot it came from, mark aftercare
-            given — is the next thing to build here, and it is the screen that would be
-            used several times a day.
+            A row marked <b>not recorded</b> means the product was logged without a lot.
+            That is the one field worth chasing: if a manufacturer recalls a batch, the
+            lot linkage is what answers &ldquo;who received it&rdquo; without
+            reconstructing it from memory.
           </p>
         </div>
       </div>

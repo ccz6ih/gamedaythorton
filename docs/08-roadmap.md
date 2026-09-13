@@ -134,8 +134,9 @@ contracts — do not enter it on enthusiasm alone.**
 This is where HIPAA lands. Work the full checklist in `06-architecture.md`. Highlights:
 
 - BAAs: host, DB, storage, SMS, email, monitoring
-- **Hosting decision point:** if Vercel's Enterprise BAA is prohibitive, migrate to
-  AWS / Render / Fly. Decide at the start of Phase C, not the end
+- **Hosting decision point:** Vercel's BAA is a $350/mo Pro add-on, not Enterprise.
+  The bigger cost is Supabase's HIPAA floor (Team $599 + add-on). Costed against
+  AWS / Render / Aptible in `21-compliance-cost.md`. Decide at the start of Phase C
 - RLS on every PHI table, with a deliberate cross-tenant penetration attempt as the test
 - Audit logging on all PHI paths
 - Column encryption: photos, intake answers, check-in free text

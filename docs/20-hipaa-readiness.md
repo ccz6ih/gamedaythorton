@@ -71,7 +71,7 @@ the most likely way this project goes wrong.
 
 | # | Item | Blocked on | Effort |
 |---|---|---|---|
-| C01 | BAA — hosting | Commercial decision: Vercel Enterprise vs AWS/Render/Fly. **Decide at the start of Phase C** | Contract + possible migration |
+| C01 | BAA — hosting | Vercel Pro + $350/mo add-on, or move. Full costing in `21-compliance-cost.md`. **Decide at the start of Phase C** | Contract + possible migration |
 | C02 | BAA — database | Supabase HIPAA add-on, paid plan. Verify current terms | Contract |
 | C03 | BAA — file storage | Bundled with C02 | Contract |
 | C04–C06 | BAA — SMS, email, error monitoring | Twilio will sign. Verify Resend; fall back to SES | Contract |
@@ -110,8 +110,8 @@ the most likely way this project goes wrong.
 
 Order matters. Doing these out of order wastes money.
 
-1. **Decide the host.** Everything else gets built on it. If Vercel's Enterprise
-   tier is prohibitive, migrate *before* building on it.
+1. **Decide the host.** Everything else gets built on it, so migrate *before*
+   building if you are going to. Costed in `21-compliance-cost.md`.
 2. **Start every BAA on day one.** Vendors are slow. Build while you wait.
 3. **Move the database region** if it is moving. Cheapest while empty.
 4. Enable read audit logging; add column encryption.

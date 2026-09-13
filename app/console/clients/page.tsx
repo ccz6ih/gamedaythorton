@@ -31,7 +31,7 @@ export default async function ClientsPage() {
           <h1>{words.people}</h1>
         </div>
         <div className="spacer" />
-        <span className="pill">{clients.length} total</span>
+        <Link className="btn primary" href="/console/clients/new">Add {words.person}</Link>
       </header>
 
       <div className="view wide">

@@ -11,7 +11,7 @@ decided now, in these choices.
 | Layer | Pilot (Phase A/B) | Production (Phase C+) | Why it changes |
 |---|---|---|---|
 | Framework | Next.js (App Router), TypeScript | same | no change needed |
-| Hosting | Vercel Hobby/Pro | **BAA-covered host** | Vercel's BAA is Enterprise-tier. Verify current pricing — if prohibitive, AWS (Amplify/ECS), Render, or Fly all offer BAAs at far lower cost. **Decide before Phase C, not during** |
+| Hosting | Vercel Hobby/Pro | **BAA-covered host** | Vercel's BAA is now a self-serve $350/mo add-on on **Pro** (it was Enterprise-only before 2025). AWS and GCP charge nothing for the BAA itself; Render and Aptible bundle the controls. Costed in `21-compliance-cost.md`. **Decide before Phase C, not during** |
 | DB | Supabase (free/Pro) | Supabase with HIPAA add-on, or RDS | Supabase offers HIPAA terms as a paid add-on on non-free plans. Verify terms |
 | Auth | Supabase Auth, magic link | + passkeys, mandatory staff MFA | |
 | File storage | Supabase Storage, private bucket | + column-encrypted refs, signed short-TTL URLs, EXIF stripped | Photos are the highest-sensitivity asset |

@@ -122,9 +122,18 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
           <h1>{name}</h1>
         </div>
         <div className="spacer" />
-        <span className="pill" data-tone={p.status === 'active' ? 'ok' : 'warn'}>
-          <i className="dot" />{titleCase(p.status)}
-        </span>
+        <div className="row tight">
+          <Link className="btn sm" href={`/console/clients/new?id=${id}`}>Edit</Link>
+          <Link className="btn sm" href={`/console/book?patient=${id}`}>Book</Link>
+          {hasModule(clinic, 'treatment_records') && (
+            <Link className="btn sm primary" href={`/console/treatments/new?patient=${id}`}>
+              Record treatment
+            </Link>
+          )}
+          {hasModule(clinic, 'labs') && (
+            <Link className="btn sm primary" href={`/console/labs?patient=${id}`}>Enter labs</Link>
+          )}
+        </div>
       </header>
 
       <div className="view wide">

@@ -137,10 +137,13 @@ output.
 
 ### What Vercel is not yet
 
-Vercel's BAA is an Enterprise-tier arrangement. **This deployment is not covered
-by one**, which is exactly why no real patient data may reach it. The hosting
-decision for Phase C — stay on Vercel Enterprise, or move to AWS / Render / Fly
-— has to be made at the *start* of Phase C, not the end. `06-architecture.md`.
+Vercel offers a BAA as a self-serve **$350/mo add-on on Pro** (it needed an
+Enterprise contract before 2025). **This deployment does not have one**, which is
+exactly why no real patient data may reach it.
+
+The larger cost is Supabase, whose HIPAA floor is the Team plan at $599/mo plus an
+unpublished add-on. Full costing against AWS, Render and Aptible is in
+`21-compliance-cost.md`. Decide at the *start* of Phase C, not the end.
 
 ---
 

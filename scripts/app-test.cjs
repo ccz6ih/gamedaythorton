@@ -91,10 +91,16 @@ async function req(url, opts = {}) {
   if (signIn.status === 200) ok('sign-in renders');
   else bad('sign-in renders', `status ${signIn.status}`);
 
-  if (/jamie@medbar\.pilot\.invalid/.test(signInHtml)) {
-    ok('pilot accounts are listed', 'so a demo can start in seconds');
+  // Inverted deliberately. Listing every pilot account here showed one practice's
+  // staff the other practice's account list, which leaks the tenant structure to
+  // anyone who reaches the page. It is now behind PILOT_SHOW_ACCOUNTS.
+  if (!/pilot\.invalid/.test(signInHtml)) {
+    ok('the account list is NOT printed on sign-in', 'no tenant structure leaked');
+  } else if (process.env.PILOT_SHOW_ACCOUNTS === 'true') {
+    ok('account list shown, but only because PILOT_SHOW_ACCOUNTS is on');
   } else {
-    bad('pilot accounts are listed');
+    bad('the account list is NOT printed on sign-in',
+      'accounts are visible without PILOT_SHOW_ACCOUNTS being set');
   }
 
   if (!new RegExp(String(process.env.PILOT_DEMO_PASSWORD || '___nope___')).test(signInHtml)) {

@@ -45,6 +45,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { group: 'Run the day' },
     { href: '/console', label: words.dashboard, icon: '◯' },
     { href: '/console/today', label: 'Today', icon: '▦' },
+    { href: '/console/book', label: 'Book', icon: '✚' },
     { href: '/console/clients', label: words.people, icon: '☇' },
     { group: 'Clinical', when: hasModule(clinic, 'labs') || hasModule(clinic, 'treatment_records') },
     { href: '/console/labs', label: 'Lab entry', icon: '⚗', when: hasModule(clinic, 'labs') },
