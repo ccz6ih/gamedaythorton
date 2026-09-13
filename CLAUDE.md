@@ -60,15 +60,37 @@ engagement, the conventions, and the mistakes already made here. Pick tasks from
    the serialiser allowlist in `lib/phi/`.
 5. **`clinic_id` on every table.** Multi-tenant from the schema up, even though the UI
    is single-tenant. Retrofitting this later is a rewrite.
-6. **`PILOT_MODE` (the env var) stays on.** It is not the same thing as the per-clinic
-   guard in rule 1: the env var drives the banner, keeps Stripe on test keys until a
-   real account is connected, and makes the webhook acknowledge without applying. The
-   database flag decides whether real records are accepted. Turning one off does not
-   turn the other off, and that separation is deliberate.
+6. **Real money is gated per clinic, not per deployment.** This changed in September
+   2026 — read it before touching payments.
 
-7. **No secret keys in the database, ever.** Each practice connects its own Stripe
-   account through Connect; the only thing stored is `clinic.stripe_account_id`, which
-   is an identifier. `docs/19-environment.md` explains why at length.
+   It used to be one switch: `PILOT_MODE` on meant nobody could use a live Stripe
+   key. Right with one tenant; unsatisfiable with two. Gameday must stay guarded
+   because it holds clinical records, and The Med Bar must be able to sell a
+   moisturiser — same deployment, same afternoon.
+
+   So the question is asked per clinic by `canTakeMoney()` in `lib/stripe.ts`,
+   against **`clinic.pilot_mode`** — the same column the database independently
+   enforces, where every PHI table rejects non-synthetic rows while it is true. One
+   flag, two enforcers, no way for the app's belief and the database's to drift.
+
+   What has **not** changed:
+   - `PILOT_MODE=true` is an absolute override. While on, no clinic may use a live
+     key whatever its own column says.
+   - Gameday Thornton keeps `pilot_mode = true`. Do not clear it, do not remove the
+     banner.
+   - No production SMS/email credentials.
+   - The **clinical** money path — memberships, visits, deposits — is still unbuilt
+     and stays that way. Only the retail shop can charge.
+
+7. **No secret keys in the database, ever.** The only thing stored is
+   `clinic.stripe_account_id`, which is an identifier. `docs/19-environment.md`
+   explains why at length.
+
+   Connect is opt-in and currently **off** (`STRIPE_CONNECT` unset). The Med Bar
+   runs on its own secret key in the deployment's environment, which is the correct
+   arrangement while there is one paying tenant: you cannot act on behalf of
+   yourself, so passing an account id alongside that practice's own key would fail.
+   Connect becomes necessary the day a second practice takes money here.
 
 ## The product thesis (governs all prioritisation)
 
@@ -170,7 +192,20 @@ Read `docs/20-hipaa-readiness.md` before touching anything near PHI.
 - **Notification previews** are trigger-checked too. Use `notificationPreview()`.
 - `audit_log` is append-only and records which columns changed, not their values.
 - Double-booking and package over-redemption are impossible at the schema level.
-- `lib/stripe.ts` refuses to initialise with a live key while `PILOT_MODE` is on.
+- `lib/stripe.ts` refuses to initialise with a live key while `PILOT_MODE` is on, and
+  `canTakeMoney()` refuses again per clinic against `clinic.pilot_mode`.
+- **The shop cannot invent a price.** A basket is ids and counts; `app.shop_order_create`
+  reads `product` itself and computes the total. `anon` has no insert, update, select or
+  delete on `shop_order` or `shop_order_item` — only two function grants. Settlement
+  (`shop_order_mark_paid`) is granted to `service_role` alone and is reachable only from
+  the signature-verified Stripe webhook.
+- **A shop order is not a `payment` row.** `payment` means money from a patient. A
+  stranger buying cleanser has no patient record and must never be given one.
+
+Verify the money path with `node scripts/shop-test.cjs` (22 checks, every one an attempt
+to do something forbidden). It also asserts which files may import
+`lib/supabase/service.ts` — the only service-role client, allowed in the webhook and
+nowhere else.
 
 Verify with `npm run test:db` (35 checks, includes a deliberate cross-tenant attempt) and
 `npm run test:auth` (16 checks through the real API). Both run against throwaway data and
