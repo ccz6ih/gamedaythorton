@@ -68,6 +68,7 @@ export function storefrontLinks(base: string) {
     packages: `${base}/packages`,
     about: `${base}/about`,
     enquire: `${base}/enquire`,
+    book: `${base}/book`,
     cart: `${base}/cart`,
     /** Stripe returns here. Absolute URL built by the checkout route. */
     thanks: `${base}/shop/thanks`

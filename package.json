@@ -31,7 +31,8 @@
     "test:brand": "node scripts/brand-test.cjs",
     "test:shop": "node scripts/shop-test.cjs",
     "test:notes": "node scripts/notes-test.cjs",
-    "test:charge": "node scripts/charge-test.cjs"
+    "test:charge": "node scripts/charge-test.cjs",
+    "test:booking": "node scripts/booking-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

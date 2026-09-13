@@ -120,10 +120,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             </p>
 
             <div className="sf-actions sf-fade" style={{ animationDelay: '1.1s' }}>
-              <Link href={links.enquire} className="sf-btn primary">Book a treatment</Link>
+              <Link href={links.book} className="sf-btn primary">Book a treatment</Link>
               {consult && (
                 <Link
-                  href={`${links.enquire}?service=${encodeURIComponent(consult.name)}`}
+                  href={`${links.book}?service=${encodeURIComponent(consult.id)}`}
                   className="sf-btn ghost"
                 >
                   Free 15-minute consult

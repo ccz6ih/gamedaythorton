@@ -98,12 +98,20 @@ export default async function Shop({ params }: { params: Promise<{ slug: string 
               <div className="sf-grid">
                 {items.map(p => {
                   const soldOut = tracksStock && p.stock_qty <= 0;
+                  const hasSecondary = Boolean(p.secondary_image_path);
                   return (
                     <article className="sf-card" key={p.id}>
-                      <div className="sf-card-img">
-                        {p.image_path
-                          ? <img src={p.image_path} alt={p.name} loading="lazy" />
-                          : <span aria-hidden="true">{p.name.slice(0, 1)}</span>}
+                      <div className={`sf-card-img${hasSecondary ? ' has-hover-img' : ''}`}>
+                        {p.image_path ? (
+                          <>
+                            <img className="sf-card-img-primary" src={p.image_path} alt={p.name} loading="lazy" />
+                            {p.secondary_image_path && (
+                              <img className="sf-card-img-hover" src={p.secondary_image_path} alt={`${p.name} alternate view`} loading="lazy" />
+                            )}
+                          </>
+                        ) : (
+                          <span aria-hidden="true">{p.name.slice(0, 1)}</span>
+                        )}
                       </div>
 
                       <div className="sf-card-body">

@@ -187,7 +187,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
       <StorefrontNav
         items={nav}
         homeHref={links.home}
-        bookHref={links.enquire}
+        bookHref={links.book}
         logoUrl={brand.logoUrl}
         name={clinic.name}
       >

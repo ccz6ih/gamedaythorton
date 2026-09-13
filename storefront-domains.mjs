@@ -34,6 +34,9 @@ export const STOREFRONT_DOMAINS = {
  */
 export const STOREFRONT_PATHS = [
   '/', '/services', '/packages', '/about', '/shop', '/enquire',
+  // Booking. Public by necessity: a person picking a treatment and a time has
+  // no account and must never meet a passcode on the way to giving money.
+  '/book',
   // The basket and the page Stripe returns to. Both must be public: a customer
   // coming back from paying has no session and must not meet a passcode box
   // holding a receipt they have already been charged for.

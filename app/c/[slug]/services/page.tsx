@@ -156,11 +156,19 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                   </div>
 
                   <div className="sf-item-cta">
+                    {/* Bookable treatments go to the booking flow with this one
+                        already chosen, so the visitor lands on the calendar
+                        rather than re-picking what they just clicked. Anything
+                        not bookable online still goes to the message form —
+                        sending somebody to a calendar that will not offer them
+                        a time is worse than asking them to write. */}
                     <Link
                       className="sf-btn ghost sm"
-                      href={`${links.enquire}?service=${encodeURIComponent(s.name)}`}
+                      href={s.online_bookable
+                        ? `${links.book}?service=${encodeURIComponent(s.id)}`
+                        : `${links.enquire}?service=${encodeURIComponent(s.name)}`}
                     >
-                      {s.online_bookable ? 'Request this' : 'Ask about this'}
+                      {s.online_bookable ? 'Book this' : 'Ask about this'}
                     </Link>
                   </div>
                 </article>
@@ -177,7 +185,7 @@ export default async function StorefrontServices({ params }: { params: Promise<{
           )}
 
           <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
-            <Link href={links.enquire} className="sf-btn primary">Request an appointment</Link>
+            <Link href={links.book} className="sf-btn primary">Book an appointment</Link>
             <Link href={links.packages} className="sf-btn ghost">Packages &amp; series</Link>
           </div>
         </div>
