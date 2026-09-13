@@ -97,46 +97,64 @@ just a couple of real patients" (`08-roadmap.md` risk register). Make it awkward
 
 ---
 
-## Stage B — production application (after Gate A, scope set by Gate A)
+## Stage B — production application
 
-**Gate A output replaces the ordering below.** Whatever the owner and staff mark as Must
-comes first, regardless of what this list says. Do not start Stage B before that session.
+**B1–B4 are DONE, ahead of Gate A.** That was a deliberate reordering: the brief changed
+to "a fully functional demo one person can actually use", and a second practice
+(The Med Bar) arrived, which forced the tenancy and practice-type decisions to be made in
+the schema rather than deferred. Those are the two things that are expensive to retrofit,
+so they were worth doing before the feedback session rather than after.
 
-### B1 · Next.js scaffold
-**Goal** An App Router project that renders one screen, with the token layer ported
-verbatim.
-**Touches** new `app/`, `components/`, `lib/`, `styles/`
-**Depends on** Gate A
-**Done when** `npm run dev` serves the Scoreboard reading from `/fixtures` JSON, and
-`styles/tokens.css` is a byte-for-byte copy of `prototype/assets/tokens.css`.
-**Notes** The prototype's route names map 1:1 to App Router paths — that was deliberate.
-`staff/patient/:id` → `app/(staff)/patients/[id]/page.tsx`.
+**Everything from B5 onward still waits on Gate A.** Whatever the owner and staff mark as
+Must comes first, regardless of the ordering below.
 
-### B2 · Supabase schema from `05-data-model.md`
-**Goal** Every table, every column, `clinic_id` on all of them, RLS policies written but
-permissive.
-**Touches** `supabase/migrations/`
-**Depends on** B1
-**Done when** A migration creates the full schema, the fixture loader seeds it, and a
-deliberate cross-tenant query is written as a *failing* test that Phase C will make pass.
-**Why RLS now** Writing the policies now and enabling them in Phase C is a hardening
-pass. Retrofitting them is a rewrite.
+### B1 · Next.js scaffold — DONE
+App Router, TypeScript, deployed on Vercel. `app/layout.tsx` imports
+`prototype/assets/tokens.css` and `app.css` **directly** rather than copying them, so
+there is one copy of the design system and no drift. See `18-decisions.md`.
 
-### B3 · Port the data layer
-**Goal** `GD.q` becomes `lib/db/queries.ts` with the same function names.
-**Touches** `lib/db/`
-**Depends on** B2
-**Done when** Every selector in `store.js` has a typed equivalent with identical
-semantics, and the metric values match the prototype's for the same fixture data. **Test
-that equivalence explicitly** — a silently different `avgMonthsOnProtocol` is the kind of
-bug nobody catches until the owner asks why the number moved.
+### B2 · Supabase schema — DONE
+`supabase/migrations/0001`–`0008`. 33 tables, `clinic_id` on every one, RLS enabled and
+**enforcing** (not permissive — there was no reason to wait). `practice_type` drives a
+module map so the two clinical models coexist.
 
-### B4 · Auth
-**Goal** Magic-link patient auth, passcode staff auth.
-**Depends on** B1
-**Done when** A patient can reach his own chart and provably cannot reach another's, and
-the staff console is behind a shared passcode with no real accounts provisioned.
-Backlog P03.
+The cross-tenant test is not a future failing test; it passes now.
+`scripts/db-test.cjs` — 35 checks.
+
+### B3 · Data layer — DONE
+`lib/db/queries.ts`, same selector names as `GD.q`.
+
+**Still outstanding from B3:** an explicit equivalence test between the prototype's
+metrics and the app's for the same fixture data. A silently different
+`avgMonthsOnProtocol` is the kind of bug nobody catches until the owner asks why the
+number moved. Worth an hour.
+
+### B4 · Auth — DONE
+Supabase Auth, session in the middleware, role separation (staff cannot reach the portal,
+patients cannot reach the console), pilot passcode gate that **fails closed** when
+unconfigured. `scripts/auth-test.cjs` — 16 checks through the real API.
+
+**Magic links are still the production design** (P03). The password accounts exist so a
+pilot works on a clinic iPad without an inbox round-trip, and they get deleted before
+Phase C.
+
+### B4a · Port the remaining console screens — NEXT
+**Goal** The console screens that exist in the prototype but not yet in the app.
+**Depends on** Gate A for ordering
+**Currently in the app:** scoreboard, today, client roster, client chart.
+**Still only in the prototype:** calendar, checkout + rebook prompt, lab entry, safety
+queue, due-for-labs, pipeline, retention, automations, inventory, settings/Brand Kit.
+
+Port in whatever order Gate A says. If Gate A has not happened, the highest-value three
+are **lab entry** (time a provider against their current process), **checkout with the
+rebook default**, and **the Brand Kit** — the last because it is what makes the client
+believe the product is theirs.
+
+### B4b · Practice-type screens the med spa needs
+**Goal** The screens The Med Bar needs that Gameday does not.
+**Done when** There is a treatment-record entry screen (areas, units, lot selection,
+aftercare), a package sale and redemption flow, and a photo series capture/compare screen.
+**Why it matters** These are her daily work. The schema supports all three; no UI does yet.
 
 ### B5–B9 · Port the patient app, in this order
 Highest retention value first, because that is what Gate A will have confirmed matters:
