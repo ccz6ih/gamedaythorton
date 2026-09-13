@@ -229,6 +229,19 @@
 }
 .sf-item-mark svg { width: 1.15rem; height: 1.15rem; }
 
+/* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
+   and drawn services still lines up down the left edge. */
+.sf-item-photo {
+  width: 2.25rem;
+  height: 2.25rem;
+  max-width: 100%;
+  border-radius: var(--gd-r-full);
+  object-fit: cover;
+  display: block;
+  margin-top: .1rem;
+  border: 1px solid var(--gd-border);
+}
+
 .sf-item-body { min-width: 0; }
 
 .sf-item-cta {

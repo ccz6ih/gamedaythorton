@@ -50,6 +50,8 @@ export type StorefrontService = {
   details: string | null;
   /** The practice has not written or approved this service's public copy. */
   needs_copy: boolean;
+  /** Optional menu image. Absent means the drawn line-art mark is used. */
+  image_path: string | null;
   duration_min: number;
   price_mode: string;
   price_cents: number | null;
@@ -127,7 +129,7 @@ export async function getStorefrontServices(clinicId: string): Promise<Storefron
   const { data } = await supabase
     .from('service')
     .select(
-      'id, name, category, description, details, needs_copy, duration_min, price_mode, price_cents, ' +
+      'id, name, category, description, details, needs_copy, image_path, duration_min, price_mode, price_cents, ' +
       'price_from_cents, unit_label, deposit_cents, requires_consent, is_membership, ' +
       'online_bookable, sort_order'
     )

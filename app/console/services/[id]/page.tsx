@@ -17,6 +17,7 @@ import { getClinic } from '@/lib/db/queries';
 import {
   requireRole, pilotFields, text, requiredText, money, int, bool, formMessage
 } from '@/lib/actions';
+import { uploadBrandImage } from '@/lib/brand-upload';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +50,23 @@ async function save(formData: FormData) {
       throw new Error('service_price_present');
     }
 
-    const row = {
+    /**
+     * Optional menu image. Three outcomes, kept explicit rather than folded
+     * into the row literal: a new upload sets it, "remove" clears it, and doing
+     * neither leaves whatever is already there — which matters, because an
+     * edit that silently wiped the image every time you changed a price would
+     * be maddening and hard to attribute.
+     */
+    let imagePath: string | null | undefined;
+    if (text(formData, 'remove_image') === '1') {
+      imagePath = null;
+    } else {
+      const file = formData.get('image') as File | null;
+      const url = file ? await uploadBrandImage(file, staff.clinicId, 'service') : null;
+      if (url) imagePath = url;
+    }
+
+    const row: Record<string, unknown> = {
       clinic_id: staff.clinicId,
       name: requiredText(formData, 'name'),
       category: requiredText(formData, 'category').toLowerCase(),
@@ -73,6 +90,7 @@ async function save(formData: FormData) {
       sort_order: int(formData, 'sort_order', 0)!,
       active: bool(formData, 'active')
     };
+    if (imagePath !== undefined) row.image_path = imagePath;
 
     const supabase = await serverClient();
     if (id === 'new') {
@@ -193,7 +211,7 @@ export default async function ServiceFormPage({
       <div className="view narrow">
         {error && <div className="note-band critical" style={{ marginBottom: 'var(--gd-5)' }}>{error}</div>}
 
-        <form action={save}>
+        <form action={save} encType="multipart/form-data">
           <input type="hidden" name="id" value={id} />
 
           <section className="card">
@@ -355,6 +373,26 @@ export default async function ServiceFormPage({
               </div>
             </div>
             <div className="stack">
+              <div className="field">
+                <label htmlFor="image">Menu image</label>
+                {service?.image_path ? (
+                  <div className="row" style={{ gap: 'var(--gd-4)', alignItems: 'center', marginBottom: '.5rem' }}>
+                    <img src={String(service.image_path)} alt=""
+                      style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 'var(--gd-r-sm)' }} />
+                    <label className="switch">
+                      <input type="checkbox" name="remove_image" value="1" />
+                      <span className="track" />
+                      <span className="txt">Remove it</span>
+                    </label>
+                  </div>
+                ) : null}
+                <input id="image" name="image" type="file" accept="image/*" />
+                <div className="hint">
+                  Optional. With none, the menu draws a line-art mark in your
+                  accent colour, which is often cleaner than a stock photo.
+                </div>
+              </div>
+
               <div className="field">
                 <label htmlFor="details">What this involves</label>
                 <textarea id="details" name="details" rows={5}

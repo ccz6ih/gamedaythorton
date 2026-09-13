@@ -105,9 +105,14 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             <div className="sf-menu-group">
               {featured.map(s => (
                 <article className="sf-item" key={s.id}>
-                  <span className="sf-item-mark" aria-hidden="true">
-                    <ServiceIcon name={s.name} category={s.category} />
-                  </span>
+                  {s.image_path ? (
+                    <img className="sf-item-photo" src={s.image_path} alt=""
+                      width={72} height={72} loading="lazy" />
+                  ) : (
+                    <span className="sf-item-mark" aria-hidden="true">
+                      <ServiceIcon name={s.name} category={s.category} />
+                    </span>
+                  )}
                   <div className="sf-item-body">
                     <h3 className="sf-item-name">
                       {s.name}
