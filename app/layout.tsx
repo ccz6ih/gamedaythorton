@@ -14,18 +14,31 @@ import '../prototype/assets/storefront.css';
 import './app-extras.css';
 
 export const metadata: Metadata = {
-  title: {
-    default: 'The Med Bar · Aesthetics & Wellness',
-    template: '%s · The Med Bar'
-  },
-  description: 'The Med Bar — cash-pay aesthetics in Loveland, CO. Skin, lashes, and regenerative treatments.',
+  /**
+   * NO TEMPLATE AT THE ROOT, deliberately.
+   *
+   * A `template` here applies to every child segment INCLUDING the one that
+   * defines its own — so the storefront's "The Med Bar · Loveland, CO" came out
+   * of the browser as "The Med Bar · Loveland, CO · The Med Bar".
+   *
+   * Both surfaces below already own their titles: the storefront layout builds
+   * one per practice, and the console has its own template. The root only needs
+   * to say something sensible on the handful of pages that are neither.
+   */
+  title: 'The Med Bar · Aesthetics & Wellness',
+  description: 'Cash-pay aesthetics in Loveland, CO. Skin, lashes, and regenerative treatments.',
   icons: {
+    /**
+     * SVG first. The practice's logo is white on transparent, which disappears
+     * on a light tab bar, and a media-query favicon is honoured inconsistently
+     * across browsers — so the reliable one leads and the rest are fallbacks
+     * for anything that cannot render SVG.
+     */
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/brand/medbar-logo-white.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/brand/medbar-logo-black.png', media: '(prefers-color-scheme: light)' }
+      { url: '/brand/medbar-favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' }
     ],
-    apple: '/brand/medbar-logo-white.png'
+    apple: '/brand/medbar-logo-black.png'
   },
   // Belt and braces alongside the X-Robots-Tag header in next.config.mjs.
   robots: { index: false, follow: false, nocache: true },
