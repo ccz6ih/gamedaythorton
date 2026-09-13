@@ -24,7 +24,12 @@
  */
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { serverClient } from '@/lib/supabase/server';
+import { getStorefront } from '@/lib/db/storefront';
+import { Brand } from '@/components/Brand';
+import { clinicForHost } from '../../storefront-domains.mjs';
+import type { Clinic } from '@/lib/db/queries';
 
 async function signIn(formData: FormData) {
   'use server';
@@ -53,7 +58,23 @@ export default async function AdminSignIn({
 }) {
   const params = await searchParams;
 
+  /**
+   * Branded from the DOMAIN, because there is no session yet to tell us whose
+   * practice this is.
+   *
+   * Without it the sign-in page is the one screen in the whole product still
+   * wearing the default red — the first thing the owner sees each morning, and
+   * the last impression anyone gets before the console loads. Reading the host
+   * costs one public query against the storefront view, which is already
+   * anonymous-readable, so no session is needed and nothing private is touched.
+   */
+  const host = (await headers()).get('host');
+  const slug = clinicForHost(host, process.env.PRIMARY_CLINIC_SLUG);
+  const storefront = slug ? await getStorefront(slug) : null;
+  const clinic = storefront ? ({ brand: storefront.brand } as unknown as Clinic) : null;
+
   return (
+    <Brand clinic={clinic}>
     <main className="auth-wrap">
       <div className="auth-card">
         <h1>Staff sign in</h1>
@@ -85,5 +106,6 @@ export default async function AdminSignIn({
         </form>
       </div>
     </main>
+    </Brand>
   );
 }

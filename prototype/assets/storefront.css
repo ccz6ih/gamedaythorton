@@ -47,6 +47,12 @@
   --gd-accent-dim:    color-mix(in srgb, var(--brand-accent) 14%, transparent);
   --gd-accent-line:   color-mix(in srgb, var(--brand-accent) 38%, transparent);
   --gd-font:          var(--brand-font);
+  /* Same trap one level down: tokens.css declares --brand-display-font from
+     --brand-font on :root, so it resolves there too. A practice that names a
+     face but no separate display face would silently get the default. Both are
+     restated here, where --brand-font is the kit's own value. */
+  --brand-display-font: var(--brand-font);
+  --gd-font-num:      var(--brand-font);
   --gd-r-sm:          calc(var(--brand-radius) * 0.6);
   --gd-r-md:          var(--brand-radius);
   --gd-r-lg:          calc(var(--brand-radius) * 1.6);

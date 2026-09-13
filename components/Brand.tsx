@@ -20,6 +20,16 @@ type BrandKit = {
   clinicName?: string;
   locationName?: string;
   tagline?: string;
+  /**
+   * A ground of the practice's own. "dark" in tokens.css is a neutral
+   * near-black, which is right for a men's health clinic and wrong for a
+   * practice whose identity is plants and brass.
+   */
+  bg?: string;
+  surfaceColor?: string;
+  surfaceRaised?: string;
+  borderColor?: string;
+  displayFont?: string;
 };
 
 const FONTS: Record<string, string> = {
@@ -83,21 +93,96 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
   const accent = brand.accent && hexToRgb(brand.accent) ? brand.accent : '#d7262f';
   const ink = brand.accentInk && brand.accentInk !== 'auto' ? brand.accentInk : inkFor(accent);
   const radius = typeof brand.radius === 'number' ? brand.radius : 10;
-  const font = FONTS[brand.font ?? 'system'] ?? FONTS.system!;
+
+  // The kit stores either a key from FONTS ("serif") or a full stack the
+  // storefront already uses ('"Cormorant Garamond", Georgia, serif'). Accept
+  // both: a practice that picked a face on its public page should not find the
+  // console rendering in something else.
+  const rawFont = brand.font ?? 'system';
+  const font = FONTS[rawFont] ?? (rawFont.includes(',') || rawFont.includes('"') ? rawFont : FONTS.system!);
+  const displayFont = brand.displayFont ?? font;
+
+  const tokens: Record<string, string> = {
+    '--brand-accent': accent,
+    '--brand-accent-ink': ink,
+    '--brand-radius': `${radius}px`,
+    '--brand-font': font,
+    '--brand-display-font': displayFont,
+
+    /* ------------------------------------------------------------------
+       RE-DERIVE EVERYTHING tokens.css DERIVES FROM --brand-*.
+
+       This is not redundant, and leaving it out is why the console rendered
+       in Gameday's red while the practice's own site was gold.
+
+       tokens.css declares `--gd-accent: var(--brand-accent)` on :root, so it
+       RESOLVES on :root — against the default red. Setting --brand-accent on
+       a descendant does not change it, because descendants inherit the
+       already-computed value rather than the expression. The storefront hit
+       exactly this and fixed it inside `.sf`; the console needed the same
+       treatment and did not get it.
+
+       Anything tokens.css writes as var(--brand-…) has to be restated here.
+       ------------------------------------------------------------------ */
+    '--gd-accent': accent,
+    '--gd-accent-hover': `color-mix(in srgb, ${accent} 82%, white)`,
+    '--gd-accent-press': `color-mix(in srgb, ${accent} 82%, black)`,
+    '--gd-accent-dim': `color-mix(in srgb, ${accent} 14%, transparent)`,
+    '--gd-accent-line': `color-mix(in srgb, ${accent} 38%, transparent)`,
+    '--gd-ring': `0 0 0 3px color-mix(in srgb, ${accent} 14%, transparent)`,
+    '--gd-font': font,
+    '--gd-font-num': font,
+    '--gd-r-sm': `${Math.round(radius * 0.6)}px`,
+    '--gd-r-md': `${radius}px`,
+    '--gd-r-lg': `${Math.round(radius * 1.6)}px`
+  };
+
+  /**
+   * The practice's own ground, when it has set one.
+   *
+   * The storefront layout has applied these since the day her page went green.
+   * The console did not, so the two halves of the same product looked like
+   * different software — which is the specific thing a practice notices when
+   * it shows the system to somebody.
+   *
+   * Only set what the kit actually specifies: a practice with no opinion keeps
+   * the neutral dark from tokens.css rather than being given a colour.
+   */
+  const SURFACES: [keyof BrandKit, string][] = [
+    ['bg', '--gd-bg'],
+    ['surfaceColor', '--gd-surface'],
+    ['surfaceRaised', '--gd-surface-raised'],
+    ['borderColor', '--gd-border']
+  ];
+  for (const [key, token] of SURFACES) {
+    const value = brand[key];
+    if (typeof value === 'string' && value) tokens[token] = value;
+  }
+
+  /**
+   * APPLIED AT :root, NOT ON A WRAPPER DIV, and that is the whole reason this
+   * renders a <style> tag instead of a style attribute.
+   *
+   * `body { background: var(--gd-bg) }` lives in app.css. body is an ANCESTOR
+   * of anything this component renders, so tokens set on a wrapper cannot
+   * reach it — the panels inside would turn green while the page behind them
+   * stayed neutral charcoal. Setting them on :root is the only place that
+   * covers both.
+   *
+   * Values are drawn from the practice's own brand kit, which is written by the
+   * console's appearance screen and validated there. They are still filtered
+   * here: anything containing a brace or a semicolon is dropped, so a malformed
+   * value cannot close the declaration and inject rules of its own.
+   */
+  const declarations = Object.entries(tokens)
+    .filter(([, v]) => !/[{};<>]/.test(v))
+    .map(([k, v]) => `${k}:${v}`)
+    .join(';');
 
   return (
-    <div
-      style={{
-        // Same custom properties tokens.css declares, so every component follows
-        // without knowing anything about branding.
-        ['--brand-accent' as string]: accent,
-        ['--brand-accent-ink' as string]: ink,
-        ['--brand-radius' as string]: `${radius}px`,
-        ['--brand-font' as string]: font,
-        display: 'contents'
-      }}
-    >
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `:root{${declarations}}` }} />
       {children}
-    </div>
+    </>
   );
 }
