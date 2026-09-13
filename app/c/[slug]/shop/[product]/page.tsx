@@ -42,7 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return { title: 'Not found' };
 
   return {
-    title: `${product.name} · ${clinic.name}`,
+    // Just the product. The layout's template appends the practice name, so
+    // including it here produced "Hydrate Facial Mist · The Med Bar · The Med Bar".
+    title: product.name,
     description: product.description ?? undefined,
     robots: clinic.live ? { index: true, follow: true } : { index: false, follow: false }
   };

@@ -21,6 +21,7 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import {
   getStorefront, getStorefrontServices, getStorefrontProviders, hoursLines
 } from '@/lib/db/storefront';
@@ -31,6 +32,30 @@ import { ProcessRail } from '@/components/ProcessRail';
 import { priceLabel, initials, money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * The home page names itself ABSOLUTELY.
+ *
+ * The layout carries `title.template` so every child reads "Shop · The Med
+ * Bar". Relying on the layout's `title.default` for this page let that template
+ * apply to it as well, and the tab read "The Med Bar · Loveland, CO · The Med
+ * Bar". `absolute` opts out of every template above it, which is what a home
+ * page wants — it is the one page whose title should be the business's full
+ * name and nothing appended.
+ */
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const clinic = await getStorefront(slug);
+  if (!clinic) return { title: 'Not found' };
+
+  const where = clinic.address_city && clinic.address_state
+    ? `${clinic.address_city}, ${clinic.address_state}`
+    : clinic.location_name ?? '';
+
+  return { title: { absolute: `${clinic.name}${where ? ` · ${where}` : ''}` } };
+}
 
 /** How PRF actually works, in sequence. */
 const PROCESS = [
