@@ -117,7 +117,7 @@ function inspect(name, res, expect) {
 const CONSOLE_ROUTES = [
   '/console', '/console/today', '/console/book', '/console/clients', '/console/labs',
   '/console/safety', '/console/treatments', '/console/packages', '/console/payments',
-  '/console/services', '/console/settings',
+  '/console/services', '/console/storefront', '/console/brand', '/console/settings',
   // The editors. A form that 500s is worse than a missing feature, because the
   // person trusts it and types real work into it.
   '/console/clients/new', '/console/services/new', '/console/treatments/new'

@@ -656,3 +656,19 @@ tbody tr.clickable:hover { background: var(--gd-surface-raised); }
   .rail, .tabbar, .topbar, .pilot-banner { display: none !important; }
   body { background: #fff; color: #000; }
 }
+
+/* A list row that is a link. Used where a screen points at the other screens
+   that edit the same thing, so "where do I change X" has one answer. */
+.rowlink {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: var(--gd-4) 0;
+  border-bottom: 1px solid var(--gd-border);
+  text-decoration: none;
+  color: var(--gd-text);
+}
+.rowlink:last-child { border-bottom: none; }
+.rowlink b { font-weight: 600; }
+.rowlink .dim { font-size: .82rem; color: var(--gd-text-dim); }
+.rowlink:hover b { color: var(--gd-accent); }

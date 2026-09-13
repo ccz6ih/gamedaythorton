@@ -389,6 +389,66 @@ async function refuses(label, fn, because) {
     await rdb.del('lab_panel', panel.id);
     ok('lab test rows removed');
 
+    /* ----------------------------------------------- brand image storage -- */
+    // A PUBLIC bucket, which is correct for a logo and would be catastrophic for
+    // a progress photograph. So the two things that matter: a clinic can write
+    // inside its own folder, and cannot write inside anyone else's.
+    console.log('\nBRAND IMAGE STORAGE');
+
+    const png = Uint8Array.from(atob(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+    ), c => c.charCodeAt(0));
+
+    async function putObject(token, objectPath) {
+      const r = await fetch(`${URL_SB}/storage/v1/object/brand/${objectPath}`, {
+        method: 'POST',
+        headers: { apikey: KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'image/png' },
+        body: png
+      });
+      return { ok: r.ok, status: r.status };
+    }
+
+    const mine = `${clinicId}/write-test-${Date.now()}.png`;
+    const up = await putObject(token, mine);
+    if (up.ok) ok('a practice can upload into its own folder', mine.split('/')[1]);
+    else bad('a practice can upload into its own folder', `status ${up.status}`);
+
+    // Public read is the point of the bucket — a logo behind a signed URL is a
+    // logo that does not load.
+    const pub = await fetch(`${URL_SB}/storage/v1/object/public/brand/${mine}`);
+    if (pub.ok) ok('and the world can read it', 'which is what a logo is for');
+    else bad('and the world can read it', `status ${pub.status}`);
+
+    // The one that matters. Jamie must not be able to write into Gameday's
+    // folder — on a shared public bucket that would mean replacing another
+    // business's logo.
+    // RLS correctly hides the other clinic from Jamie, so its id has to come
+    // from the other side. Signing in as Gameday to LEARN the id is not the
+    // exploit — the exploit would be Jamie writing there once she knows it,
+    // which is exactly what this then tries.
+    let otherClinicId = null;
+    try {
+      const rt = await signIn('owner@gameday.pilot.invalid');
+      const [gd] = await api(rt).get('clinic_public', 'select=id');
+      otherClinicId = gd?.id ?? null;
+    } catch { /* reported below */ }
+
+    if (otherClinicId) {
+      const theirs = `${otherClinicId}/hostile-${Date.now()}.png`;
+      const cross = await putObject(token, theirs);
+      if (!cross.ok) ok('but not into another practice\u2019s folder', `refused (${cross.status})`);
+      else bad('but not into another practice\u2019s folder', 'ONE CLINIC CAN OVERWRITE ANOTHER\u2019S BRANDING');
+    } else {
+      bad('found a second clinic to test isolation against');
+    }
+
+    // Clean up our own object.
+    const del = await fetch(`${URL_SB}/storage/v1/object/brand/${mine}`, {
+      method: 'DELETE', headers: { apikey: KEY, Authorization: `Bearer ${token}` }
+    });
+    if (del.ok) ok('and can delete its own uploads');
+    else bad('and can delete its own uploads', `status ${del.status}`);
+
     /* -------------------------------------------------- guards still on -- */
     console.log('\nGUARDS STILL HOLD ON WRITES');
 

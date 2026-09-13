@@ -56,6 +56,8 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { href: '/console/payments', label: 'Payments', icon: '⌗' },
     { group: 'Setup' },
     { href: '/console/services', label: 'Services & pricing', icon: '☰' },
+    { href: '/console/storefront', label: 'Your public page', icon: '◈' },
+    { href: '/console/brand', label: 'Logo & colours', icon: '◐' },
     { href: '/console/settings', label: 'Settings', icon: '⚙' }
   ].filter(item => item.when === undefined || item.when);
 

@@ -219,6 +219,46 @@ minutes; migrating a live one with PHI in it does not.** See `18-decisions.md`.
 
 ---
 
+## Images and payment accounts
+
+### The `brand` storage bucket
+
+Created by migration 0011. **Public**, 5MB per file, images only, laid out as
+`brand/<clinic_id>/<file>`. Staff write only inside their own clinic's folder;
+the world reads. That is correct for a logo — one behind a signed URL is a logo
+that does not load.
+
+**Patient media never goes here.** Progress photographs get their own private
+bucket with short-TTL signed URLs, which does not exist yet
+(`16-media-pipeline.md`). The separation is enforced by being different buckets
+rather than by anyone remembering, because the two have opposite requirements
+and one of the mistakes is unrecoverable.
+
+`npm run test:write` proves the isolation: a practice can write its own folder,
+the world can read it, and a deliberate attempt to write into the *other*
+practice's folder is refused.
+
+### Stripe, and why no key is stored
+
+**There is no `stripe_secret_key` column and there must never be one.** A secret
+key in a database row is a secret at rest — readable by anyone with database
+access, in every backup, printed by any careless `select *` — and it would mean
+we hold the ability to move money for three separate businesses.
+
+These are separate legal entities; a franchise LLC and a med spa LLC cannot
+share a payout account. **Stripe Connect** is the answer: each practice connects
+its own Stripe account, Stripe keeps their credentials, money settles to their
+bank, and the only thing stored here is `clinic.stripe_account_id` — an
+identifier beginning `acct_`, useless on its own.
+
+The console field refuses anything starting `sk_`, `rk_` or `pk_` with an
+explanation, because a field labelled "Stripe" invites exactly that paste.
+
+The platform secret key stays in the environment and belongs to one account:
+ours.
+
+---
+
 ## Pilot sign-in accounts
 
 ```bash
