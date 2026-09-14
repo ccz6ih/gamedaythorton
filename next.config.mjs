@@ -215,7 +215,7 @@ const nextConfig = {
      * STOREFRONT_PATHS and matched the rule above it. A wildcard with nothing
      * under it is untested by definition.
      */
-    const WILDCARDS = ['/shop'];
+    const WILDCARDS = ['/shop', '/prf'];
 
     const forSlug = (slug, host) => [
       ...storefrontPaths.map(p => ({

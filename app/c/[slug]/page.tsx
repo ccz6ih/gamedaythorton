@@ -30,6 +30,7 @@ import { ServiceIcon } from '@/components/ServiceIcon';
 import { Centrifuge } from '@/components/Centrifuge';
 import { ProcessRail } from '@/components/ProcessRail';
 import { priceLabel, initials, money } from '@/lib/format';
+import { PRF_PROCESS } from '@/lib/prf-content';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,14 +57,6 @@ export async function generateMetadata(
 
   return { title: { absolute: `${clinic.name}${where ? ` · ${where}` : ''}` } };
 }
-
-/** How PRF actually works, in sequence. */
-const PROCESS = [
-  { n: '01', h: 'Draw', p: 'A small blood draw, done in the treatment room. Roughly the volume of a routine lab panel.' },
-  { n: '02', h: 'Spin', p: 'Your sample goes into the centrifuge. Spinning separates it into layers and concentrates the platelets, growth factors and fibrin into PRF.' },
-  { n: '03', h: 'Place', p: 'The PRF goes back where you need it — under the eyes, through microneedling channels, or worked into the scalp.' },
-  { n: '04', h: 'Build', p: 'Because it works with your own repair process, results develop over weeks rather than the same day. A series is often recommended.' }
-];
 
 export default async function StorefrontHome({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -150,7 +143,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
               and nothing synthetic is added to it.
             </p>
           </div>
-          <ProcessRail steps={PROCESS} />
+          <ProcessRail steps={PRF_PROCESS} />
         </div>
       </section>
 

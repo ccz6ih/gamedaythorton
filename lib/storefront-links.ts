@@ -70,6 +70,8 @@ export function storefrontLinks(base: string) {
     enquire: `${base}/enquire`,
     book: `${base}/book`,
     cart: `${base}/cart`,
+    /** The PRF education/pillar page. */
+    prf: `${base}/prf`,
     /** Stripe returns here. Absolute URL built by the checkout route. */
     thanks: `${base}/shop/thanks`
   };

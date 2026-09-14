@@ -12,7 +12,8 @@
  */
 
 import type { MetadataRoute } from 'next';
-import { getStorefront, getStorefrontProducts } from '@/lib/db/storefront';
+import { getStorefront, getStorefrontProducts, getStorefrontServices } from '@/lib/db/storefront';
+import { PRF_TREATMENTS } from '@/lib/prf-content';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,7 @@ export default async function sitemap(
   const pages: MetadataRoute.Sitemap = [
     { url: `${base}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${base}/services`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${base}/prf`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${base}/book`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/shop`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/packages`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
@@ -53,6 +55,19 @@ export default async function sitemap(
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7
+    });
+  }
+
+  // One entry per PRF treatment that actually exists in this clinic's menu —
+  // same "only list what's real" rule as the product loop above.
+  const services = await getStorefrontServices(clinic.id);
+  for (const t of PRF_TREATMENTS) {
+    if (!services.some(s => t.match.test(s.name))) continue;
+    pages.push({
+      url: `${base}/prf/${t.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8
     });
   }
 
