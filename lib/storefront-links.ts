@@ -72,6 +72,11 @@ export function storefrontLinks(base: string) {
     cart: `${base}/cart`,
     /** The PRF education/pillar page. */
     prf: `${base}/prf`,
+    prfCompare: `${base}/prf/compare`,
+    prfAftercare: `${base}/prf/aftercare`,
+    prfUnderEye: `${base}/prf/under-eye`,
+    prfMicroneedling: `${base}/prf/microneedling`,
+    prfHairRestoration: `${base}/prf/hair-restoration`,
     /** Stripe returns here. Absolute URL built by the checkout route. */
     thanks: `${base}/shop/thanks`
   };

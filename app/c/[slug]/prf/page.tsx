@@ -31,6 +31,7 @@ import { ServiceIcon } from '@/components/ServiceIcon';
 import { Centrifuge } from '@/components/Centrifuge';
 import { ProcessRail } from '@/components/ProcessRail';
 import { PrfIcon } from '@/components/PrfIcon';
+import { TreatmentMatcher } from '@/components/TreatmentMatcher';
 import { priceLabel } from '@/lib/format';
 import { PRF_PROCESS, PRF_TREATMENTS } from '@/lib/prf-content';
 
@@ -121,7 +122,16 @@ export default async function StorefrontPRF({ params }: { params: Promise<{ slug
             and how {clinic.name} uses it.
           </p>
 
-          <div className="sf-actions">
+          <div className="sf-cluster-nav" style={{ marginTop: 'var(--gd-5)' }}>
+            <Link href={links.prfCompare} className="sf-chip accent">
+              Compare: PRF vs PRP vs Fillers &rarr;
+            </Link>
+            <Link href={links.prfAftercare} className="sf-chip">
+              Pre-Care &amp; Recovery Timeline &rarr;
+            </Link>
+          </div>
+
+          <div className="sf-actions" style={{ marginTop: 'var(--gd-6)' }}>
             <Link href={links.services} className="sf-btn primary">See PRF treatments &amp; pricing</Link>
             {consult && (
               <Link
@@ -319,7 +329,14 @@ export default async function StorefrontPRF({ params }: { params: Promise<{ slug
         </section>
       )}
 
+      {/* Interactive Treatment Finder */}
       <section className="sf-section sf-bordered">
+        <div className="sf-wrap">
+          <TreatmentMatcher bookUrl={links.book} prfBaseUrl={links.prf} />
+        </div>
+      </section>
+
+      <section className="sf-section">
         <div className="sf-wrap">
           <div className="sf-section-head">
             <h2>Common questions</h2>
