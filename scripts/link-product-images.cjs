@@ -48,6 +48,14 @@ const WRITE = args.includes('--write');
 const slug = args.find(a => !a.startsWith('--')) ?? 'medbar-loveland';
 
 const DIR = path.resolve(__dirname, '..', 'public', 'products');
+/**
+ * SPACES AND PARENTHESES NEVER REACH A URL.
+ *
+ * A browser-duplicate download is named `Thing (1).webp`, and a path with a
+ * space in it has to be percent-encoded everywhere it is used or the image
+ * silently 404s. One slipped through and broke a product tile on the live
+ * shop. Files are renamed on the way in rather than encoded at every use.
+ */
 const EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
 
 /** Below this share of the product's words, it is a guess and gets reported. */
