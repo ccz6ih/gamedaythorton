@@ -917,42 +917,61 @@
 
 .sf-cent-halo {
   position: absolute;
-  width: 74%;
+  width: 82%;
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle,
-    color-mix(in srgb, var(--gd-accent) 30%, transparent) 0%,
+    color-mix(in srgb, var(--gd-accent) 35%, transparent) 0%,
+    color-mix(in srgb, var(--gd-accent) 18%, #1f4232) 32%,
     transparent 68%);
-  filter: blur(12px);
+  filter: blur(18px);
   opacity: 0;
   animation: sf-halo 1.2s ease-out 1.4s forwards, sf-breathe 4.5s ease-in-out 3.4s infinite;
 }
 @keyframes sf-halo   { to { opacity: 1; } }
 @keyframes sf-breathe {
-  0%, 100% { transform: scale(1);    opacity: 1; }
-  50%      { transform: scale(1.09); opacity: .72; }
+  0%, 100% { transform: scale(1);    opacity: 1; filter: blur(18px); }
+  50%      { transform: scale(1.14); opacity: .88; filter: blur(24px); }
 }
 
 /* The rotor spins down, the way a centrifuge actually does. */
 .sf-cent-ring {
-  transform-origin: 200px 200px;
-  animation: sf-spin 2.6s cubic-bezier(.15,.6,.25,1) both;
+  transform-origin: 220px 220px;
+  animation: sf-spin 2.8s cubic-bezier(.15,.6,.25,1) both;
 }
 @keyframes sf-spin { from { transform: rotate(0); } to { transform: rotate(1440deg); } }
 
 /* Ambient molecular spine constellation watermark */
 .sf-cent-spine {
   opacity: 0;
-  transform-origin: 200px 200px;
+  transform-origin: 100px 220px;
   animation: sf-spine-reveal 1.6s ease-out 0.8s forwards, sf-spine-glow 4.5s ease-in-out 3.4s infinite;
 }
 @keyframes sf-spine-reveal {
-  from { opacity: 0; transform: scale(0.92); }
-  to   { opacity: 0.8; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.92) translateX(-8px); }
+  to   { opacity: 0.95; transform: scale(1) translateX(0); }
 }
 @keyframes sf-spine-glow {
-  0%, 100% { opacity: 0.75; filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gd-accent) 40%, transparent)); }
-  50%      { opacity: 0.95; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gd-accent) 75%, transparent)); }
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gd-accent) 50%, transparent)); }
+  50%      { opacity: 1; filter: drop-shadow(0 0 12px color-mix(in srgb, var(--gd-accent) 85%, transparent)); }
+}
+
+/* Telemetry typography */
+.sf-cent-telemetry {
+  font-family: var(--gd-font);
+  opacity: 0;
+  animation: sf-halo 1s ease-out 2s forwards;
+}
+.sf-tel-num {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  fill: currentColor;
+  fill-opacity: 0.38;
+}
+.sf-tel-num.is-gold {
+  fill: var(--gd-accent);
+  fill-opacity: 0.85;
+  font-weight: 600;
 }
 
 .sf-cent-glass { fill: color-mix(in srgb, var(--gd-surface-raised) 95%, transparent); }
@@ -967,7 +986,7 @@
 }
 /* The gold layer — the part that goes back in — grows from nothing. */
 .sf-cent-prf {
-  transform-origin: 200px 104px;
+  transform-origin: 220px 110px;
   transform: scaleY(0);
   animation: sf-fill 1.4s cubic-bezier(.4,0,.2,1) 1s both;
 }
@@ -983,33 +1002,34 @@
 @keyframes sf-buffy-glow { to { opacity: 0.85; } }
 @keyframes sf-buffy-pulse {
   0%, 100% { opacity: 0.7; }
-  50%      { opacity: 1; filter: drop-shadow(0 0 4px #ffffff); }
+  50%      { opacity: 1; filter: drop-shadow(0 0 6px #ffffff); }
 }
 
 /* Floating active platelet sparks in PRF */
 .sf-cent-platelets {
   opacity: 0;
-  transform-origin: 200px 160px;
+  transform-origin: 220px 175px;
   animation: sf-platelets 1.4s ease-out 1.6s forwards, sf-sparkle 4s ease-in-out 3s infinite;
 }
 @keyframes sf-platelets { to { opacity: 0.85; } }
 @keyframes sf-sparkle {
   0%, 100% { opacity: 0.65; transform: translateY(0); }
-  50%      { opacity: 1; transform: translateY(-3px); }
+  50%      { opacity: 1; transform: translateY(-4px); }
 }
 
 .sf-cent-cap-rect {
-  fill: color-mix(in srgb, var(--gd-accent) 22%, var(--gd-surface-raised));
+  fill: color-mix(in srgb, var(--gd-accent) 26%, var(--gd-surface-raised));
   stroke: currentColor;
-  stroke-opacity: .22;
+  stroke-opacity: .35;
   stroke-width: 1.2;
 }
 .sf-cent-label {
   font-family: var(--gd-font);
-  font-size: 13px;
-  letter-spacing: 1.4px;
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  font-weight: 500;
   fill: currentColor;
-  fill-opacity: .42;
+  fill-opacity: .48;
   opacity: 0;
   animation: sf-halo .8s ease-out 2s forwards;
 }

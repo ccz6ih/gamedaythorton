@@ -27,164 +27,225 @@ export function Centrifuge() {
   return (
     <div className="sf-cent" aria-hidden="true">
       <div className="sf-cent-halo" />
-      <svg viewBox="0 0 400 400" className="sf-cent-svg">
+      <svg viewBox="0 0 440 440" className="sf-cent-svg">
         <defs>
-          {/* PRF liquid gold gradient */}
+          {/* PRF liquid gold gradient with warm luminescent core */}
           <linearGradient id="sf-prf-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f7dc87" />
-            <stop offset="45%" stopColor="#e5b842" />
-            <stop offset="100%" stopColor="#c59825" />
+            <stop offset="0%" stopColor="#fff2ba" />
+            <stop offset="25%" stopColor="#f5ce62" />
+            <stop offset="65%" stopColor="#dca52e" />
+            <stop offset="100%" stopColor="#ad7c15" />
           </linearGradient>
 
-          {/* Deep cellular red blood gradient */}
+          {/* Deep cellular red blood gradient with rich organic undertones */}
           <linearGradient id="sf-rbc-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#9c2d3c" />
-            <stop offset="60%" stopColor="#761d2a" />
-            <stop offset="100%" stopColor="#4a0f19" />
+            <stop offset="0%" stopColor="#a32838" />
+            <stop offset="35%" stopColor="#821d2a" />
+            <stop offset="70%" stopColor="#5e121d" />
+            <stop offset="100%" stopColor="#3d0a12" />
           </linearGradient>
 
-          {/* Whole blood before spin */}
+          {/* Whole blood before separation */}
           <linearGradient id="sf-whole-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7a2a38" />
-            <stop offset="100%" stopColor="#541722" />
+            <stop offset="0%" stopColor="#872b38" />
+            <stop offset="50%" stopColor="#671c26" />
+            <stop offset="100%" stopColor="#440f17" />
           </linearGradient>
 
-          {/* Specular glass tube highlight */}
+          {/* 3D cylindrical glass reflection */}
           <linearGradient id="sf-glass-spec" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
-            <stop offset="25%" stopColor="#ffffff" stopOpacity="0.08" />
-            <stop offset="70%" stopColor="#ffffff" stopOpacity="0.02" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.18" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.32" />
+            <stop offset="18%" stopColor="#ffffff" stopOpacity="0.08" />
+            <stop offset="65%" stopColor="#ffffff" stopOpacity="0.02" />
+            <stop offset="85%" stopColor="#ffffff" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.28" />
           </linearGradient>
 
-          {/* Molecular spine emblem gradient */}
-          <linearGradient id="sf-spine-gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="var(--gd-accent)" stopOpacity="0.75" />
-            <stop offset="100%" stopColor="var(--gd-accent)" stopOpacity="0.25" />
+          {/* Gold constellation gradient */}
+          <linearGradient id="sf-gold-beam" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--gd-accent)" stopOpacity="0.85" />
+            <stop offset="50%" stopColor="#f7e199" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="var(--gd-accent)" stopOpacity="0.4" />
           </linearGradient>
         </defs>
 
-        {/* Ambient background: The Med Bar molecular spine constellation */}
-        <g className="sf-cent-spine" stroke="url(#sf-spine-gold)" strokeWidth="1.75">
-          {/* The signature 5-node vertical serpentine molecular chain */}
+        {/* -------------------------------------------------------------
+            BRAND MOLECULAR SPINE CONSTELLATION (Flanked & Illuminated)
+            Mirrors the iconic Med Bar molecular mark in the hero background
+            ------------------------------------------------------------- */}
+        <g className="sf-cent-spine">
+          {/* Constellation connector vectors */}
           <path
-            d="M200,68 L228,118 L192,176 L226,236 L196,294"
+            d="M84,104 L114,152 L82,216 L118,284 L86,346"
             fill="none"
-            strokeDasharray="3 3"
-            strokeOpacity="0.45"
+            stroke="url(#sf-gold-beam)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          {/* Connecting bonds */}
-          <line x1="200" y1="68" x2="228" y2="118" strokeWidth="2" strokeOpacity="0.65" />
-          <line x1="228" y1="118" x2="192" y2="176" strokeWidth="2" strokeOpacity="0.65" />
-          <line x1="192" y1="176" x2="226" y2="236" strokeWidth="2" strokeOpacity="0.65" />
-          <line x1="226" y1="236" x2="196" y2="294" strokeWidth="2" strokeOpacity="0.65" />
+          {/* Orbital connection threads leading into the centrifuge core */}
+          <path d="M114,152 C150,165 170,180 194,188" fill="none" stroke="var(--gd-accent)" strokeOpacity="0.25" strokeDasharray="3 4" />
+          <path d="M82,216 C130,218 160,220 194,222" fill="none" stroke="var(--gd-accent)" strokeOpacity="0.3" strokeDasharray="3 4" />
+          <path d="M118,284 C150,270 170,255 194,248" fill="none" stroke="var(--gd-accent)" strokeOpacity="0.25" strokeDasharray="3 4" />
 
-          {/* Nodes with concentric bio-rings */}
-          <circle cx="200" cy="68" r="9" fill="none" strokeWidth="2" />
-          <circle cx="200" cy="68" r="3.5" fill="var(--gd-accent)" stroke="none" opacity="0.8" />
+          {/* Node 1 */}
+          <circle cx="84" cy="104" r="14" fill="color-mix(in srgb, var(--gd-accent) 12%, transparent)" stroke="url(#sf-gold-beam)" strokeWidth="2.2" />
+          <circle cx="84" cy="104" r="5" fill="var(--gd-accent)" />
+          <circle cx="84" cy="104" r="1.5" fill="#ffffff" />
 
-          <circle cx="228" cy="118" r="11" fill="none" strokeWidth="2" />
-          <circle cx="228" cy="118" r="4.5" fill="var(--gd-accent)" stroke="none" opacity="0.85" />
+          {/* Node 2 */}
+          <circle cx="114" cy="152" r="16" fill="color-mix(in srgb, var(--gd-accent) 14%, transparent)" stroke="url(#sf-gold-beam)" strokeWidth="2.4" />
+          <circle cx="114" cy="152" r="6" fill="var(--gd-accent)" />
+          <circle cx="114" cy="152" r="2" fill="#ffffff" />
 
-          <circle cx="192" cy="176" r="13" fill="none" strokeWidth="2.2" />
-          <circle cx="192" cy="176" r="5.5" fill="var(--gd-accent)" stroke="none" opacity="0.9" />
+          {/* Node 3 (Major central atom) */}
+          <circle cx="82" cy="216" r="19" fill="color-mix(in srgb, var(--gd-accent) 18%, transparent)" stroke="url(#sf-gold-beam)" strokeWidth="2.8" />
+          <circle cx="82" cy="216" r="7.5" fill="var(--gd-accent)" />
+          <circle cx="82" cy="216" r="2.5" fill="#ffffff" />
 
-          <circle cx="226" cy="236" r="11" fill="none" strokeWidth="2" />
-          <circle cx="226" cy="236" r="4.5" fill="var(--gd-accent)" stroke="none" opacity="0.85" />
+          {/* Node 4 */}
+          <circle cx="118" cy="284" r="16" fill="color-mix(in srgb, var(--gd-accent) 14%, transparent)" stroke="url(#sf-gold-beam)" strokeWidth="2.4" />
+          <circle cx="118" cy="284" r="6" fill="var(--gd-accent)" />
+          <circle cx="118" cy="284" r="2" fill="#ffffff" />
 
-          <circle cx="196" cy="294" r="9" fill="none" strokeWidth="2" />
-          <circle cx="196" cy="294" r="3.5" fill="var(--gd-accent)" stroke="none" opacity="0.8" />
+          {/* Node 5 */}
+          <circle cx="86" cy="346" r="14" fill="color-mix(in srgb, var(--gd-accent) 12%, transparent)" stroke="url(#sf-gold-beam)" strokeWidth="2.2" />
+          <circle cx="86" cy="346" r="5" fill="var(--gd-accent)" />
+          <circle cx="86" cy="346" r="1.5" fill="#ffffff" />
         </g>
 
-        {/* The rotating centrifuge rotor */}
+        {/* Right-side precision telemetry */}
+        <g className="sf-cent-telemetry" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1">
+          <line x1="262" y1="140" x2="278" y2="140" />
+          <text x="286" y="143" className="sf-tel-num">10 mL</text>
+
+          <line x1="262" y1="172" x2="274" y2="172" />
+          <text x="286" y="175" className="sf-tel-num">8 mL</text>
+
+          <line x1="262" y1="204" x2="282" y2="204" stroke="var(--gd-accent)" strokeOpacity="0.6" strokeWidth="1.5" />
+          <text x="290" y="208" className="sf-tel-num is-gold">PRF · 5.5 mL</text>
+
+          <line x1="262" y1="236" x2="274" y2="236" />
+          <text x="286" y="239" className="sf-tel-num">4 mL</text>
+
+          <line x1="262" y1="268" x2="278" y2="268" />
+          <text x="286" y="271" className="sf-tel-num">2 mL</text>
+        </g>
+
+        {/* -------------------------------------------------------------
+            THE ROTATING CENTRIFUGE ROTOR & ORBITAL RINGS
+            ------------------------------------------------------------- */}
         <g className="sf-cent-ring">
-          <circle cx="200" cy="200" r="172" fill="none" stroke="currentColor" strokeOpacity=".18" strokeWidth="1" strokeDasharray="4 6" />
-          <circle cx="200" cy="200" r="156" fill="none" stroke="currentColor" strokeOpacity=".10" strokeWidth="1" />
-          <circle cx="200" cy="200" r="140" fill="none" stroke="currentColor" strokeOpacity=".06" strokeWidth="1" />
+          {/* Outer astronomical compass ring */}
+          <circle cx="220" cy="220" r="185" fill="none" stroke="currentColor" strokeOpacity=".12" strokeWidth="1" strokeDasharray="6 8" />
+          <circle cx="220" cy="220" r="168" fill="none" stroke="currentColor" strokeOpacity=".18" strokeWidth="1.2" />
+          <circle cx="220" cy="220" r="150" fill="none" stroke="currentColor" strokeOpacity=".08" strokeWidth="1" />
 
-          {/* Precision axis ticks */}
-          <g stroke="currentColor" strokeOpacity=".35" strokeWidth="1.5">
-            <line x1="200" y1="20" x2="200" y2="44" />
-            <line x1="380" y1="200" x2="356" y2="200" />
-            <line x1="200" y1="380" x2="200" y2="356" />
-            <line x1="20" y1="200" x2="44" y2="200" />
+          {/* Precision cardinal axes */}
+          <g stroke="currentColor" strokeOpacity=".38" strokeWidth="1.5">
+            <line x1="220" y1="24" x2="220" y2="52" />
+            <line x1="416" y1="220" x2="388" y2="220" />
+            <line x1="220" y1="416" x2="220" y2="388" />
+            <line x1="24" y1="220" x2="52" y2="220" />
           </g>
-          {/* Diagonals */}
-          <g stroke="currentColor" strokeOpacity=".18" strokeWidth="1">
-            <line x1="326" y1="74" x2="310" y2="90" />
-            <line x1="326" y1="326" x2="310" y2="310" />
-            <line x1="74" y1="326" x2="90" y2="310" />
-            <line x1="74" y1="74" x2="90" y2="90" />
+          {/* Degree angle marks */}
+          <g stroke="currentColor" strokeOpacity=".20" strokeWidth="1">
+            <line x1="351" y1="89" x2="333" y2="107" />
+            <line x1="351" y1="351" x2="333" y2="333" />
+            <line x1="89" y1="351" x2="107" y2="333" />
+            <line x1="89" y1="89" x2="107" y2="107" />
           </g>
-          {/* Micro degree ticks */}
-          <circle cx="200" cy="28" r="2" fill="var(--gd-accent)" stroke="none" opacity="0.7" />
-          <circle cx="372" cy="200" r="2" fill="var(--gd-accent)" stroke="none" opacity="0.7" />
-          <circle cx="200" cy="372" r="2" fill="var(--gd-accent)" stroke="none" opacity="0.7" />
-          <circle cx="28" cy="200" r="2" fill="var(--gd-accent)" stroke="none" opacity="0.7" />
+          {/* Gold orbital reticle accents */}
+          <circle cx="220" cy="34" r="2.5" fill="var(--gd-accent)" stroke="none" />
+          <circle cx="406" cy="220" r="2.5" fill="var(--gd-accent)" stroke="none" />
+          <circle cx="220" cy="406" r="2.5" fill="var(--gd-accent)" stroke="none" />
+          <circle cx="34" cy="220" r="2.5" fill="var(--gd-accent)" stroke="none" />
         </g>
 
-        {/* The glass tube with anatomical meniscus and organic fluid layers */}
+        {/* -------------------------------------------------------------
+            THE PRF TUBE (Luxury Laboratory Glass with Organic Fluid Flow)
+            ------------------------------------------------------------- */}
         <clipPath id="sf-tube">
-          <path d="M174,104 L174,258 C174,293 186,308 200,308 C214,308 226,293 226,258 L226,104 Z" />
+          <path d="M192,112 L192,274 C192,312 205,328 220,328 C235,328 248,312 248,274 L248,112 Z" />
         </clipPath>
 
         <g clipPath="url(#sf-tube)">
-          {/* Tube glass background */}
-          <rect x="170" y="100" width="60" height="212" className="sf-cent-glass" />
+          {/* Glass vial base background */}
+          <rect x="188" y="108" width="64" height="230" className="sf-cent-glass" />
 
-          {/* Whole blood before spin */}
-          <rect x="170" y="100" width="60" height="212" className="sf-cent-whole" fill="url(#sf-whole-grad)" />
+          {/* Whole Blood (dissolves as centrifuge accelerates) */}
+          <rect x="188" y="108" width="64" height="230" className="sf-cent-whole" fill="url(#sf-whole-grad)" />
 
-          {/* Separated Red Blood Cell layer */}
+          {/* Red Blood Cell Cellular Matrix with organic meniscus wave */}
           <path
-            d="M170,210 Q200,215 230,210 L230,312 L170,312 Z"
+            d="M188,222 C204,227 236,217 252,223 L252,332 L188,332 Z"
             className="sf-cent-rbc"
             fill="url(#sf-rbc-grad)"
           />
 
-          {/* Separated PRF liquid gold layer with organic curved meniscus */}
+          {/* Deep cellular density waves in RBC */}
           <path
-            d="M170,102 L230,102 L230,212 Q200,217 170,212 Z"
+            d="M188,252 C208,256 232,248 252,253 L252,332 L188,332 Z"
+            fill="#32060c"
+            opacity="0.45"
+            className="sf-cent-rbc"
+          />
+
+          {/* Liquid Gold PRF with organic upper & lower meniscus curves */}
+          <path
+            d="M188,110 L252,110 L252,224 C236,218 204,228 188,223 Z"
             className="sf-cent-prf"
             fill="url(#sf-prf-grad)"
           />
 
-          {/* Luminous buffy coat interface line */}
+          {/* Luminous Buffy Coat Interface Spark Line */}
           <path
-            d="M170,211 Q200,216 230,211"
+            d="M188,223 C204,228 236,218 252,224"
             className="sf-cent-buffy"
             fill="none"
             stroke="#ffffff"
-            strokeWidth="1.8"
-            strokeOpacity="0.75"
+            strokeWidth="2.2"
+            strokeOpacity="0.85"
+            strokeLinecap="round"
           />
 
-          {/* Floating active platelet sparks in PRF */}
+          {/* Active Bioactive Platelet & Fibrin Strands */}
           <g className="sf-cent-platelets">
-            <circle cx="190" cy="135" r="1.8" fill="#ffffff" opacity="0.8" />
-            <circle cx="210" cy="155" r="1.4" fill="#ffffff" opacity="0.65" />
-            <circle cx="184" cy="178" r="1.6" fill="#ffffff" opacity="0.7" />
+            <circle cx="210" cy="142" r="2.2" fill="#ffffff" opacity="0.9" />
+            <circle cx="232" cy="165" r="1.6" fill="#ffffff" opacity="0.75" />
             <circle cx="204" cy="192" r="2" fill="#ffffff" opacity="0.85" />
-            <circle cx="196" cy="164" r="1.2" fill="#ffffff" opacity="0.5" />
+            <circle cx="226" cy="208" r="2.4" fill="#ffffff" opacity="0.95" />
+            <circle cx="218" cy="174" r="1.4" fill="#ffffff" opacity="0.6" />
+
+            {/* Micro fibrin matrix webs */}
+            <line x1="210" y1="142" x2="218" y2="174" stroke="#ffffff" strokeWidth="0.7" strokeOpacity="0.4" />
+            <line x1="218" y1="174" x2="204" y2="192" stroke="#ffffff" strokeWidth="0.7" strokeOpacity="0.45" />
+            <line x1="204" y1="192" x2="226" y2="208" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.55" />
           </g>
 
-          {/* Glass 3D reflection highlight */}
-          <rect x="174" y="104" width="52" height="204" fill="url(#sf-glass-spec)" />
-          <path d="M177,108 L177,258 C177,288 184,300 192,303" fill="none" stroke="#ffffff" strokeWidth="1.5" strokeOpacity="0.35" />
+          {/* 3D Curved Glass Specular Highlight */}
+          <rect x="192" y="112" width="56" height="216" fill="url(#sf-glass-spec)" />
+          <path d="M195,116 L195,274 C195,306 202,320 212,324" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeOpacity="0.45" />
         </g>
 
-        {/* Tube outer glass contour */}
+        {/* Vial Outer Rim & Glass Bevel */}
         <path
-          d="M174,104 L174,258 C174,293 186,308 200,308 C214,308 226,293 226,258 L226,104"
-          fill="none" stroke="currentColor" strokeOpacity=".38" strokeWidth="1.75" strokeLinecap="round"
+          d="M192,112 L192,274 C192,312 205,328 220,328 C235,328 248,312 248,274 L248,112"
+          fill="none"
+          stroke="currentColor"
+          strokeOpacity=".45"
+          strokeWidth="2"
+          strokeLinecap="round"
         />
 
-        {/* Test tube cap */}
-        <rect x="168" y="86" width="64" height="20" rx="4" className="sf-cent-cap-rect" />
-        <line x1="174" y1="110" x2="226" y2="110" stroke="currentColor" strokeOpacity=".25" strokeWidth="1" />
+        {/* Polished Glass Lip & Frosted Cap */}
+        <ellipse cx="220" cy="112" rx="28" ry="4.5" fill="none" stroke="currentColor" strokeOpacity="0.3" strokeWidth="1.2" />
+        <rect x="184" y="92" width="72" height="22" rx="4" className="sf-cent-cap-rect" />
+        <line x1="192" y1="118" x2="248" y2="118" stroke="currentColor" strokeOpacity=".3" strokeWidth="1.2" />
 
-        <text x="200" y="348" textAnchor="middle" className="sf-cent-label">
-          platelet-rich fibrin
+        {/* Telemetry labels */}
+        <text x="220" y="372" textAnchor="middle" className="sf-cent-label">
+          PLATELET-RICH FIBRIN · 2200 RPM
         </text>
       </svg>
     </div>
