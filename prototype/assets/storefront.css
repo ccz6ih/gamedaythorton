@@ -1086,6 +1086,117 @@
 .sf-section.sf-centre .sf-display-sm { max-width: 18ch; margin-inline: auto; }
 .sf-section.sf-bordered { border-top: 1px solid var(--gd-border); }
 
+/* -------------------------------------------------------------- about ---- */
+/* The About page borrows the editorial energy of the reference landing page
+   without importing its external images, scripts or hard-coded palette. The
+   orbit is deliberately CSS-only: it gives a no-photo practice a signature
+   visual while still inheriting every brand value from the clinic's kit. */
+.sf-about-stage {
+  min-height: min(46rem, 78vh);
+  display: grid;
+  align-items: center;
+}
+.sf-about-stage .sf-stage-grid {
+  position: relative;
+  min-height: 30rem;
+}
+.sf-about-orbit {
+  position: relative;
+  width: min(22rem, 68vw);
+  aspect-ratio: 1;
+  margin: clamp(2rem, 5vw, 4rem) 0 0 clamp(1rem, 9vw, 7rem);
+  color: var(--gd-accent);
+  pointer-events: none;
+}
+.sf-about-orbit-line {
+  position: absolute;
+  inset: 12%;
+  border: 1px solid var(--gd-accent-line);
+  border-radius: 50%;
+  transform: rotate(-25deg) scaleY(.42);
+}
+.sf-about-orbit-line-a { animation: sf-about-orbit-a 12s linear infinite; }
+.sf-about-orbit-line-b {
+  transform: rotate(55deg) scaleY(.42);
+  animation: sf-about-orbit-b 16s linear infinite reverse;
+}
+@keyframes sf-about-orbit-a {
+  from { transform: rotate(-25deg) scaleY(.42); }
+  to { transform: rotate(335deg) scaleY(.42); }
+}
+@keyframes sf-about-orbit-b {
+  from { transform: rotate(55deg) scaleY(.42); }
+  to { transform: rotate(415deg) scaleY(.42); }
+}
+.sf-about-orbit-dot {
+  position: absolute;
+  width: .65rem;
+  height: .65rem;
+  border-radius: 50%;
+  background: var(--gd-accent);
+  box-shadow: 0 0 1.25rem var(--gd-accent);
+}
+.sf-about-orbit-dot-a { top: 16%; left: 18%; animation: sf-about-pulse 3.2s ease-in-out infinite; }
+.sf-about-orbit-dot-b { right: 15%; bottom: 20%; animation: sf-about-pulse 3.2s ease-in-out 1.2s infinite; }
+@keyframes sf-about-pulse {
+  0%, 100% { transform: scale(.75); opacity: .55; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+.sf-about-orbit-word {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-style: italic;
+  letter-spacing: -.03em;
+  transform: rotate(-8deg);
+}
+.sf-about-manifesto {
+  align-self: end;
+  max-width: 19rem;
+  margin: 0 0 clamp(1rem, 4vw, 3rem) auto;
+  padding: var(--gd-5);
+  border-left: 1px solid var(--gd-accent);
+}
+.sf-about-manifesto p:not(.sf-about-manifesto-kicker) {
+  margin: 0 0 var(--gd-5);
+  color: var(--gd-text-muted);
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  line-height: 1.25;
+}
+.sf-about-manifesto-kicker,
+.sf-about-number {
+  color: var(--gd-accent);
+  font-size: var(--gd-step--2);
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.sf-about-manifesto-kicker { margin: 0 0 var(--gd-3); }
+.sf-about-manifesto .sf-btn { font-size: var(--gd-step--1); }
+.sf-about-principles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gd-6);
+}
+.sf-about-principles article {
+  padding-top: var(--gd-4);
+  border-top: 1px solid var(--gd-border-strong);
+}
+.sf-about-principles h3 {
+  margin: var(--gd-5) 0 var(--gd-2);
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+}
+.sf-about-principles p {
+  margin: 0;
+  color: var(--gd-text-muted);
+  line-height: 1.55;
+}
+
 /* ---------------------------------------------------------- centrifuge -- */
 .sf-cent {
   position: relative;
@@ -1322,6 +1433,10 @@
   .sf-stage-grid { grid-template-columns: 1fr; }
   .sf-cent { width: 62%; margin-inline: auto; }
   .sf-split { grid-template-columns: 1fr; }
+  .sf-about-stage { min-height: auto; }
+  .sf-about-stage .sf-stage-grid { min-height: auto; }
+  .sf-about-manifesto { margin: var(--gd-8) 0 0; max-width: 25rem; }
+  .sf-about-principles { grid-template-columns: 1fr; gap: var(--gd-7); }
 }
 
 @media (prefers-reduced-motion: reduce) {
