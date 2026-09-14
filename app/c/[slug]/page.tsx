@@ -324,7 +324,14 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
       {providers.length > 0 && (
         <section className="sf-section sf-bordered">
           <div className="sf-wrap">
-            <div className="sf-section-head"><h2>Who you&rsquo;ll see</h2></div>
+            <div className="sf-section-head">
+              <h2>Who you&rsquo;ll see</h2>
+              <p>
+                {isSpa && providers.length === 1
+                  ? 'A small practice, which means the person you meet is the person who does the work.'
+                  : 'The people who will actually be treating you.'}
+              </p>
+            </div>
             <div className="sf-people">
               {providers.slice(0, 2).map(p => (
                 <article className="sf-person" key={p.id}>
@@ -334,7 +341,16 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                       : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
                   </div>
                   <div>
-                    <h3>{p.name}{p.credentials ? `, ${p.credentials}` : ''}</h3>
+                    {/* The name is a link as well as the button below it.
+                        Somebody reading a headshot and a two-line bio and
+                        wanting the longer version reaches for the name, not for
+                        a control further down the page they have not scrolled
+                        to yet. */}
+                    <h3>
+                      <Link href={links.about}>
+                        {p.name}{p.credentials ? `, ${p.credentials}` : ''}
+                      </Link>
+                    </h3>
                     {p.role_label && <p className="role">{p.role_label}</p>}
                     {p.bio
                       ? <p className="bio">{p.bio}</p>
@@ -342,6 +358,19 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                   </div>
                 </article>
               ))}
+            </div>
+
+            {/* The home page shows a photograph and a short bio; the about page
+                carries the full story, the credentials and the practice's
+                principles. Without a way through, this section is a dead end at
+                exactly the moment a reader has decided they want to know who
+                they would be trusting. */}
+            <div className="sf-actions" style={{ marginTop: 'var(--gd-6)' }}>
+              <Link href={links.about} className="sf-btn ghost sm">
+                {providers.length === 1 && providers[0]
+                  ? `More about ${providers[0].name.split(' ')[0]}`
+                  : 'More about the practice'} <span aria-hidden="true">&rarr;</span>
+              </Link>
             </div>
           </div>
         </section>

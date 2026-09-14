@@ -819,6 +819,23 @@
   letter-spacing: -.015em;
   margin: 0 0 var(--gd-1);
 }
+/* The name links through to the about page. It keeps the heading's colour and
+   weight rather than reading as a link in prose — a practitioner's name set in
+   underlined blue looks like a citation, not an invitation. The underline
+   appears on hover and focus, which is where the affordance is actually
+   needed. */
+.sf-person h3 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-person h3 a:hover,
+.sf-person h3 a:focus-visible {
+  color: var(--gd-accent);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+  text-decoration-thickness: 1px;
+}
 .sf-person .role {
   font-size: var(--gd-step--1);
   color: var(--gd-accent);
