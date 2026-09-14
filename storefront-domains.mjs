@@ -39,6 +39,10 @@ export const STOREFRONT_PATHS = [
   '/prf',
   '/prf/compare',
   '/prf/aftercare',
+  // Clinical Guides & Directories
+  '/led-light-therapy',
+  '/facials',
+  '/scar-revision',
   // Booking. Public by necessity: a person picking a treatment and a time has
   // no account and must never meet a passcode on the way to giving money.
   '/book',

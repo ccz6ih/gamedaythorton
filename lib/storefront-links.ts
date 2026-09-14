@@ -77,6 +77,10 @@ export function storefrontLinks(base: string) {
     prfUnderEye: `${base}/prf/under-eye`,
     prfMicroneedling: `${base}/prf/microneedling`,
     prfHairRestoration: `${base}/prf/hair-restoration`,
+    /** Clinical Guides & Directories. */
+    ledLightTherapy: `${base}/led-light-therapy`,
+    facialsGuide: `${base}/facials`,
+    scarRevision: `${base}/scar-revision`,
     /** Stripe returns here. Absolute URL built by the checkout route. */
     thanks: `${base}/shop/thanks`
   };

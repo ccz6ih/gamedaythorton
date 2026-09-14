@@ -119,6 +119,24 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                 </p>
               )}
 
+              {group.category === 'paramedical' && (
+                <p className="sf-cat-note">
+                  Exploring scar remodeling? <Link href={links.scarRevision}>Read our complete Inkless Scar &amp; Stretch Mark Revision Guide</Link>.
+                </p>
+              )}
+
+              {group.category === 'skin' && (
+                <p className="sf-cat-note">
+                  Targeted cellular phototherapy: <Link href={links.ledLightTherapy}>Explore the 7-Wavelength LED Light Therapy Guide</Link>.
+                </p>
+              )}
+
+              {group.category === 'facials' && (
+                <p className="sf-cat-note">
+                  Engineered for Colorado altitude: <Link href={links.facialsGuide}>Explore the Clinical Facials Directory &amp; Diagnostic Finder</Link>.
+                </p>
+              )}
+
               {group.items.map(s => (
                 <article className="sf-item" key={s.id}>
                   {s.image_path ? (
