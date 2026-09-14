@@ -25,97 +25,162 @@ const { Client } = require('pg');
 
 const slug = process.argv[2] ?? 'medbar-loveland';
 
-/** name, price in dollars, stock on hand, category, description, details */
+/** name, price in dollars, stock on hand, category, card blurb, full description */
 const GREEN_ENVEE = [
   [
-    'Acne Rescue Kit', 84.00, 2, 'kits',
-    'Complete 4-step clarifying regimen formulated with organic botanicals, willow bark, and tea tree to calm breakouts, clear congested pores, and restore balance.',
-    'Includes Clarify Cleansing Gel, Clear Complexion Masque, Flora Elixir, and Clear Repair Serum. Specifically designed for oily, combination, and acne-prone skin types.'
+    'Soothe Herbal Cleansing Cream', 34.00, 2, 'cleanser',
+    'A cream cleanser for skin that feels tight or reactive after washing.',
+    'Green tea and chamomile do the calming work here. It lifts makeup and the day off without stripping the barrier, so skin ends up clean but still comfortable rather than squeaking. If your skin runs dry, sensitive, or easily flushed, start and end the day with this one.'
   ],
   [
-    'Clear Repair Serum', 72.50, 1, 'serums',
-    'Lightweight clarifying serum with botanical willow bark, niacinamide, and prebiotic ferment to soothe active blemishes, refine pores, and promote even tone.',
-    'Apply 2–3 drops morning and evening to clean skin before moisturizing. Helps reduce redness and decongest without stripping natural moisture.'
+    'Purify Botanic Cleansing Oil', 37.00, 2, 'cleanser',
+    'Melts sunscreen and makeup, then rinses clean instead of leaving a film.',
+    'Oil dissolves oil — which is why this removes SPF and long-wear makeup that a foaming cleanser just smears around. It rinses away cleanly rather than leaving the slick residue people expect from an oil. Use it as your first cleanse at night and follow with your regular one.'
   ],
   [
-    'Flora Elixir', 72.50, 0, 'serums',
-    'Restorative probiotic essence mist crafted with nutrient-dense plant waters to balance skin flora, calm redness, and deliver immediate hydration.',
-    'Mist over face and neck after cleansing or throughout the day as an instant refreshing hydration boost.'
+    'Clarify Cleansing Gel', 33.00, 2, 'cleanser',
+    'A gel cleanse for oily and breakout-prone skin, without the stripped feeling.',
+    'Clears congestion and excess oil while leaving the barrier intact. The tight, squeaky finish most acne cleansers give you is the thing that pushes skin into producing more oil by afternoon — this avoids it. Suits oily and combination skin morning and night.'
   ],
   [
-    'Glow C+ Brightening Serum', 91.00, 0, 'serums',
-    'High-potency antioxidant serum featuring stable Vitamin C, kakadu plum, and ferulic acid to brighten dull tone, fade hyperpigmentation, and boost collagen.',
-    'Apply 3–4 drops each morning to clean skin. Follow with moisturizer and daily broad-spectrum SPF.'
+    'Illuminate Enzyme Cleansing Powder', 42.50, 1, 'cleanser',
+    'A dry powder that activates in your palm — gentle enzyme exfoliation with every wash.',
+    'Because it exfoliates with enzymes rather than grit, it\'s a good bridge for anyone whose skin can\'t tolerate a scrub but still looks dull. Activate a small amount in wet hands and cleanse as usual. Nothing to spill, which makes it the easiest one to travel with.'
   ],
   [
-    'H.A. Collagen Boosting Serum', 83.00, 0, 'serums',
-    'Multi-molecular hyaluronic acid serum with snow mushroom and vegan peptides to deeply hydrate, plump fine lines, and strengthen elasticity.',
-    'Apply morning and night to slightly damp skin for optimal moisture binding. Excellent following peels or microneedling.'
+    'Pumpkin Glycolic Peel 3%', 53.00, 2, 'exfoliator',
+    'An at-home peel at a strength you can actually use every week.',
+    'Glycolic loosens dull surface cells while pumpkin enzymes help clear them away, leaving texture smoother and tone more even. Three percent is meaningful without being a weekend-ruining peel. Start once weekly at night, build from there, and wear SPF the following day without exception.'
   ],
   [
-    'Hydrate Facial Mist', 33.00, 2, 'hydration',
-    'Refreshing botanical face mist infused with rosewater, aloe, and soothing chamomile to calm irritation and restore moisture balance on contact.',
-    'Spritz generously over face and neck after cleansing, post-treatment, or over makeup throughout the day.'
+    'Rejuvenate Brightening Enzyme Masque', 53.00, 2, 'exfoliator',
+    'For skin that looks tired more than it looks problematic.',
+    'Enzymes clear the dulling layer on the surface so everything you apply afterward actually absorbs instead of sitting on top. Ten minutes, once or twice a week. The most noticeable result is usually the next morning, when makeup goes on smooth instead of patchy.'
   ],
   [
-    'Illuminate Enzyme Cleansing Powder', 42.50, 1, 'exfoliants',
-    'Water-activated micro-exfoliating powder combining papaya, pineapple enzymes, and rice bran to polish away dull cells for instant radiance.',
-    'Dispense into wet hands, lather into a creamy foam, and massage gently over damp skin for 60 seconds before rinsing with lukewarm water.'
+    'Refine Polishing Facial Scrub', 45.50, 2, 'exfoliator',
+    'A physical polish for normal to combination skin that likes the feel of a scrub.',
+    'Smooths rough patches and keeps pores from filling in. Use the lightest pressure you can and let the scrub do the work — pressing harder doesn\'t exfoliate more, it just irritates. Once or twice a week is plenty for most skin.'
   ],
   [
-    'Mandelic Resurfacing Serum 8%', 81.00, 0, 'serums',
-    'Gentle AHA resurfacing treatment with 8% mandelic and lactic acids to smooth rough texture, clear pores, and brighten post-blemish discoloration.',
-    'Ideal for sensitive, acne-prone, and reactive skin. Apply 3–4 drops in the evening 2–4 times weekly.'
+    'Hydrate Facial Mist', 33.00, 2, 'toner',
+    'Mist onto damp skin so the layers on top have something to hold onto.',
+    'This is the step most people skip and then wonder why their serum disappears. Applying to damp skin gives everything after it something to bind to. It also earns its keep at three in the afternoon — Colorado air pulls moisture out of your skin all day. Keep one at your desk.'
   ],
   [
-    'Post Peel Kit', 87.00, 0, 'kits',
-    'Calming recovery system formulated with barrier-repair lipids and soothing botanicals to accelerate healing following chemical peels or clinical facials.',
-    'Includes gentle botanical cleanser, soothing essence mist, restorative moisture balm, and antioxidant protection to support optimal recovery.'
+    'Bright Facial Mist', 33.00, 2, 'toner',
+    'The same hydrating step, tuned toward evenness of tone.',
+    'Preps skin after cleansing and supports a more even appearance with consistent daily use. Choose this one over Hydrate if your main concern is skin that reads dull or patchy rather than skin that reads dry.'
   ],
   [
-    'Protect Antioxidant Moisturizer', 66.00, 0, 'hydration',
-    'Daily protective cream rich in CoQ10, green tea, and plant ceramides to shield against environmental stress, soothe inflammation, and seal in hydration.',
-    'Massage 1–2 pumps onto clean face and neck morning and evening. Perfect for normal, combination, and sensitive skin.'
+    'Firm Collagen Gel Masque', 61.00, 2, 'masque',
+    'A cooling gel masque for skin that looks slack or stressed.',
+    'For after travel, a long week, or a short night. It supports firmness and takes the tired look off the face without any heaviness. Twenty minutes is enough, and it pairs particularly well with LED if you\'re layering treatments at home.'
   ],
   [
-    'Pumpkin Glycolic Peel 3%', 53.00, 0, 'exfoliants',
-    'Nutrient-rich enzyme peel with organic pumpkin puree, 3% glycolic acid, and honey to dissolve dead surface buildup and reveal glowing, luminous skin.',
-    'Apply a thin layer to clean skin for 5–10 minutes depending on tolerance. Rinse thoroughly with cool water. Use 1–2 times weekly.'
+    'Restore Hydration Masque', 63.00, 2, 'masque',
+    'For skin that has gone flat and thirsty and needs water, not oil.',
+    'Hyaluronic acid and CoQ10 restore hydration to the barrier rather than coating it, with rosehip and hibiscus supporting tone and elasticity. This is the one to reach for after a peel, after a flight, or in the middle of a Colorado winter week when nothing else is landing.'
   ],
   [
-    'Purify Cleansing Oil', 37.00, 0, 'exfoliants',
-    'Luxurious botanical oil cleanser that melts away makeup, sunscreen, and daily impurities while nourishing the lipid barrier.',
-    'Massage 2–3 pumps onto dry skin, emulsify with warm water, and rinse clean. Follow with a water-based cleanser if double cleansing.'
+    'Clear Complexion Healing Masque', 53.00, 2, 'masque',
+    'A treatment masque for active breakouts, not a preventative one.',
+    'Helps draw down congestion while supporting the skin\'s own repair process, so spots tend to settle faster and leave less behind them. Use it as a full masque when things flare, or spot-apply overnight on individual areas.'
   ],
   [
-    'Refine Polishing Facial Scrub', 45.50, 0, 'exfoliants',
-    'Gentle dual-action physical and enzymatic scrub with micro-jojoba beads and fruit enzymes to smooth texture without micro-tears.',
-    'Gently massage onto damp skin in circular motions for 1–2 minutes, avoiding the eye area. Rinse thoroughly. Use 1–2 times per week.'
+    'Potent C Superfood Masque', 63.00, 2, 'masque',
+    'A concentrated weekly vitamin C dose for dullness and uneven tone.',
+    'Antioxidant support in a treatment-strength format rather than a daily one — a reset for skin that\'s been outside, under stress, or neglected for a stretch. Follow with moisturizer, and with SPF if you\'re using it in the morning.'
   ],
   [
-    'Renew Eye Complex', 68.00, 0, 'hydration',
-    'Targeted peptide eye cream with caffeine and botanical extracts to diminish dark circles, reduce under-eye puffiness, and firm delicate contours.',
-    'Gently pat half a pump around the orbital bone morning and night using your ring finger.'
+    'Glow C+ Brightening Serum', 91.00, 2, 'serum',
+    'Your daily antioxidant step, worn in the morning under everything else.',
+    'Vitamin C supports a more even tone over time and helps defend against the environmental load your skin absorbs between waking up and going to bed. Apply to clean skin, moisturizer over it, SPF over that. The order matters more than people think.'
   ],
   [
-    'Restore Hydration Masque', 63.00, 0, 'hydration',
-    'Deeply replenishing gel-cream masque with hyaluronic acid and blue tansy to soothe thirsty, sensitized, or sun-exposed skin.',
-    'Apply generously to face and neck. Leave on for 15–20 minutes, then rinse or leave on overnight as an intensive recovery treatment.'
+    'Clear Repair Serum', 72.50, 1, 'serum',
+    'For breakout-prone skin that\'s also dry and irritated from treating it.',
+    'Most acne routines attack congestion and wreck the barrier on the way, which is why they stall around week six. This one targets blemishes while supporting the barrier at the same time, so skin can stay on it long enough to see a change. Use nightly.'
   ],
   [
-    'Retinal Renewal Complex', 121.00, 0, 'serums',
-    'Advanced encapsulated retinaldehyde (Vitamin A) with bakuchiol to stimulate cellular renewal, refine lines, and clarify tone with superior tolerance.',
-    'Apply 1–2 pumps in the evening to clean, dry skin 2–3 nights weekly, building to nightly use as tolerated. Always wear daily SPF.'
+    'H.A. Collagen Boosting Serum', 83.00, 2, 'serum',
+    'Hyaluronic acid for hydration, plant peptides and stem cells for collagen support.',
+    'Plant peptides and echinacea stem cells work alongside hyaluronic acid to hold moisture and support firmness. Apply to damp skin and seal with moisturizer — on dry skin with dry air around it, hyaluronic acid can pull water the wrong direction. Suits every skin type.'
   ],
   [
-    'Revitalize Eye Gel', 68.00, 0, 'hydration',
-    'Cooling, depuffing eye gel infused with green tea, cucumber, and marine peptides to revive tired eyes and reduce morning puffiness.',
-    'Dab lightly around eye area morning and night. Store in refrigerator for an enhanced cooling and depuffing sensation.'
+    'Mandelic Resurfacing Serum 8%', 81.00, 2, 'serum',
+    'The resurfacing acid for skin that has reacted badly to glycolic.',
+    'Mandelic is the gentlest of the AHAs — a larger molecule that penetrates more slowly and with less irritation. That makes it the better choice for sensitive skin and for deeper skin tones, where aggressive acids carry a real risk of post-inflammatory pigment. Nightly, with SPF.'
   ],
   [
-    'Vahati Herb Infused Healing Oil', 71.60, 0, 'hydration',
-    'Sacred multi-correctional face oil with cold-pressed moringa, rosehip, and calendula to calm reactivity, heal dry patches, and impart a dewy glow.',
-    'Warm 3–4 drops in palms and gently press into face, neck, and décolleté as the finishing step in your skincare ritual.'
+    'Retinal Renewal Complex', 121.00, 2, 'serum',
+    'The highest-return product on this shelf for lines and texture over time.',
+    'A step above retinol in strength and a step below prescription in irritation. Nothing else in a home routine changes texture and fine lines as reliably, but it only works if you stay on it. Start two nights a week, build slowly, and never skip SPF while you\'re using it.'
+  ],
+  [
+    'Revitalize Eye Gel', 68.00, 2, 'eye_care',
+    'A lightweight gel for puffiness and the morning-after look.',
+    'Cool, fast-absorbing, and comfortable under concealer — which is the whole point, since an eye product you can't wear with makeup gets used twice and abandoned. The right choice for anyone who finds eye creams too heavy.'
+  ],
+  [
+    'Renew Eye Complex', 68.00, 2, 'eye_care',
+    'A richer nightly treatment for fine lines and crepiness.',
+    'The skin around the eye is the thinnest on the face, which is why it shows change first. Use nightly, tapped in gently with the ring finger rather than rubbed. A natural companion to what a PRF under-eye treatment starts in the treatment room.'
+  ],
+  [
+    'Nourish Replenishing Moisturizer', 68.00, 2, 'moisturizer',
+    'For dry and mature skin that needs more than water.',
+    'Replenishes the lipids a depleted barrier has lost, so skin holds hydration through the night instead of shedding it by morning. Rich in feel without sitting on the surface or pilling under anything applied over it.'
+  ],
+  [
+    'Protect Antioxidant Moisturizer', 66.00, 2, 'moisturizer',
+    'A daytime moisturizer with antioxidant support already built in.',
+    'Hydrates while buffering against the exposure of an ordinary day spent partly outdoors. Layers cleanly under sunscreen and makeup, which is the practical test any morning moisturizer has to pass.'
+  ],
+  [
+    'Balance Charcoal Moisturizer', 60.00, 2, 'moisturizer',
+    'Oily skin still needs moisturizer — skipping it is why it overproduces.',
+    'Charcoal helps manage oil at the surface while the formula hydrates underneath. Skin stays comfortable and matte rather than tight, and tight is the condition that triggers the oil rebound in the first place.'
+  ],
+  [
+    'Sun Shield Serum Broad Spectrum SPF 50 - Solstice Dawn', 60.00, 2, 'spf',
+    'Broad spectrum SPF 50 in a serum texture, in the lighter of two shades.',
+    'The reason people wear this daily and forget the one in the drawer: it feels like a serum, not sunscreen. Solstice Dawn is the lighter shade. Apply every morning as the last step before makeup, and reapply across long days outdoors.'
+  ],
+  [
+    'Sun Shield Serum Broad Spectrum SPF 50 - Canyon Glow', 60.00, 2, 'spf',
+    'The same SPF 50 serum in the deeper of the two shades.',
+    'At Colorado altitude, UV exposure runs meaningfully higher than at sea level, and it doesn\'t take the summer off. This is the single product on the shelf that protects the results of everything else on it. Canyon Glow is the deeper shade.'
+  ],
+  [
+    'Flora Elixir Botanic Facial Oil', 72.50, 2, 'facial_oil',
+    'A botanic facial oil for the final step at night, sealing in everything under it.',
+    'For dry or mature skin it can stand in for a night cream entirely. For everyone else, two or three drops pressed into the face on the days skin feels depleted. Apply last — an oil goes over water-based products, never under them.'
+  ],
+  [
+    'Vahati Herb Infused Healing Oil', 30.00, 2, 'facial_oil',
+    'A multi-use herbal oil for whatever needs calming.',
+    'Dry patches, post-treatment skin, cuticles, anywhere tight or irritated. This is the one that ends up living in a bag rather than on a shelf, and the one clients repurchase without being asked.'
+  ],
+  [
+    'Rehydrate Lip Balm', 5.50, 5, 'lip_care',
+    'Lips have no oil glands, which is why they go first in dry air.',
+    'Puts moisture back and helps hold it there. Reapply through the day — with no oil glands of their own, lips can\'t maintain it unaided, especially at altitude and in winter.'
+  ],
+  [
+    'Calm Lip Balm', 5.50, 5, 'lip_care',
+    'A soothing balm for lips that are chapped, peeling, or wind-burned.',
+    'For lips past the point of dry and into raw. Comfortable enough to wear overnight, and it sits fine under color once things have settled down.'
+  ],
+  [
+    'Acne Rescue Kit', 84.00, 2, 'kit',
+    'A complete clarifying routine for breakout-prone skin, in one box.',
+    'Every step of a congestion-focused routine, sized so you can find out whether the line works for your skin before committing to full sizes. The sensible starting point for anyone dealing with active breakouts who doesn\'t know where to begin.'
+  ],
+  [
+    'Post Peel Kit', 87.00, 2, 'kit',
+    'Aftercare for the days following a peel or resurfacing treatment.',
+    'What you use in the week after a treatment determines a meaningful share of the result. This covers the calming and barrier support that stretch of recovery needs. Ask which products to use and in what order at your appointment.'
   ]
 ];
 

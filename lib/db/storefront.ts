@@ -40,6 +40,8 @@ export type StorefrontClinic = {
   intro: string | null;
   booking_note: string | null;
   legal_name: string | null;
+  /** GA4 id for the PUBLIC pages only. Never rendered behind login. */
+  ga_measurement_id: string | null;
   /**
    * The website presents as a live business: no preview notice, indexable.
    * Distinct from the database's pilot guard, which is private and stays that
@@ -140,7 +142,7 @@ export async function getStorefront(slug: string): Promise<StorefrontClinic | nu
     .select(
       'id, slug, name, location_name, practice_type, modules, ' +
       'address_line1, address_line2, address_city, address_state, address_zip, address_note, ' +
-      'phone_voice, phone_text, email, hours, brand, visit_facts, tagline, intro, booking_note, legal_name, site_live'
+      'phone_voice, phone_text, email, hours, brand, visit_facts, tagline, intro, booking_note, legal_name, site_live, ga_measurement_id'
     )
     .eq('slug', slug)
     .maybeSingle();

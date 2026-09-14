@@ -261,7 +261,25 @@ export const config = {
    * from /public; it lives in private storage behind short-TTL signed URLs.
    * docs/16-media-pipeline.md.
    */
+  /**
+   * EXCLUDE BY FILE EXTENSION, NOT BY FOLDER NAME.
+   *
+   * This listed the public folders that existed when it was written —
+   * practitioners, brand, favicon, robots — and then `public/products/` was
+   * added and nobody came back here. The result: every product photograph on
+   * the shop answered 307 to /admin, because middleware saw a path it did not
+   * recognise, found no session, and sent it to the sign-in page. Thirty-odd
+   * images, all redirecting to a login form.
+   *
+   * It looked like a mobile-only bug because a browser that had loaded the
+   * images before the redirect appeared kept serving them from cache. Every
+   * genuinely new visitor saw a shop full of empty tiles.
+   *
+   * A list of folders has to be maintained. A list of extensions does not: any
+   * request for a real file is a request for a real file, whatever folder it
+   * lands in, and no page route in this app ends in a dot-suffix.
+   */
   matcher: [
-    '/((?!_next/static|_next/image|practitioners|brand|favicon.ico|robots.txt).*)'
+    '/((?!_next/|.*\\.(?:ico|png|jpe?g|webp|avif|gif|svg|css|js|mjs|map|json|txt|xml|woff2?|ttf|otf|eot|pdf|mp4|webm)$).*)'
   ]
 };

@@ -69,9 +69,33 @@ const nextConfig = {
 
     const csp = base.join('; ');
 
+    /**
+     * The storefront additions, and the reasoning for each.
+     *
+     * FONTS. A practice whose identity is a particular serif cannot have it
+     * silently fall back to Georgia. Cost: Google sees the IP of someone
+     * browsing a public marketing page.
+     *
+     * ANALYTICS. A SCRIPT origin, which is a materially bigger concession than
+     * a font — a script can read the whole page it runs on. It is admitted here
+     * and ONLY here: the catch-all above, which covers the console, the portal,
+     * the sign-in page and the gate, still allows no external script of any
+     * kind. That asymmetry is the entire control. A business cannot be asked to
+     * run without knowing where its customers come from; it also cannot have a
+     * third party reading a page with client names on it.
+     *
+     * If the practice sets no measurement id these origins are simply unused —
+     * the policy permits them, nothing loads from them.
+     */
+    const GA_SCRIPT = 'https://www.googletagmanager.com';
+    const GA_COLLECT = 'https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com';
+
     const storefrontCsp = base
       .map(d => d.startsWith('style-src') ? `${d} https://fonts.googleapis.com` : d)
       .map(d => d.startsWith('font-src') ? `${d} https://fonts.gstatic.com` : d)
+      .map(d => d.startsWith('script-src') ? `${d} ${GA_SCRIPT}` : d)
+      .map(d => d.startsWith('connect-src') ? `${d} ${GA_COLLECT} ${GA_SCRIPT}` : d)
+      .map(d => d.startsWith('img-src') ? `${d} ${GA_COLLECT}` : d)
       .join('; ');
 
     /**

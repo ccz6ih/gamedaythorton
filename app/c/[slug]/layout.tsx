@@ -15,6 +15,7 @@ import { getStorefront, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
+import { Analytics } from '@/components/Analytics';
 import { phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -35,17 +36,15 @@ export async function generateMetadata(
     ? `${clinic.address_city}, ${clinic.address_state}`
     : clinic.location_name ?? '';
 
+  const titleText = `${name} · PRF & Regenerative Aesthetics${where ? ` · ${where}` : ''}`;
+
   /**
    * The title says WHAT and WHERE, not just who.
-   *
-   * "The Med Bar · Loveland" is what the practice calls itself and tells a
-   * stranger nothing. Somebody scanning a search result or a row of tabs needs
-   * to know it is a med spa and that it is near them — those two facts are what
-   * make the difference between a click and a scroll past.
+   * Includes highest-intent search keywords: PRF (Platelet-Rich Fibrin), Aesthetics, Loveland CO.
    */
   const description = clinic.tagline
     ?? clinic.intro
-    ?? `Aesthetics, lashes and regenerative treatments${where ? ` in ${where}` : ''}.`;
+    ?? `The Med Bar in Loveland, CO specializes in PRF (Platelet-Rich Fibrin) under-eye & microneedling treatments, hair restoration, UV lashes, and medical-grade botanical skincare.`;
 
   /**
    * A DRAWN favicon rather than the practice's logo.
@@ -63,7 +62,7 @@ export async function generateMetadata(
   return {
     ...(base ? { metadataBase: new URL(base) } : {}),
     title: {
-      default: `${name}${where ? ` · ${where}` : ''}`,
+      default: titleText,
       template: `%s · ${name}`
     },
     description,
@@ -80,13 +79,13 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       siteName: name,
-      title: `${name}${where ? ` · ${where}` : ''}`,
+      title: titleText,
       description,
       locale: 'en_US'
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${name}${where ? ` · ${where}` : ''}`,
+      title: titleText,
       description
     },
     // Still noindex while this is a pilot. A storefront carrying a real
@@ -141,7 +140,18 @@ export default async function StorefrontLayout({ children, params }: Props) {
     ['bg', '--gd-bg'],
     ['surfaceColor', '--gd-surface'],
     ['surfaceRaised', '--gd-surface-raised'],
-    ['borderColor', '--gd-border']
+    ['borderColor', '--gd-border'],
+    /**
+     * TEXT AS WELL AS SURFACES, and leaving it out was a real bug.
+     *
+     * The kit repainted the ground green and left the type on tokens.css's
+     * neutral greys. A neutral grey on a warm green ground reads COOL — body
+     * copy was rendering blue-grey, the only cool note anywhere on the site,
+     * and looked like an unstyled link or a broken span rather than prose.
+     */
+    ['text', '--gd-text'],
+    ['textMuted', '--gd-text-muted'],
+    ['textDim', '--gd-text-dim']
   ];
   for (const [key, token] of SURFACE_KEYS) {
     if (brand[key]) style[token] = brand[key];
@@ -234,6 +244,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         />
       )}
+      <Analytics measurementId={clinic.ga_measurement_id} />
       <StorefrontNav
         items={nav}
         homeHref={links.home}

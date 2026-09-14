@@ -51,11 +51,10 @@ export async function generateMetadata(
   const clinic = await getStorefront(slug);
   if (!clinic) return { title: 'Not found' };
 
-  const where = clinic.address_city && clinic.address_state
-    ? `${clinic.address_city}, ${clinic.address_state}`
-    : clinic.location_name ?? '';
-
-  return { title: { absolute: `${clinic.name}${where ? ` · ${where}` : ''}` } };
+  return {
+    title: { absolute: `${clinic.name} · PRF & Regenerative Aesthetics · Loveland, CO` },
+    description: 'The Med Bar in Loveland, CO specializes in PRF (Platelet-Rich Fibrin) under-eye & microneedling treatments, hair restoration, UV lashes, and medical-grade botanical skincare.'
+  };
 }
 
 export default async function StorefrontHome({ params }: { params: Promise<{ slug: string }> }) {
@@ -102,9 +101,9 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
       <section className="sf-stage">
         <div className="sf-wrap sf-stage-grid">
           <div>
-            <h1 className="sf-display">
-              <span className="ln"><span>The bar where</span></span>
-              <span className="ln"><span>the good stuff</span></span>
+            <h1 className="sf-display" aria-label="The bar where the good stuff comes from you.">
+              <span className="ln"><span>The bar where </span></span>
+              <span className="ln"><span>the good stuff </span></span>
               <span className="ln"><span>comes <i>from you</i>.</span></span>
             </h1>
 
@@ -356,8 +355,11 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
               'Bring your questions and whatever you have already tried. We will talk through what is realistic, what it costs, and whether you are a candidate — at no charge, with nothing booked at the end unless you want it.'}
           </p>
           <div className="sf-actions centre">
-            <Link href={links.enquire} className="sf-btn primary">
-              {consult ? 'Book the free consult' : 'Request an appointment'}
+            <Link
+              href={consult ? `${links.book}?service=${encodeURIComponent(consult.id)}` : links.book}
+              className="sf-btn primary"
+            >
+              {consult ? 'Book the free consult' : 'Book an appointment'}
             </Link>
             {clinic.phone_voice && (
               <a href={`tel:${clinic.phone_voice}`} className="sf-btn ghost">Call the practice</a>

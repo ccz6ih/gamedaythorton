@@ -139,6 +139,54 @@ async function cannotRead(label, table, select = '*') {
   if (staffLink.status >= 400) ok('provider.staff_user_id is refused', `${staffLink.status}`);
   else bad('provider.staff_user_id is refused', 'staff linkage is readable');
 
+  /* ------------------------------------------------------ static assets -- */
+  /**
+   * A PRODUCT PHOTOGRAPH MUST COME BACK AS A PHOTOGRAPH.
+   *
+   * The middleware matcher excluded the public folders that existed when it was
+   * written. `public/products/` was added later, so every product image
+   * answered 307 to the sign-in page — the whole shop rendered as empty tiles
+   * for anyone whose browser had not already cached them, which is why it
+   * presented as "broken on mobile".
+   *
+   * Nothing in the suite could see it: the HTML was correct, the src attributes
+   * were correct, the files were on disk. Only fetching one and looking at what
+   * came back reveals it.
+   */
+  console.log('\nSTATIC ASSETS ARE SERVED, NOT GATED');
+
+  const SITE = process.env.SMOKE_SITE || 'https://www.medbarco.com';
+
+  const { body: withImages } = await anon(
+    'product?select=name,image_path&image_path=not.is.null&limit=3');
+
+  const assets = [
+    ...(Array.isArray(withImages) ? withImages.map(p => p.image_path) : []),
+    '/practitioners/jamie-salazar.jpg',
+    '/brand/medbar-favicon.svg',
+    '/robots.txt'
+  ].filter(Boolean);
+
+  let served = 0, gated = [];
+  for (const asset of assets) {
+    try {
+      const res = await fetch(`${SITE}${asset}`, { redirect: 'manual' });
+      const type = res.headers.get('content-type') ?? '';
+      // A redirect, or HTML where a file was asked for, both mean the gate ate it.
+      if (res.status >= 300 && res.status < 400) gated.push(`${asset} -> ${res.status}`);
+      else if (/text\/html/.test(type)) gated.push(`${asset} -> html`);
+      else served++;
+    } catch {
+      gated.push(`${asset} -> unreachable`);
+    }
+  }
+
+  if (gated.length === 0) {
+    ok(`${served} static asset(s) serve as files`, 'not redirected to sign-in');
+  } else {
+    bad('static assets serve as files', gated.join(', '));
+  }
+
   /* -------------------------------------------------------- write paths -- */
   console.log('\nWRITE PATHS');
 
