@@ -295,6 +295,20 @@ export default async function StorefrontLayout({ children, params }: Props) {
                 {clinic.email && <a href={`mailto:${clinic.email}`}>{clinic.email}</a>}
               </p>
             </div>
+
+            {isSpa && (
+              <div>
+                <h4>PRF &amp; Guides</h4>
+                <ul className="sf-foot-links" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <li><Link href={links.prf}>PRF Complete Guide</Link></li>
+                  <li><Link href={links.prfCompare}>Compare PRF vs PRP &amp; Fillers</Link></li>
+                  <li><Link href={links.prfAftercare}>Pre-Care &amp; Recovery</Link></li>
+                  <li><Link href={`${links.prf}/under-eye`}>PRF Under-Eye</Link></li>
+                  <li><Link href={`${links.prf}/microneedling`}>PRF Microneedling</Link></li>
+                  <li><Link href={`${links.prf}/hair-restoration`}>Hair Restoration</Link></li>
+                </ul>
+              </div>
+            )}
           </div>
 
           {clinic.live ? (
