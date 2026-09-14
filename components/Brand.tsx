@@ -30,6 +30,8 @@ type BrandKit = {
   surfaceRaised?: string;
   borderColor?: string;
   displayFont?: string;
+  /** The interface face: nav, buttons, labels, prices, and the console. */
+  uiFont?: string;
   text?: string;
   textMuted?: string;
   textDim?: string;
@@ -107,12 +109,35 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
   const font = FONTS[rawFont] ?? (rawFont.includes(',') || rawFont.includes('"') ? rawFont : FONTS.system!);
   const displayFont = brand.displayFont ?? font;
 
+  /**
+   * THE THIRD FACE: the one the interface is built out of.
+   *
+   * The practice's printed material is set in a geometric sans — the wordmark,
+   * every headline, every service label — with a serif used for one paragraph.
+   * The site was Cormorant Garamond for all of it, so the two only related
+   * through the logo.
+   *
+   * Rather than swap one for the other, the job is split. Cormorant keeps the
+   * headings and the prose, which is where the banners also use a serif and
+   * where the practice's character lives. The sans takes everything that is
+   * furniture — navigation, buttons, eyebrows, labels, prices — which is both
+   * what the banners do and what Cormorant is worst at: a 0.68rem uppercase
+   * label with 0.16em tracking in a high-contrast old-style serif is a smear.
+   *
+   * Defaults to the body font, so a clinic that has not chosen one renders
+   * exactly as it did before this existed.
+   */
+  const rawUi = brand.uiFont ?? '';
+  const uiFont = FONTS[rawUi]
+    ?? (rawUi.includes(',') || rawUi.includes('"') ? rawUi : font);
+
   const tokens: Record<string, string> = {
     '--brand-accent': accent,
     '--brand-accent-ink': ink,
     '--brand-radius': `${radius}px`,
     '--brand-font': font,
     '--brand-display-font': displayFont,
+    '--brand-ui-font': uiFont,
     '--brand-logo-height': `${typeof brand.logoHeight === 'number' ? brand.logoHeight : 75}px`,
 
     /* ------------------------------------------------------------------

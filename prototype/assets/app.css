@@ -33,6 +33,34 @@ img { max-width: 100%; }
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
+
+/*
+ * THE STAFF CONSOLE IS SET IN THE INTERFACE FACE, ALL OF IT.
+ *
+ * --gd-font comes from the practice's brand kit, which for The Med Bar is
+ * Cormorant Garamond — chosen for a shopfront, not for a screen showing thirty
+ * appointments and a column of prices. It also never loaded here, because only
+ * the storefront layout ever injected a webfont link, so the console has in
+ * fact been rendering in Georgia this whole time. Nobody picked Georgia.
+ *
+ * The public site keeps the serif for its headings and its prose. A dense
+ * admin screen takes the sans the practice's own printed material uses for
+ * every label on it.
+ */
+.shell[data-app="staff"],
+.shell[data-app="staff"] input,
+.shell[data-app="staff"] select,
+.shell[data-app="staff"] textarea,
+.shell[data-app="staff"] button {
+  font-family: var(--brand-ui-font);
+}
+/*
+ * Tabular figures wherever a number should line up with the number under it —
+ * prices, times, counts. Montserrat carries the feature; Georgia's proportional
+ * digits are why columns of money in the console never quite aligned.
+ */
+.shell[data-app="staff"] { font-variant-numeric: tabular-nums; }
+
 /* ---------------------------------------------------------------- banner -- */
 /* Non-removable while PILOT_MODE is on. docs/09-compliance-register.md. */
 .pilot-banner {

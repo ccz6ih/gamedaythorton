@@ -52,6 +52,12 @@
      face but no separate display face would silently get the default. Both are
      restated here, where --brand-font is the kit's own value. */
   --brand-display-font: var(--brand-font);
+  /* And once more for the interface face, for exactly the same reason. The
+     storefront layout sets it per clinic from the kit; this is the fallback
+     for a practice that names a body font and no separate UI face, which
+     without this line would inherit the default sans from :root rather than
+     its own. */
+  --brand-ui-font:    var(--brand-font);
   --gd-font-num:      var(--brand-font);
   --gd-r-sm:          calc(var(--brand-radius) * 0.6);
   --gd-r-md:          var(--brand-radius);
@@ -6075,3 +6081,86 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   color: var(--gd-text-dim);
   margin-bottom: var(--gd-2);
 }
+
+/* ---------------------------------------------------------------------------
+   THE INTERFACE FACE
+   ---------------------------------------------------------------------------
+   The practice's printed material is set in a geometric sans: the wordmark,
+   every headline, and every service label on both banners. The site was
+   Cormorant Garamond throughout, so the two only related through the logo.
+
+   Rather than swap one for the other, the job is split. Cormorant keeps the
+   display headings and the prose — the banners use a serif for their body
+   paragraph too, and it is where the practice's character lives. The sans
+   takes everything that is FURNITURE: navigation, buttons, eyebrows, chips,
+   prices, spec rows, form controls.
+
+   That is both what the banners do and what Cormorant is worst at. A 0.68rem
+   uppercase label with 0.16em tracking, set in a high-contrast old-style
+   serif, is a smear — and this site has a lot of them.
+
+   Everything below is opt-in. Nothing that was serif becomes sans unless it is
+   named here, so a heading or a paragraph is untouched.
+   --------------------------------------------------------------------------- */
+
+.sf-nav-links .sf-link,
+.sf-burger,
+.sf-btn,
+.sf-eyebrow,
+.sf-chip,
+.sf-jump-link,
+.sf-item-reserve,
+.sf-item-price,
+.sf-card-price,
+.sf-card-brand,
+.sf-product-price,
+.sf-product-spec,
+.sf-finder-pill,
+.sf-matcher-pill,
+.sf-matcher-eyebrow,
+.sf-matcher-section-title,
+.sf-finder-eyebrow,
+.sf-hero-crumbs,
+.sf-breadcrumb,
+.sf-matrix-stat .lbl,
+.sf-matrix-table thead th,
+.sf-aftercare-step-num,
+.sf-pillar-num,
+.sf-compare-tag,
+.sf-timeline-badge,
+.sf-editorial-tag,
+.sf-cta-actions,
+.sf-finder-card-foot,
+.sf-product-routine-tag,
+.sf-step-pill,
+.sf label,
+.sf input,
+.sf select,
+.sf textarea,
+.sf button {
+  font-family: var(--brand-ui-font);
+}
+
+/*
+ * Numbers that sit in a column line up.
+ *
+ * Cormorant's figures are proportional and old-style — a 1 is narrow, a 3 and
+ * a 7 drop below the baseline — which is lovely in a sentence and wrong in a
+ * price list, where it made every column of money look slightly crooked.
+ */
+.sf-item-price,
+.sf-card-price,
+.sf-product-price,
+.sf-matrix-stat .val,
+.sf-row-time,
+.sf-finder-card-foot {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The nav sets a little tighter than the default.
+ *
+ * Montserrat has a wide default sidebearing, so a six-item menu that fitted
+ * comfortably in Cormorant runs into the Book button without this.
+ */
+.sf-nav-links .sf-link { letter-spacing: .01em; }

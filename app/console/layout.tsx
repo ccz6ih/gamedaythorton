@@ -90,6 +90,23 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
 
   return (
     <Brand clinic={clinic}>
+      {/*
+        THE CONSOLE NEVER HAD ITS OWN FONT.
+
+        Brand.tsx has always set --brand-font here from the practice's kit, so
+        every console screen was ASKING for Cormorant Garamond — but only the
+        storefront layout ever injected a webfont link. The console has been
+        rendering in Georgia, the fallback, since the day the practice picked a
+        face. It is why the dashboard and the calendar read oddly bookish for
+        an admin screen.
+
+        The fix is not a link here. The console's content security policy
+        admits no external style or font origin, deliberately — CLAUDE.md rule
+        3, no third-party requests from behind a login. So the interface face
+        is self-hosted from /public/fonts and declared in tokens.css, which
+        needs no policy change and hands nobody the IP of a staff member
+        opening the appointment book.
+      */}
       <PilotBanner pilotMode={process.env.PILOT_MODE !== 'false'} dbPilotMode={flags?.pilot_mode} />
       <ConsoleShell
         clinicName={clinic?.location_name ?? clinic?.name ?? 'Clinic'}

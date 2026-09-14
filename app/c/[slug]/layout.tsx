@@ -17,6 +17,7 @@ import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
 import { Analytics } from '@/components/Analytics';
 import { phone } from '@/lib/format';
+import { googleFontsHref } from '@/lib/webfonts';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,6 +127,17 @@ export default async function StorefrontLayout({ children, params }: Props) {
   }
   if (brand.font) style['--brand-font'] = brand.font;
   if (brand.displayFont) style['--brand-display-font'] = brand.displayFont;
+  /**
+   * The interface face has to be set HERE, not left to inherit.
+   *
+   * tokens.css declares `--brand-ui-font: var(--brand-font)` on :root, which
+   * RESOLVES there — against the default sans, not against this practice's
+   * font. A descendant inherits the already-computed value rather than the
+   * expression, so setting --brand-font on .sf does not carry through to it.
+   * Same trap that once rendered the console in Gameday's red; scripts/
+   * brand-test.cjs exists to catch it and did.
+   */
+  style['--brand-ui-font'] = brand.uiFont || brand.font || 'inherit';
 
   /**
    * Surface colours, when the practice wants a ground of its own.
@@ -185,7 +197,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
    * Every face named in the brand kit needs a real fallback, because this link
    * can fail and the page still has to read.
    */
-  const needsCormorant = /Cormorant/i.test(String(brand.displayFont ?? brand.font ?? ''));
+  const webFontLink = googleFontsHref([brand.displayFont, brand.font, brand.uiFont]);
 
   /**
    * LocalBusiness structured data, present on every storefront page.
@@ -238,12 +250,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
         />
       )}
-      {needsCormorant && (
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap"
-        />
-      )}
+      {webFontLink && <link rel="stylesheet" href={webFontLink} />}
       <Analytics measurementId={clinic.ga_measurement_id} />
       <StorefrontNav
         items={nav}
