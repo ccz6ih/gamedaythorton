@@ -68,7 +68,10 @@ const ALLOWED = new Set([
   'sf-art-nano', 'sf-art-peel', 'sf-art-rf', 'sf-art-scar', 'sf-art-syringe',
   'sf-art-under-eye', 'sf-art-volume-lash', 'sf-art-wax', 'sf-art-wellness',
   'sf-blade-body', 'sf-hydro-drop', 'sf-matrix-dot',
-  'sf-scar-stipple-1', 'sf-scar-stipple-2'
+  'sf-scar-stipple-1', 'sf-scar-stipple-2',
+  // Same role in the home-page discipline deck: one class per drawing, so the
+  // SVG is readable in the DOM. The moving parts inside them DO have rules.
+  'sf-art-prf', 'sf-art-jeuveau', 'sf-art-facials'
 ]);
 
 function readStylesheets() {

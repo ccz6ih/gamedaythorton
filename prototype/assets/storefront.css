@@ -5499,3 +5499,59 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   height: 2.25rem;
   display: block;
 }
+
+/* ---------------------------------------------------------------------------
+   DECK ARTWORK — the motion these were drawn for
+   ---------------------------------------------------------------------------
+   The home-page discipline deck ships four line drawings whose parts are named
+   for movement — orbit rings, a vortex stream, a pulse of target nodes, a
+   stipple matrix — with no animation defined for any of them. They have been
+   sitting still since they shipped, which is the same thing that happened to
+   .sf-prf-icon-spin.
+
+   Slow, and small. The file already sets the convention at 8-18s for this kind
+   of ambient motion (see .sf-vortex-outer), and anything faster on a page
+   someone is trying to read a price on stops being atmosphere and starts being
+   a distraction. Nothing here moves more than a few percent.
+   --------------------------------------------------------------------------- */
+
+@keyframes sf-deck-orbit { to { transform: rotate(360deg); } }
+@keyframes sf-deck-drift {
+  0%, 100% { stroke-dashoffset: 0; opacity: .3; }
+  50%      { stroke-dashoffset: -20; opacity: .55; }
+}
+@keyframes sf-deck-pulse {
+  0%, 100% { opacity: .45; }
+  50%      { opacity: 1; }
+}
+
+/* The rings turn about the middle of the 220x110 viewBox. transform-box is
+   required: without it an SVG child rotates about the origin of the whole
+   user-coordinate system and swings off the canvas. */
+.sf-orbit-outer,
+.sf-orbit-mid {
+  transform-origin: 110px 55px;
+  transform-box: view-box;
+}
+.sf-orbit-outer { animation: sf-deck-orbit 40s linear infinite; }
+.sf-orbit-mid   { animation: sf-deck-orbit 28s linear infinite reverse; }
+
+/* The dashed stream reads as flow by moving its dashes rather than the path,
+   so the drawing itself never shifts. */
+.sf-vortex-stream {
+  stroke-dasharray: 6 8;
+  animation: sf-deck-drift 9s ease-in-out infinite;
+}
+
+.sf-target-nodes  { animation: sf-deck-pulse 4.5s ease-in-out infinite; }
+.sf-stipple-matrix { animation: sf-deck-pulse 6s ease-in-out infinite; }
+
+/* tokens.css disables animation globally under reduced motion; restated here
+   because every rule above exists only to move something. */
+@media (prefers-reduced-motion: reduce) {
+  .sf-orbit-outer,
+  .sf-orbit-mid,
+  .sf-vortex-stream,
+  .sf-target-nodes,
+  .sf-stipple-matrix { animation: none; }
+}
