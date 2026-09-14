@@ -64,9 +64,9 @@ const clinic = {
   address_city: 'Loveland',
   address_state: 'CO',
   address_zip: '80538',
-  phone_voice: null,          // TODO discovery: not published
-  phone_text: null,           // TODO discovery
-  email: null,                // TODO discovery
+  phone_voice: null,
+  phone_text: null,
+  email: 'jamie@medbarco.com',
   timezone: 'America/Denver',
   // Published hours. Narrow and split across three days, which makes the
   // waitlist and self-serve rebooking matter more here than they would for a
@@ -83,7 +83,7 @@ const clinic = {
   brand: {
     clinicName: 'The Med Bar',
     locationName: 'Loveland',
-    tagline: 'Skin, lashes, and regenerative treatments.',
+    tagline: 'PRF & Regenerative Aesthetics · Loveland, CO',
     // Read off her existing site rather than guessed: near-black ground, rose
     // gold line art, cream. An earlier version of this file had a muted brown
     // on a light surface, which was nothing like her actual brand.
@@ -97,11 +97,10 @@ const clinic = {
     sportsVocabulary: false
   },
   visit_facts: {
-    parking: 'TODO discovery — parking situation at 2362 W 44th St.',
-    suite: 'TODO discovery — suite number and how to find the door.',
+    parking: 'Dedicated on-site parking lot directly in front of the building at 2362 W 44th St.',
     draw: 'PRF treatments begin with a standard blood draw, about a minute.',
     duration: 'Most treatments run 45–120 minutes. Your confirmation shows the exact length.',
-    privacy: 'Private treatment room. TODO discovery — confirm wording with the practice.',
+    privacy: 'Private single-client treatment room.',
     cost: 'Price is confirmed before anything begins. Buy Now Pay Later is available in person for $50–$4,000.'
   },
   pilot_mode: true

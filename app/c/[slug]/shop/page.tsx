@@ -30,7 +30,10 @@ import { AddToCart } from '@/components/AddToCart';
 import { money, titleCase } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Shop' };
+export const metadata: Metadata = {
+  title: 'Botanical Skincare Shop · Green Envee',
+  description: 'Shop organic, cold-pressed Green Envee skincare used in our clinical treatments. Clean serums, masks, and barrier-repair formulas shipped or available for studio pickup in Loveland, CO.'
+};
 
 export default async function Shop({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

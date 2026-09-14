@@ -27,7 +27,13 @@ export function Centrifuge() {
   return (
     <div className="sf-cent" aria-hidden="true">
       <div className="sf-cent-halo" />
-      <svg viewBox="0 0 440 440" className="sf-cent-svg">
+      <svg
+        viewBox="0 0 440 440"
+        className="sf-cent-svg"
+        aria-hidden="true"
+        role="presentation"
+        focusable="false"
+      >
         <defs>
           {/* PRF liquid gold gradient with warm luminescent core */}
           <linearGradient id="sf-prf-grad" x1="0" y1="0" x2="0" y2="1">

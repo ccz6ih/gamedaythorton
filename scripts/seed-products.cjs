@@ -30,7 +30,7 @@ const GREEN_ENVEE = [
   [
     'Acne Rescue Kit', 84.00, 2, 'kits',
     'Complete 4-step clarifying regimen formulated with organic botanicals, willow bark, and tea tree to calm breakouts, clear congested pores, and restore balance.',
-    'Includes Clarify Cleansing Gel, Clear Complexion Masque, Flora Elixir, and Clear Repair Serum. Specifically designed for oily, combination, and acne-prone skin types.'
+    'Includes Clarify Cleansing Gel, Clear Complexion Healing Masque, Flora Elixir Botanic Oil Serum, and Clear Repair Serum. Specifically designed for oily, combination, and acne-prone skin types.'
   ],
   [
     'Clear Repair Serum', 72.50, 1, 'serums',
@@ -39,82 +39,82 @@ const GREEN_ENVEE = [
   ],
   [
     'Flora Elixir', 72.50, 0, 'serums',
-    'Restorative probiotic essence mist crafted with nutrient-dense plant waters to balance skin flora, calm redness, and deliver immediate hydration.',
-    'Mist over face and neck after cleansing or throughout the day as an instant refreshing hydration boost.'
+    'Nutrient-rich botanic oil serum crafted with organic cold-pressed plant lipids and floral essences to fortify the barrier, replenish moisture, and impart a dewy glow.',
+    'Warm 3–4 drops in palms and gently press into clean face, neck, and décolleté following water-based serums or mist.'
   ],
   [
     'Glow C+ Brightening Serum', 91.00, 0, 'serums',
-    'High-potency antioxidant serum featuring stable Vitamin C, kakadu plum, and ferulic acid to brighten dull tone, fade hyperpigmentation, and boost collagen.',
+    'High-potency antioxidant serum featuring stable Vitamin C (tetrahexyldecyl ascorbate), kakadu plum, and ferulic acid to brighten dull tone, fade hyperpigmentation, and boost collagen.',
     'Apply 3–4 drops each morning to clean skin. Follow with moisturizer and daily broad-spectrum SPF.'
   ],
   [
     'H.A. Collagen Boosting Serum', 83.00, 0, 'serums',
-    'Multi-molecular hyaluronic acid serum with snow mushroom and vegan peptides to deeply hydrate, plump fine lines, and strengthen elasticity.',
+    'Multi-molecular hyaluronic acid serum with snow mushroom extract and botanical peptides to deeply hydrate, plump fine lines, and strengthen elasticity.',
     'Apply morning and night to slightly damp skin for optimal moisture binding. Excellent following peels or microneedling.'
   ],
   [
     'Hydrate Facial Mist', 33.00, 2, 'hydration',
-    'Refreshing botanical face mist infused with rosewater, aloe, and soothing chamomile to calm irritation and restore moisture balance on contact.',
-    'Spritz generously over face and neck after cleansing, post-treatment, or over makeup throughout the day.'
+    'Refreshing botanical toning mist infused with organic rosewater, aloe vera, and calming chamomile to balance pH and quench thirsty skin on contact.',
+    'Spritz generously over face and neck after cleansing, post-treatment, or over makeup throughout the day as an instant hydration reset.'
   ],
   [
     'Illuminate Enzyme Cleansing Powder', 42.50, 1, 'exfoliants',
-    'Water-activated micro-exfoliating powder combining papaya, pineapple enzymes, and rice bran to polish away dull cells for instant radiance.',
+    'Water-activated micro-exfoliating powder combining papaya, pineapple enzymes, and rice bran to gently polish away dull surface cells for instant radiance.',
     'Dispense into wet hands, lather into a creamy foam, and massage gently over damp skin for 60 seconds before rinsing with lukewarm water.'
   ],
   [
     'Mandelic Resurfacing Serum 8%', 81.00, 0, 'serums',
-    'Gentle AHA resurfacing treatment with 8% mandelic and lactic acids to smooth rough texture, clear pores, and brighten post-blemish discoloration.',
+    'Gentle AHA resurfacing treatment with 8% mandelic and lactic acids to smooth rough texture, clear congested pores, and brighten post-blemish discoloration.',
     'Ideal for sensitive, acne-prone, and reactive skin. Apply 3–4 drops in the evening 2–4 times weekly.'
   ],
   [
     'Post Peel Kit', 87.00, 0, 'kits',
     'Calming recovery system formulated with barrier-repair lipids and soothing botanicals to accelerate healing following chemical peels or clinical facials.',
-    'Includes gentle botanical cleanser, soothing essence mist, restorative moisture balm, and antioxidant protection to support optimal recovery.'
+    'Includes gentle botanical cleanser, soothing essence mist, restorative moisture balm, and antioxidant protection to support optimal barrier recovery.'
   ],
   [
     'Protect Antioxidant Moisturizer', 66.00, 0, 'hydration',
-    'Daily protective cream rich in CoQ10, green tea, and plant ceramides to shield against environmental stress, soothe inflammation, and seal in hydration.',
+    'Daily protective cream rich in CoQ10, green tea, and plant ceramides to shield against environmental oxidative stress, soothe inflammation, and seal in hydration.',
     'Massage 1–2 pumps onto clean face and neck morning and evening. Perfect for normal, combination, and sensitive skin.'
   ],
   [
     'Pumpkin Glycolic Peel 3%', 53.00, 0, 'exfoliants',
-    'Nutrient-rich enzyme peel with organic pumpkin puree, 3% glycolic acid, and honey to dissolve dead surface buildup and reveal glowing, luminous skin.',
+    'Nutrient-rich enzyme peel with organic pumpkin puree, 3% glycolic acid, and raw honey to dissolve dead keratinized buildup and reveal glowing, luminous skin.',
     'Apply a thin layer to clean skin for 5–10 minutes depending on tolerance. Rinse thoroughly with cool water. Use 1–2 times weekly.'
   ],
   [
     'Purify Cleansing Oil', 37.00, 0, 'exfoliants',
-    'Luxurious botanical oil cleanser that melts away makeup, sunscreen, and daily impurities while nourishing the lipid barrier.',
+    'Luxurious botanical oil cleanser with sunflower, jojoba, and lavender that melts away makeup, sunscreen, and daily sebum without stripping the skin.',
     'Massage 2–3 pumps onto dry skin, emulsify with warm water, and rinse clean. Follow with a water-based cleanser if double cleansing.'
   ],
   [
     'Refine Polishing Facial Scrub', 45.50, 0, 'exfoliants',
-    'Gentle dual-action physical and enzymatic scrub with micro-jojoba beads and fruit enzymes to smooth texture without micro-tears.',
+    'Gentle dual-action physical and enzymatic scrub with biodegradable micro-jojoba beads and fruit enzymes to refine texture without micro-tears.',
     'Gently massage onto damp skin in circular motions for 1–2 minutes, avoiding the eye area. Rinse thoroughly. Use 1–2 times per week.'
   ],
   [
     'Renew Eye Complex', 68.00, 0, 'hydration',
-    'Targeted peptide eye cream with caffeine and botanical extracts to diminish dark circles, reduce under-eye puffiness, and firm delicate contours.',
+    'Targeted peptide eye cream with green coffee caffeine and marine botanical extracts to diminish dark circles, reduce under-eye puffiness, and firm delicate contours.',
     'Gently pat half a pump around the orbital bone morning and night using your ring finger.'
   ],
   [
     'Restore Hydration Masque', 63.00, 0, 'hydration',
-    'Deeply replenishing gel-cream masque with hyaluronic acid and blue tansy to soothe thirsty, sensitized, or sun-exposed skin.',
+    'Deeply replenishing gel-cream masque with hyaluronic acid, blue tansy, and aloe to soothe thirsty, sensitized, or post-treatment skin.',
     'Apply generously to face and neck. Leave on for 15–20 minutes, then rinse or leave on overnight as an intensive recovery treatment.'
   ],
   [
     'Retinal Renewal Complex', 121.00, 0, 'serums',
-    'Advanced encapsulated retinaldehyde (Vitamin A) with bakuchiol to stimulate cellular renewal, refine lines, and clarify tone with superior tolerance.',
+    'Advanced encapsulated retinaldehyde (0.05% Vitamin A) with bakuchiol to accelerate cellular renewal, refine lines, and clarify tone with superior tolerance.',
     'Apply 1–2 pumps in the evening to clean, dry skin 2–3 nights weekly, building to nightly use as tolerated. Always wear daily SPF.'
   ],
   [
     'Revitalize Eye Gel', 68.00, 0, 'hydration',
-    'Cooling, depuffing eye gel infused with green tea, cucumber, and marine peptides to revive tired eyes and reduce morning puffiness.',
+    'Cooling, depuffing eye gel infused with green tea, cucumber, and botanical peptides to revive tired eyes and reduce fluid retention.',
     'Dab lightly around eye area morning and night. Store in refrigerator for an enhanced cooling and depuffing sensation.'
   ],
   [
     'Vahati Herb Infused Healing Oil', 71.60, 0, 'hydration',
-    'Sacred multi-correctional face oil with cold-pressed moringa, rosehip, and calendula to calm reactivity, heal dry patches, and impart a dewy glow.',
+    'Sacred Ayurvedic multi-correctional face oil with cold-pressed moringa, ashwagandha, and calendula to calm reactivity, heal dry patches, and restore skin vitality.',
     'Warm 3–4 drops in palms and gently press into face, neck, and décolleté as the finishing step in your skincare ritual.'
   ]
 ];

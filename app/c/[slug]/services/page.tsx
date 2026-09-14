@@ -34,7 +34,10 @@ import { priceLabel, titleCase, money } from '@/lib/format';
 import { PRF_TREATMENTS } from '@/lib/prf-content';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Services & Pricing' };
+export const metadata: Metadata = {
+  title: 'Treatment Menu & Pricing · PRF, Lashes & Facials',
+  description: 'Explore signature PRF (Platelet-Rich Fibrin) injections, microneedling, UV lash extensions, and botanical facials at The Med Bar in Loveland, CO.'
+};
 
 /** Category order the practice would read out, not alphabetical. */
 const CATEGORY_ORDER = [

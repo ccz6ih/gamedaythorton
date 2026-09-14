@@ -36,17 +36,15 @@ export async function generateMetadata(
     ? `${clinic.address_city}, ${clinic.address_state}`
     : clinic.location_name ?? '';
 
+  const titleText = `${name} · PRF & Regenerative Aesthetics${where ? ` · ${where}` : ''}`;
+
   /**
    * The title says WHAT and WHERE, not just who.
-   *
-   * "The Med Bar · Loveland" is what the practice calls itself and tells a
-   * stranger nothing. Somebody scanning a search result or a row of tabs needs
-   * to know it is a med spa and that it is near them — those two facts are what
-   * make the difference between a click and a scroll past.
+   * Includes highest-intent search keywords: PRF (Platelet-Rich Fibrin), Aesthetics, Loveland CO.
    */
   const description = clinic.tagline
     ?? clinic.intro
-    ?? `Aesthetics, lashes and regenerative treatments${where ? ` in ${where}` : ''}.`;
+    ?? `The Med Bar in Loveland, CO specializes in PRF (Platelet-Rich Fibrin) under-eye & microneedling treatments, hair restoration, UV lashes, and medical-grade botanical skincare.`;
 
   /**
    * A DRAWN favicon rather than the practice's logo.
@@ -64,7 +62,7 @@ export async function generateMetadata(
   return {
     ...(base ? { metadataBase: new URL(base) } : {}),
     title: {
-      default: `${name}${where ? ` · ${where}` : ''}`,
+      default: titleText,
       template: `%s · ${name}`
     },
     description,
@@ -81,13 +79,13 @@ export async function generateMetadata(
     openGraph: {
       type: 'website',
       siteName: name,
-      title: `${name}${where ? ` · ${where}` : ''}`,
+      title: titleText,
       description,
       locale: 'en_US'
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${name}${where ? ` · ${where}` : ''}`,
+      title: titleText,
       description
     },
     // Still noindex while this is a pilot. A storefront carrying a real
