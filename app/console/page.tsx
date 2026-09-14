@@ -129,6 +129,23 @@ export default async function ScoreboardPage() {
                 : 'All intakes complete'
             }
           />
+
+          {/* What is coming, which the dashboard could not say before. A
+              booking taken online for next Tuesday appeared nowhere until
+              Tuesday — on a practice whose website exists so that bookings
+              arrive unattended, that is the wrong thing to be silent about. */}
+          <Stat
+            label="Booked ahead"
+            value={board.upcomingCount}
+            unit={board.upcomingCount === 1 ? 'appointment' : 'appointments'}
+            note={
+              board.newBookings
+                ? `${board.newBookings} came in today`
+                : board.upcomingOnline
+                  ? `${board.upcomingOnline} booked on the website`
+                  : 'Nothing new since yesterday'
+            }
+          />
         </div>
 
         {attention.length > 0 && (

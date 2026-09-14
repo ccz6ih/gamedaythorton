@@ -55,6 +55,12 @@ export type Scoreboard = {
   avgMonthsRetained: number;
   todayCount: number;
   todayMissingIntake: number;
+  /** Booked and still to come, beyond today. */
+  upcomingCount: number;
+  /** Of those, taken on the website rather than by the front desk. */
+  upcomingOnline: number;
+  /** Bookings that arrived in the last 24 hours, whenever they are for. */
+  newBookings: number;
   openTasks: number;
   highPriorityTasks: number;
   unreadMessages: number;
@@ -69,12 +75,23 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
   const supabase = await serverClient();
   const today = dayKey(new Date().toISOString(), clinic.timezone);
 
-  const [memberships, appts, tasks, threads, payments, purchases, redemptions, treatments] =
+  const [memberships, appts, ahead, tasks, threads, payments, purchases, redemptions, treatments] =
     await Promise.all([
       supabase.from('membership').select('status, mrr_cents, started_at, cancelled_at'),
       supabase.from('appointment').select('id, starts_at, status, intake_complete')
         .gte('starts_at', today + 'T00:00:00')
         .lte('starts_at', today + 'T23:59:59'),
+      // Everything still to come after today, and how it was booked. The
+      // dashboard could only see today, so a booking taken online for next
+      // Tuesday appeared nowhere until Tuesday — on a practice whose website
+      // exists so bookings arrive unattended, that is the wrong thing to be
+      // silent about.
+      supabase.from('appointment')
+        .select('id, starts_at, status, booking_channel, created_at')
+        .gt('starts_at', today + 'T23:59:59')
+        .in('status', ['booked', 'confirmed'])
+        .order('starts_at')
+        .limit(200),
       supabase.from('task').select('id, priority').eq('done', false),
       supabase.from('message_thread').select('unread_staff'),
       supabase.from('payment').select('amount_cents, status, created_at'),
@@ -130,6 +147,11 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
     avgMonthsRetained: avgMonths,
     todayCount: todays.length,
     todayMissingIntake: todays.filter(a => !a.intake_complete).length,
+    upcomingCount: (ahead.data ?? []).length,
+    upcomingOnline: (ahead.data ?? []).filter(a => a.booking_channel === 'online').length,
+    newBookings: (ahead.data ?? []).filter(
+      a => Date.now() - new Date(String(a.created_at)).getTime() < 864e5
+    ).length,
     openTasks: (tasks.data ?? []).length,
     highPriorityTasks: (tasks.data ?? []).filter(t => t.priority === 'high').length,
     unreadMessages: (threads.data ?? []).reduce((s, t) => s + (t.unread_staff ?? 0), 0),

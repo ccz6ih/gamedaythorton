@@ -178,6 +178,72 @@ function nextOpenDate(hours, offsetDays = 3) {
   }
 
   /* ===================================================================
+     A BOOKING NEVER LANDS ON SOMEBODY ELSE'S CHART
+     ===================================================================
+     The bug this replaced: matching on email alone. Craig booked as "Craig
+     Carda" with an address already on Sarah Carda's record, and the day sheet
+     showed Sarah arriving twice.
+
+     Households share an address constantly, and a med spa is exactly where that
+     happens. Filing the wrong person's visit means the practitioner preps for
+     the wrong face and — once notes exist, which are append-only — clinical
+     history accumulates on a chart it does not belong to. */
+  console.log('\nA VISIT CANNOT LAND ON SOMEBODY ELSE’S CHART');
+
+  const SHARED = 'household-test@example.invalid';
+  const freshSlots = async () => {
+    const r = await rpc('public_slots', {
+      p_clinic_slug: SLUG, p_service_id: service.id, p_date: openDate
+    });
+    return Array.isArray(r.body) ? r.body : [];
+  };
+
+  const s1 = await freshSlots();
+  const first = s1.length ? await rpc('book_appointment', {
+    p_clinic_slug: SLUG, p_service_id: service.id, p_date: openDate, p_time: s1[0],
+    p_first: 'Alex', p_last: 'Household', p_email: SHARED
+  }) : null;
+
+  if (first && first.status < 300) {
+    ok('a new address creates a chart');
+
+    // Same person, typed carelessly. Must be recognised, not duplicated.
+    const s2 = await freshSlots();
+    const same = s2.length ? await rpc('book_appointment', {
+      p_clinic_slug: SLUG, p_service_id: service.id, p_date: openDate, p_time: s2[0],
+      p_first: '  alex ', p_last: 'HOUSEHOLD', p_email: SHARED
+    }) : null;
+
+    if (same && same.status < 300 && same.body?.matched_existing === true) {
+      ok('the same person, typed carelessly, is recognised', 'case and spacing ignored');
+    } else {
+      bad('the same person, typed carelessly, is recognised',
+          JSON.stringify(same?.body).slice(0, 160));
+    }
+
+    // A different person on the same address. Must be refused, not filed.
+    const s3 = await freshSlots();
+    const other = s3.length ? await rpc('book_appointment', {
+      p_clinic_slug: SLUG, p_service_id: service.id, p_date: openDate, p_time: s3[0],
+      p_first: 'Jordan', p_last: 'Household', p_email: SHARED
+    }) : null;
+
+    if (other && other.status >= 400) {
+      ok('a different name on the same address is refused', `refused (${other.status})`);
+      const msg = String(other.body?.message ?? '');
+      // The refusal must not name who else uses the address — that would
+      // confirm a client of this practice to anyone who guessed an email.
+      if (!/alex/i.test(msg)) ok('and the refusal does not say who it belongs to');
+      else bad('and the refusal does not say who it belongs to', msg.slice(0, 120));
+    } else {
+      bad('a different name on the same address is refused',
+          'a visit was filed against another person’s chart');
+    }
+  } else {
+    bad('a new address creates a chart', JSON.stringify(first?.body).slice(0, 160));
+  }
+
+  /* ===================================================================
      BAD INPUT
      =================================================================== */
   console.log('\nBAD INPUT IS REFUSED');
@@ -222,12 +288,12 @@ function nextOpenDate(hours, offsetDays = 3) {
     await admin.connect();
     await admin.query(
       `delete from appointment a using patient p
-        where p.id = a.patient_id and p.email in ($1, 'booking-test-2@example.invalid')`, [TEST_EMAIL]);
-    await admin.query(`delete from lead where email in ($1, 'booking-test-2@example.invalid')`, [TEST_EMAIL]);
-    await admin.query(`delete from patient where email in ($1, 'booking-test-2@example.invalid')`, [TEST_EMAIL]);
+        where p.id = a.patient_id and p.email in ($1, 'booking-test-2@example.invalid', 'household-test@example.invalid')`, [TEST_EMAIL]);
+    await admin.query(`delete from lead where email in ($1, 'booking-test-2@example.invalid', 'household-test@example.invalid')`, [TEST_EMAIL]);
+    await admin.query(`delete from patient where email in ($1, 'booking-test-2@example.invalid', 'household-test@example.invalid')`, [TEST_EMAIL]);
 
     const { rows } = await admin.query(
-      `select count(*)::int as n from patient where email in ($1, 'booking-test-2@example.invalid')`, [TEST_EMAIL]);
+      `select count(*)::int as n from patient where email in ($1, 'booking-test-2@example.invalid', 'household-test@example.invalid')`, [TEST_EMAIL]);
     await admin.end();
 
     if (rows[0].n === 0) ok('test bookings removed', 'and verified gone');

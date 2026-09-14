@@ -321,3 +321,78 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
 
   return { logged: true, delivered: sent.ok, reason: sent.reason };
 }
+
+/* ----------------------------------------------------------- reminders -- */
+
+export type ReminderEmail = {
+  appointmentId: string;
+  clinicId: string;
+  clinicName: string;
+  practicePhone: string | null;
+  clientName: string;
+  clientEmail: string;
+  serviceName: string;
+  whenText: string;
+};
+
+/**
+ * The day-before reminder.
+ *
+ * THE LOG ROW IS WRITTEN FIRST, and that ordering is the whole anti-duplicate
+ * mechanism. app/api/cron/reminders skips any appointment that already has a
+ * row for this rule, so if the send crashes half way the appointment is marked
+ * as attempted and is not retried.
+ *
+ * That trade is deliberate: a missed reminder costs one person a nudge they
+ * would probably have survived without, and their confirmation email still
+ * exists. Four reminders at three in the morning costs the practice a client.
+ */
+export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyResult> {
+  const supabase = await serverClient();
+
+  // Claim it before attempting anything.
+  const { error: claimError } = await supabase.from('automation_run').insert({
+    clinic_id: r.clinicId,
+    rule_key: 'appointment_reminder',
+    channel: 'email',
+    payload_preview: notificationPreview(r.clinicName, 'appointment_reminder'),
+    payload_ref: r.appointmentId,
+    consent_verified: false,
+    synthetic: false,
+    status: 'logged_not_sent'
+  });
+
+  if (claimError) {
+    // Most likely somebody else claimed it a moment ago. Not an error worth
+    // shouting about, and definitely not a reason to send anyway.
+    return { logged: false, delivered: false, reason: 'already claimed' };
+  }
+
+  const body = [
+    `Hi ${r.clientName.split(' ')[0]},`,
+    '',
+    `A reminder about your appointment at ${r.clinicName}:`,
+    '',
+    `  ${r.serviceName}`,
+    `  ${r.whenText}`,
+    '',
+    'If anything has changed, reply to this email'
+      + (r.practicePhone ? ` or call ${r.practicePhone}.` : '.'),
+    '',
+    `— ${r.clinicName}`
+  ].join('\n');
+
+  const sent = await deliver(r.clientEmail, `Tomorrow at ${r.clinicName}`, body);
+
+  // Update the claim with what actually happened.
+  await supabase
+    .from('automation_run')
+    .update({
+      status: sent.ok ? 'sent' : 'failed',
+      ...(sent.ok ? { sent_at: new Date().toISOString() } : { error: sent.reason })
+    })
+    .eq('rule_key', 'appointment_reminder')
+    .eq('payload_ref', r.appointmentId);
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}

@@ -54,7 +54,8 @@ export type BookingResult =
 const OURS = [
   'not taking online bookings', 'not available to book online',
   'first and last name', 'email address does not look right', 'Pick a time',
-  'just been taken', 'several bookings for this email'
+  'just been taken', 'several bookings for this email',
+  'already on file for someone else'
 ];
 
 export async function book(input: {

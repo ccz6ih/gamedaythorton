@@ -296,7 +296,19 @@ async function cannotRead(label, table) {
   // The enforcement referred to in lib/supabase/service.ts. If someone imports
   // it into a page, this fails — which is the whole point of writing it down
   // as a test rather than as a comment.
-  const ALLOWED = ['app/api/stripe/webhook/route.ts'];
+  /**
+   * Both callers hold the same property: no user input reaches them.
+   *
+   *   the Stripe webhook   authenticated by an HMAC over the raw body
+   *   the reminder cron    authenticated by a shared secret, takes no input at
+   *                        all — it reads the calendar and sends
+   *
+   * Anything else added here needs the same argument made in the same place.
+   */
+  const ALLOWED = [
+    'app/api/stripe/webhook/route.ts',
+    'app/api/cron/reminders/route.ts'
+  ];
 
   function walk(dir, out = []) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
