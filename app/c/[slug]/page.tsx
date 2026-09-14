@@ -166,32 +166,47 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             </div>
 
             <div className="sf-menu-group" style={{ marginTop: 'var(--gd-8)' }}>
-              {signature.map(s => (
-                <article className="sf-item" key={s.id}>
-                  <span className="sf-item-mark" aria-hidden="true">
-                    <ServiceIcon name={s.name} category={s.category} />
-                  </span>
-                  <div className="sf-item-body">
-                    <h3 className="sf-item-name">
-                      <Link href={`${links.book}?service=${encodeURIComponent(s.id)}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                        {s.name}
+              {signature.map(s => {
+                const badge = s.name.includes('Jeuveau')
+                  ? 'Neurotoxin'
+                  : s.name.includes('Hair')
+                  ? 'Follicle Restoration'
+                  : s.name.includes('Microneedl')
+                  ? 'Collagen Induction'
+                  : s.name.includes('PRF')
+                  ? 'Regenerative PRF'
+                  : s.category === 'paramedical'
+                  ? 'Scar Revision'
+                  : null;
+
+                return (
+                  <article className="sf-item" key={s.id}>
+                    <span className="sf-item-mark" aria-hidden="true">
+                      <ServiceIcon name={s.name} category={s.category} />
+                    </span>
+                    <div className="sf-item-body">
+                      {badge && <div className="sf-card-brand">{badge}</div>}
+                      <h3 className="sf-item-name">
+                        <Link href={`${links.book}?service=${encodeURIComponent(s.id)}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                          {s.name}
+                        </Link>
+                      </h3>
+                      {s.description && <p className="sf-item-desc">{s.description}</p>}
+                    </div>
+                    <div className="sf-item-price">
+                      <span className="amount">{priceLabel(s)}</span>
+                      <span className="dur">{s.duration_min} min</span>
+                      <Link
+                        href={`${links.book}?service=${encodeURIComponent(s.id)}`}
+                        className="sf-btn primary sm"
+                        style={{ marginTop: 'var(--gd-2)', display: 'inline-flex' }}
+                      >
+                        Book &rarr;
                       </Link>
-                    </h3>
-                    {s.description && <p className="sf-item-desc">{s.description}</p>}
-                  </div>
-                  <div className="sf-item-price">
-                    <span className="amount">{priceLabel(s)}</span>
-                    <span className="dur">{s.duration_min} min</span>
-                    <Link
-                      href={`${links.book}?service=${encodeURIComponent(s.id)}`}
-                      className="sf-btn ghost sm"
-                      style={{ marginTop: 'var(--gd-2)', display: 'inline-flex' }}
-                    >
-                      Book
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
 
             <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>

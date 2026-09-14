@@ -21,7 +21,7 @@ type Props = { name: string; category: string; className?: string };
 const S = {
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 1.4,
+  strokeWidth: 1.6,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const
 };
@@ -32,13 +32,13 @@ function Lash() {
   return (
     <>
       {/* closed eye with elegant curved extensions */}
-      <path d="M4 15c4.5 4.2 11.5 4.2 16 0" {...S} strokeWidth={1.6} />
-      <path d="M4.6 14.2c-1.1-1.8-1.7-3.8-1.9-5.2" {...S} />
-      <path d="M8 17c-.8-2.2-1.2-4.5-1.3-6.5" {...S} />
-      <path d="M12 18V10" {...S} strokeWidth={1.5} />
-      <path d="M16 17c.8-2.2 1.2-4.5 1.3-6.5" {...S} />
-      <path d="M19.4 14.2c1.1-1.8 1.7-3.8 1.9-5.2" {...S} />
-      <circle cx="12" cy="18" r="1" fill="currentColor" opacity="0.3" stroke="none" />
+      <path d="M3.5 15c4.8 4.5 12.2 4.5 17 0" {...S} strokeWidth={1.8} />
+      <path d="M4.2 14c-1.2-2-1.8-4.2-2-5.8" {...S} strokeWidth={1.7} />
+      <path d="M8 17c-.9-2.5-1.3-5-1.4-7.2" {...S} strokeWidth={1.7} />
+      <path d="M12 18.2V9.5" {...S} strokeWidth={1.8} />
+      <path d="M16 17c.9-2.5 1.3-5 1.4-7.2" {...S} strokeWidth={1.7} />
+      <path d="M19.8 14c1.2-2 1.8-4.2 2-5.8" {...S} strokeWidth={1.7} />
+      <circle cx="12" cy="18.2" r="1.2" fill="currentColor" stroke="none" />
     </>
   );
 }
@@ -46,22 +46,23 @@ function Lash() {
 function Syringe() {
   return (
     <>
-      {/* cosmetic precision syringe with subtle body fill */}
+      {/* cosmetic precision syringe with barrel & plunger */}
       <path
-        d="M13.5 8.5 18.5 3.5a1.4 1.4 0 0 1 2 2L15.5 10.5"
+        d="M13.5 8.5 19 3a1.4 1.4 0 0 1 2 2L15.5 10.5"
         {...S}
+        strokeWidth={1.7}
       />
       <path
         d="M12.5 9.5 5.5 16.5a1.8 1.8 0 0 0 0 2.5l.5.5a1.8 1.8 0 0 0 2.5 0l7-7Z"
         {...S}
         fill="currentColor"
-        fillOpacity="0.16"
+        fillOpacity="0.25"
       />
-      <path d="m4.5 19.5-2.2 2.2" {...S} strokeWidth={1.6} />
-      <path d="m11.5 10.5 2 2" {...S} />
-      <path d="m9 13 2 2" {...S} />
-      <path d="m17 2 5 5" {...S} strokeWidth={1.6} />
-      <circle cx="2.3" cy="21.7" r="0.6" fill="currentColor" stroke="none" />
+      <path d="m4.5 19.5-2.5 2.5" {...S} strokeWidth={1.8} />
+      <path d="m11.5 10.5 2 2" {...S} strokeWidth={1.5} />
+      <path d="m9 13 2 2" {...S} strokeWidth={1.5} />
+      <path d="m17 2 5 5" {...S} strokeWidth={1.8} />
+      <circle cx="2" cy="22" r="0.9" fill="currentColor" stroke="none" />
     </>
   );
 }
@@ -71,16 +72,16 @@ function Droplet() {
     <>
       {/* PRF platelet droplet with radiant core */}
       <path
-        d="M12 2.5C8.2 7 5.5 10.8 5.5 14.2a6.5 6.5 0 0 0 13 0c0-3.4-2.7-7.2-6.5-11.7Z"
+        d="M12 2.2C7.8 7 4.8 11.2 4.8 14.8a7.2 7.2 0 0 0 14.4 0c0-3.6-3-7.8-7.2-12.6Z"
         {...S}
         fill="currentColor"
-        fillOpacity="0.18"
+        fillOpacity="0.25"
       />
       {/* internal glow curve & platelets */}
-      <path d="M8.8 14.8a3.5 3.5 0 0 0 3.5 3.5" {...S} strokeWidth={1.2} opacity="0.8" />
-      <circle cx="12" cy="13.5" r="1.4" fill="currentColor" stroke="none" opacity="0.75" />
-      <circle cx="14.2" cy="11.2" r="0.8" fill="currentColor" stroke="none" opacity="0.6" />
-      <circle cx="10" cy="11" r="0.7" fill="currentColor" stroke="none" opacity="0.6" />
+      <path d="M8.2 15.2a3.8 3.8 0 0 0 3.8 3.8" {...S} strokeWidth={1.4} opacity="0.9" />
+      <circle cx="12" cy="13.2" r="1.6" fill="#ffffff" stroke="none" opacity="0.9" />
+      <circle cx="14.6" cy="10.8" r="1" fill="#ffffff" stroke="none" opacity="0.75" />
+      <circle cx="9.6" cy="10.5" r="0.9" fill="#ffffff" stroke="none" opacity="0.75" />
     </>
   );
 }
@@ -90,15 +91,15 @@ function Microneedle() {
     <>
       {/* precision microneedling pen with channel matrix */}
       <path
-        d="M8.5 16.5 17 8l2.5 2.5-8.5 8.5-3.8 1Z"
+        d="M8.5 16.5 17 8l2.5 2.5-8.5 8.5-4 1Z"
         {...S}
         fill="currentColor"
-        fillOpacity="0.16"
+        fillOpacity="0.25"
       />
-      <path d="m17 8 1.8-1.8a1.6 1.6 0 0 1 2.3 0l.4.4a1.6 1.6 0 0 1 0 2.3L19.5 10.5" {...S} />
+      <path d="m17 8 2-2a1.6 1.6 0 0 1 2.3 0l.4.4a1.6 1.6 0 0 1 0 2.3L19.5 10.5" {...S} strokeWidth={1.7} />
       {/* micro-channel active matrix */}
       {[0, 1, 2].map(r => [0, 1, 2].map(c => (
-        <circle key={`${r}-${c}`} cx={3.8 + c * 2.2} cy={4.2 + r * 2.2} r=".6" fill="currentColor" stroke="none" opacity="0.8" />
+        <circle key={`${r}-${c}`} cx={3.6 + c * 2.4} cy={4 + r * 2.4} r=".75" fill="currentColor" stroke="none" opacity="0.9" />
       )))}
     </>
   );
@@ -109,15 +110,15 @@ function Hair() {
     <>
       {/* regenerative hair follicle & strands */}
       <path
-        d="M4.5 20.5c0-6.8 3.5-11.5 7.5-11.5s7.5 4.7 7.5 11.5"
+        d="M4 21c0-7.2 3.8-12.2 8-12.2s8 5 8 12.2"
         {...S}
         fill="currentColor"
-        fillOpacity="0.12"
+        fillOpacity="0.2"
       />
-      <path d="M7.8 20.5c0-4.8 2-8.2 4.2-8.2s4.2 3.4 4.2 8.2" {...S} />
-      <path d="M12 9V3.5" {...S} strokeWidth={1.5} />
-      <path d="M12 3.5 9.5 5.5M12 3.5l2.5 2" {...S} />
-      <circle cx="12" cy="16.5" r="1.2" fill="currentColor" stroke="none" opacity="0.7" />
+      <path d="M7.5 21c0-5.2 2.2-8.8 4.5-8.8s4.5 3.6 4.5 8.8" {...S} strokeWidth={1.5} />
+      <path d="M12 8.8V2.8" {...S} strokeWidth={1.8} />
+      <path d="M12 2.8 9.2 5M12 2.8l2.8 2.2" {...S} strokeWidth={1.8} />
+      <circle cx="12" cy="16.8" r="1.5" fill="#ffffff" stroke="none" opacity="0.85" />
     </>
   );
 }
@@ -125,11 +126,11 @@ function Hair() {
 function Peel() {
   return (
     <>
-      <circle cx="12" cy="12" r="8.5" {...S} fill="currentColor" fillOpacity="0.14" />
-      <path d="M12 3.5a8.5 8.5 0 0 0 0 17" {...S} strokeDasharray="2.5 2.5" />
-      <circle cx="8.5" cy="9" r="1.1" fill="currentColor" stroke="none" opacity="0.7" />
-      <circle cx="15" cy="8.5" r="1.1" fill="currentColor" stroke="none" opacity="0.7" />
-      <circle cx="14.5" cy="15" r="1.1" fill="currentColor" stroke="none" opacity="0.7" />
+      <circle cx="12" cy="12" r="8.8" {...S} fill="currentColor" fillOpacity="0.2" />
+      <path d="M12 3.2a8.8 8.8 0 0 0 0 17.6" {...S} strokeDasharray="2.8 2.8" strokeWidth={1.7} />
+      <circle cx="8" cy="9" r="1.3" fill="currentColor" stroke="none" opacity="0.85" />
+      <circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none" opacity="0.85" />
+      <circle cx="15" cy="15.5" r="1.3" fill="currentColor" stroke="none" opacity="0.85" />
     </>
   );
 }
@@ -137,12 +138,12 @@ function Peel() {
 function Led() {
   return (
     <>
-      <path d="M5 5h14v5.5H5z" {...S} fill="currentColor" fillOpacity="0.15" />
-      <path d="M12 10.5v3.5" {...S} />
-      <path d="M6 18h12" {...S} strokeWidth={1.6} />
-      <path d="M8 21h8" {...S} />
-      {[7.5, 10.5, 13.5, 16.5].map(x => (
-        <path key={x} d={`M${x} 13v2`} {...S} strokeWidth={1.2} />
+      <path d="M4.5 4.5h15v6h-15z" {...S} fill="currentColor" fillOpacity="0.22" />
+      <path d="M12 10.5v4" {...S} strokeWidth={1.8} />
+      <path d="M5.5 18.5h13" {...S} strokeWidth={1.8} />
+      <path d="M7.5 21.5h9" {...S} strokeWidth={1.6} />
+      {[7.2, 10.4, 13.6, 16.8].map(x => (
+        <path key={x} d={`M${x} 13.5v2.2`} {...S} strokeWidth={1.4} />
       ))}
     </>
   );
@@ -151,10 +152,10 @@ function Led() {
 function ScarPen() {
   return (
     <>
-      <path d="M6 18 16.5 7.5l3 3L9 21H6Z" {...S} fill="currentColor" fillOpacity="0.16" />
-      <path d="m16.5 7.5 1.6-1.6a1.5 1.5 0 0 1 2.2 0l.7.7a1.5 1.5 0 0 1 0 2.2l-1.6 1.6" {...S} />
-      <path d="M3 13c1.5-1.2 2.6-.4 4.1-1.5" {...S} strokeDasharray="1.8 1.8" />
-      <path d="M3 8.5c1.5-1.2 2.6-.4 4.1-1.5" {...S} strokeDasharray="1.8 1.8" />
+      <path d="M5.5 18.5 16.5 7.5l3 3-11 11H5.5Z" {...S} fill="currentColor" fillOpacity="0.24" />
+      <path d="m16.5 7.5 1.8-1.8a1.5 1.5 0 0 1 2.2 0l.7.7a1.5 1.5 0 0 1 0 2.2l-1.8 1.8" {...S} strokeWidth={1.7} />
+      <path d="M2.5 13.5c1.6-1.4 2.8-.5 4.4-1.6" {...S} strokeDasharray="2 2" strokeWidth={1.6} />
+      <path d="M2.5 8.5c1.6-1.4 2.8-.5 4.4-1.6" {...S} strokeDasharray="2 2" strokeWidth={1.6} />
     </>
   );
 }
@@ -162,9 +163,9 @@ function ScarPen() {
 function Waves() {
   return (
     <>
-      <path d="M3.5 8.5c1.7-2 3.4-2 5.1 0s3.4 2 5.1 0 3.4-2 5.1 0" {...S} strokeWidth={1.5} />
-      <path d="M3.5 13c1.7-2 3.4-2 5.1 0s3.4 2 5.1 0 3.4-2 5.1 0" {...S} strokeWidth={1.5} />
-      <path d="M3.5 17.5c1.7-2 3.4-2 5.1 0s3.4 2 5.1 0 3.4-2 5.1 0" {...S} strokeWidth={1.5} />
+      <path d="M3 8c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" {...S} strokeWidth={1.7} />
+      <path d="M3 13c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" {...S} strokeWidth={1.7} />
+      <path d="M3 18c2-2.2 4-2.2 6 0s4 2.2 6 0 4-2.2 6 0" {...S} strokeWidth={1.7} />
     </>
   );
 }
@@ -173,14 +174,14 @@ function Face() {
   return (
     <>
       <path
-        d="M12 3.2c4.2 0 7 2.8 7 6.8 0 4.8-3.2 11-7 11s-7-6.2-7-11c0-4 2.8-6.8 7-6.8Z"
+        d="M12 2.8c4.5 0 7.5 3 7.5 7.2 0 5.2-3.4 11.8-7.5 11.8S4.5 15.2 4.5 10c0-4.2 3-7.2 7.5-7.2Z"
         {...S}
         fill="currentColor"
-        fillOpacity="0.14"
+        fillOpacity="0.2"
       />
-      <circle cx="9" cy="10" r="1" fill="currentColor" stroke="none" opacity="0.8" />
-      <circle cx="15" cy="10" r="1" fill="currentColor" stroke="none" opacity="0.8" />
-      <path d="M10 15.2c1.2.9 2.8.9 4 0" {...S} />
+      <circle cx="8.8" cy="9.8" r="1.2" fill="currentColor" stroke="none" opacity="0.9" />
+      <circle cx="15.2" cy="9.8" r="1.2" fill="currentColor" stroke="none" opacity="0.9" />
+      <path d="M9.8 15.5c1.3 1 3.1 1 4.4 0" {...S} strokeWidth={1.6} />
     </>
   );
 }
@@ -188,9 +189,9 @@ function Face() {
 function Chat() {
   return (
     <>
-      <path d="M3.5 6h12.5v8.5H8.5L4.5 18V14.5H3.5Z" {...S} fill="currentColor" fillOpacity="0.14" />
-      <path d="M19 9.5h1.5v8.5h-1.5V21L16 18h-3.5" {...S} />
-      <path d="M7 10h5.5" {...S} />
+      <path d="M3 5.5h13.5V15H8.5L4 19V15H3Z" {...S} fill="currentColor" fillOpacity="0.2" />
+      <path d="M19.5 9.2H21v9h-1.5V21.5L16.2 18.2H12.5" {...S} strokeWidth={1.5} />
+      <path d="M6.8 9.8h6" {...S} strokeWidth={1.5} />
     </>
   );
 }
@@ -198,14 +199,14 @@ function Chat() {
 function Jar() {
   return (
     <>
-      <path d="M8 4h8v2.5H8z" {...S} />
+      <path d="M7.5 3.5h9v2.8h-9z" {...S} strokeWidth={1.7} />
       <path
-        d="M6.5 9c0-1.4 1.2-2.5 2.6-2.5h5.8c1.4 0 2.6 1.1 2.6 2.5v9c0 1.4-1.2 2.5-2.6 2.5H9.1A2.6 2.6 0 0 1 6.5 18Z"
+        d="M6 9c0-1.5 1.3-2.7 2.8-2.7h6.4c1.5 0 2.8 1.2 2.8 2.7v9.5c0 1.5-1.3 2.7-2.8 2.7H8.8A2.8 2.8 0 0 1 6 18.5Z"
         {...S}
         fill="currentColor"
-        fillOpacity="0.15"
+        fillOpacity="0.22"
       />
-      <path d="M9.5 13h5" {...S} />
+      <path d="M9.2 13.5h5.6" {...S} strokeWidth={1.5} />
     </>
   );
 }

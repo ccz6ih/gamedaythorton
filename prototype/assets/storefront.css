@@ -255,51 +255,65 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 3.25rem 1fr auto;
+  grid-template-columns: 3.75rem 1fr auto;
   gap: var(--gd-3) var(--gd-5);
-  padding: var(--gd-5) var(--gd-4);
-  margin-inline: calc(-1 * var(--gd-4));
-  border-bottom: 1px solid var(--gd-border);
+  padding: var(--gd-5) var(--gd-5);
+  margin-inline: calc(-1 * var(--gd-3));
+  margin-bottom: var(--gd-3);
+  background: color-mix(in srgb, var(--gd-surface) 65%, rgba(255,255,255,0.4));
+  border: 1px solid var(--gd-border);
   border-radius: var(--gd-r-md);
-  align-items: start;
-  transition: background var(--gd-fast) var(--gd-ease), transform var(--gd-fast) var(--gd-ease);
+  align-items: center;
+  transition: transform var(--gd-fast) var(--gd-ease),
+              box-shadow var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              background var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover {
-  background: color-mix(in srgb, var(--gd-surface-raised) 55%, transparent);
+  background: color-mix(in srgb, var(--gd-surface-raised) 75%, transparent);
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--gd-accent) 65%, transparent);
+  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.08);
 }
-.sf-item:last-child { border-bottom: none; }
+.sf-item:last-child { margin-bottom: 0; }
 
 .sf-item-mark {
   display: grid;
   place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 3.75rem;
+  height: 3.75rem;
   border-radius: var(--gd-r-full);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--gd-accent) 24%, rgba(255,255,255,0.85)), color-mix(in srgb, var(--gd-accent) 10%, rgba(255,255,255,0.35)));
-  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 55%, transparent);
-  box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--gd-accent) 30%, transparent), inset 0 1px 2px rgba(255,255,255,0.85);
-  color: color-mix(in srgb, var(--gd-accent) 85%, #4a3400);
-  margin-top: .15rem;
+  background: radial-gradient(circle at 35% 35%, #233b2c 0%, #101c14 100%);
+  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 70%, transparent);
+  box-shadow: 0 6px 18px -2px rgba(16, 28, 20, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  color: #F3CA65;
   flex: none;
-  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease), box-shadow var(--gd-fast) var(--gd-ease);
+  transition: transform var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              box-shadow var(--gd-fast) var(--gd-ease),
+              color var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover .sf-item-mark {
   border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-1px);
-  box-shadow: 0 6px 20px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent), inset 0 1px 3px rgba(255,255,255,0.95);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 55%, transparent), inset 0 1px 3px rgba(255, 255, 255, 0.4);
+  color: #FFE79E;
 }
-.sf-item-mark svg { width: 1.65rem; height: 1.65rem; }
+.sf-item-mark svg {
+  width: 2rem;
+  height: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
 
 /* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
    and drawn services still lines up down the left edge. */
 .sf-item-photo {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 3.75rem;
+  height: 3.75rem;
   max-width: 100%;
   border-radius: var(--gd-r-full);
   object-fit: cover;
   display: block;
-  margin-top: .15rem;
   border: 1.5px solid var(--gd-border);
   box-shadow: 0 4px 14px -2px rgba(0,0,0,0.08);
   flex: none;
@@ -307,8 +321,8 @@
 }
 .sf-item:hover .sf-item-photo {
   border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-1px);
-  box-shadow: 0 6px 20px -2px color-mix(in srgb, var(--gd-accent) 35%, transparent);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 35%, transparent);
 }
 
 .sf-item-body { min-width: 0; }
@@ -416,19 +430,33 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--gd-1);
 }
 .sf-item-price .amount {
   display: block;
   font-family: var(--brand-display-font);
-  font-size: clamp(1.2rem, 1.08rem + 0.35vw, 1.45rem);
+  font-size: clamp(1.3rem, 1.15rem + 0.45vw, 1.65rem);
   font-weight: 700;
   letter-spacing: -.01em;
 }
 .sf-item-price .dur {
-  display: block;
-  font-size: var(--gd-step--1);
+  display: inline-block;
+  font-size: var(--gd-step--2);
   color: var(--gd-text-dim);
+  padding: .15em .55em;
+  background: color-mix(in srgb, var(--gd-text) 8%, transparent);
+  border-radius: 999px;
+  letter-spacing: .03em;
+  font-weight: 500;
+}
+.sf-item-price .sf-btn {
   margin-top: var(--gd-1);
+  padding: .38rem .95rem;
+  font-size: var(--gd-step--1);
+  font-weight: 600;
 }
 .sf-item-actions { grid-column: 1 / -1; display: flex; gap: var(--gd-2); margin-top: var(--gd-1); }
 
@@ -690,10 +718,10 @@
 @media (max-width: 640px) {
   .sf-person { grid-template-columns: 1fr; }
   .sf-portrait { max-width: 11rem; }
-  .sf-item { grid-template-columns: 2.75rem 1fr; gap: var(--gd-2) var(--gd-4); }
-  .sf-item-mark, .sf-item-photo { width: 2.75rem; height: 2.75rem; }
-  .sf-item-mark svg { width: 1.4rem; height: 1.4rem; }
-  .sf-item-price { grid-column: 2 / -1; text-align: left; display: flex; gap: var(--gd-3); align-items: baseline; }
+  .sf-item { grid-template-columns: 3rem 1fr; gap: var(--gd-3) var(--gd-4); padding: var(--gd-4) var(--gd-4); }
+  .sf-item-mark, .sf-item-photo { width: 3rem; height: 3rem; }
+  .sf-item-mark svg { width: 1.6rem; height: 1.6rem; }
+  .sf-item-price { grid-column: 2 / -1; text-align: left; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: var(--gd-2); }
   .sf-item-price .dur { margin-top: 0; }
   .sf-item-cta { grid-column: 2 / -1; }
   .sf-nav-inner { gap: var(--gd-4); }
