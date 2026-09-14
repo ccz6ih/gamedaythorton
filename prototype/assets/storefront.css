@@ -4868,9 +4868,9 @@
 
 .sf-face-diagram-wrap {
   width: 100%;
-  aspect-ratio: 16 / 13;
-  background: var(--gd-surface-raised);
-  border: 1px solid var(--gd-border-strong);
+  aspect-ratio: 16 / 15;
+  background: radial-gradient(circle at center, rgba(22, 32, 26, 0.95) 0%, #0E1711 90%);
+  border: 1px solid color-mix(in srgb, var(--gd-accent, #D4AF37) 25%, var(--gd-border));
   border-radius: var(--gd-r-lg);
   display: flex;
   flex-direction: column;
@@ -4878,26 +4878,23 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(0.75rem, 2vw, 1.25rem);
 }
 
-.sf-face-svg {
+.sf-face-svg.sf-face-natural {
   width: 100%;
   height: 100%;
-  max-height: 220px;
-  color: var(--gd-accent, #D4AF37);
+  max-height: 240px;
   overflow: visible;
 }
 
-.sf-active-muscle-path {
-  filter: drop-shadow(0 0 10px currentColor);
-  animation: sf-muscle-pulse 2.2s ease-in-out infinite;
-  transform-origin: center;
+.sf-active-muscle-layer {
+  animation: sf-muscle-layer-pulse 2.8s ease-in-out infinite;
 }
 
-@keyframes sf-muscle-pulse {
-  0%, 100% { fill-opacity: 0.35; stroke-width: 1.6; }
-  50% { fill-opacity: 0.7; stroke-width: 2.2; filter: drop-shadow(0 0 16px currentColor); }
+@keyframes sf-muscle-layer-pulse {
+  0%, 100% { opacity: 0.88; filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.85)); }
 }
 
 .sf-face-active-label {
@@ -4905,23 +4902,24 @@
   bottom: 0.75rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-size: var(--gd-step--2);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gd-accent);
-  background: color-mix(in srgb, var(--gd-surface) 85%, transparent);
-  border: 1px solid var(--gd-border);
-  padding: 0.3em 0.8em;
+  color: #FEF3C7;
+  background: rgba(14, 23, 17, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 0.35em 0.9em;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 .sf-face-spark {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
   animation: sf-deck-pulse 2s infinite ease-in-out;
 }
 
@@ -4935,33 +4933,33 @@
   background: var(--gd-surface-raised);
   border: 1px solid var(--gd-border);
   border-radius: var(--gd-r-md);
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1.1rem;
   font: inherit;
   font-size: var(--gd-step--1);
-  color: var(--gd-text-muted);
+  color: #D1D5DB;
   cursor: pointer;
   transition: all var(--gd-fast) var(--gd-ease);
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   text-align: left;
 }
 .sf-muscle-zone-btn:hover {
-  background: color-mix(in srgb, var(--gd-accent) 10%, var(--gd-surface-raised));
-  border-color: var(--gd-accent-line);
-  color: var(--gd-text);
-  transform: translateX(2px);
+  background: color-mix(in srgb, var(--gd-accent) 12%, var(--gd-surface-raised));
+  border-color: var(--gd-accent);
+  color: #FFFFFF;
+  transform: translateX(3px);
 }
 .sf-muscle-zone-btn.is-active {
   background: var(--gd-accent);
   border-color: var(--gd-accent);
-  color: var(--brand-accent-ink, #16201A);
-  font-weight: 600;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--gd-accent) 40%, transparent);
+  color: #16201A !important;
+  font-weight: 700;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--gd-accent) 45%, transparent);
 }
 .sf-zone-btn-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 50%;
   background: currentColor;
   flex: none;
@@ -4973,12 +4971,13 @@
 /* Right Column: In-Depth Anatomical Analysis Card */
 .sf-muscle-detail-card {
   background: var(--gd-surface-raised);
-  border: 1px solid var(--gd-border);
+  border: 1px solid var(--gd-border-strong);
   border-radius: var(--gd-r-lg);
-  padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  padding: clamp(1.5rem, 3.5vw, 2.35rem);
   display: flex;
   flex-direction: column;
   gap: var(--gd-4);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
 }
 
 .sf-muscle-detail-header {
@@ -4994,23 +4993,27 @@
 .sf-muscle-latin-badge {
   font-size: var(--gd-step--2);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   font-weight: 700;
-  color: var(--gd-accent);
+  color: #F59E0B;
 }
 .sf-muscle-name {
   font-family: var(--brand-display-font);
-  font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.85rem);
+  font-size: clamp(1.4rem, 1.25rem + 0.7vw, 2rem);
   font-weight: 400;
-  color: var(--gd-text);
-  margin: 0.2rem 0 0.3rem;
+  color: #FFFFFF;
+  margin: 0.2rem 0 0.35rem;
   line-height: 1.2;
 }
 .sf-muscle-target {
   font-size: var(--gd-step--1);
-  color: var(--gd-text-muted);
+  color: #E5E7EB;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.55;
+}
+.sf-target-lbl {
+  color: #9CA3AF;
+  font-weight: 600;
 }
 
 .sf-muscle-dosing-pill {
@@ -5018,24 +5021,25 @@
   flex-direction: column;
   align-items: flex-end;
   background: var(--gd-surface);
-  border: 1px solid var(--gd-border);
+  border: 1px solid rgba(212, 175, 55, 0.35);
   border-radius: var(--gd-r-md);
-  padding: 0.45rem 0.85rem;
+  padding: 0.5rem 0.95rem;
 }
 .sf-dosing-lbl {
   font-size: var(--gd-step--2);
-  color: var(--gd-text-dim);
+  color: #9CA3AF;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  font-weight: 600;
 }
 .sf-dosing-val {
   font-size: var(--gd-step--1);
-  font-weight: 600;
-  color: var(--gd-text);
+  font-weight: 700;
+  color: #FEF3C7;
   font-variant-numeric: tabular-nums;
 }
 
-/* Comparison Matrix (Flaw vs Med Bar Standard) */
+/* High-Contrast Comparison Matrix: Flaw vs Standard */
 .sf-muscle-comparison-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -5043,35 +5047,43 @@
 }
 .sf-muscle-compare-card {
   border-radius: var(--gd-r-md);
-  padding: var(--gd-3) var(--gd-4);
+  padding: var(--gd-4);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 .sf-muscle-compare-card.warning {
-  background: color-mix(in srgb, #ef4444 6%, var(--gd-surface));
-  border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+  background: rgba(45, 18, 20, 0.85);
+  border: 1px solid rgba(239, 68, 68, 0.45);
 }
 .sf-muscle-compare-card.success {
-  background: color-mix(in srgb, var(--gd-accent) 8%, var(--gd-surface));
-  border: 1px solid var(--gd-accent-line);
+  background: rgba(14, 34, 22, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.5);
 }
-.sf-compare-badge {
-  font-size: var(--gd-step--2);
+
+.sf-compare-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
 }
-.sf-compare-badge.danger {
-  color: #fca5a5;
+.sf-compare-head.danger {
+  color: #F87171;
 }
-.sf-compare-badge.success {
-  color: var(--gd-accent);
+.sf-compare-head.success {
+  color: #FBBF24;
 }
+.sf-compare-icon {
+  font-weight: 900;
+}
+
 .sf-compare-text {
   font-size: var(--gd-step--1);
-  color: var(--gd-text-muted);
-  line-height: 1.55;
+  color: #F3F4F6;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -5091,21 +5103,21 @@
   gap: 0.2rem;
 }
 .sf-muscle-spec-lbl {
-  font-size: var(--gd-step--2);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   font-weight: 700;
-  color: var(--gd-accent);
+  color: #FBBF24;
 }
 .sf-muscle-spec-body {
   font-size: var(--gd-step--1);
-  color: var(--gd-text-muted);
-  line-height: 1.55;
+  color: #E5E7EB;
+  line-height: 1.6;
   margin: 0;
 }
 .sf-muscle-spec-body.highlight {
-  color: var(--gd-text);
-  font-weight: 500;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 /* Card Action Foot */
@@ -5126,11 +5138,11 @@
   font-family: var(--brand-display-font);
   font-size: var(--gd-step-1);
   font-weight: 700;
-  color: var(--gd-text);
+  color: #FEF3C7;
 }
 .sf-muscle-price-sub {
   font-size: var(--gd-step--2);
-  color: var(--gd-text-dim);
+  color: #9CA3AF;
 }
 
 .sf-muscle-actions {
