@@ -238,7 +238,7 @@ export default async function FacialsDirectoryPage({ params }: { params: Promise
                     <span className="sf-facial-price">{priceLabel(s)}</span>
                     <span className="sf-facial-dur">{s.duration_min} min</span>
                   </div>
-                  <Link href={`${links.book}?service=${encodeURIComponent(s.id)}`} className="sf-btn sf-btn-primary">
+                  <Link href={`${links.book}?service=${encodeURIComponent(s.id)}`} className="sf-btn primary">
                     Reserve &rarr;
                   </Link>
                 </div>
@@ -346,10 +346,10 @@ export default async function FacialsDirectoryPage({ params }: { params: Promise
               to design your personalized Colorado skincare roadmap.
             </p>
             <div style={{ display: 'flex', gap: 'var(--gd-3)', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href={`${links.book}?service=68ea65e5-3598-5f10-93f2-6b886a8f9021`} className="sf-btn sf-btn-ghost">
+              <Link href={`${links.book}?service=68ea65e5-3598-5f10-93f2-6b886a8f9021`} className="sf-btn ghost">
                 Free 15-Min Consult &rarr;
               </Link>
-              <Link href={links.services} className="sf-btn sf-btn-primary">
+              <Link href={links.services} className="sf-btn primary">
                 Explore Treatment Menu &rarr;
               </Link>
             </div>

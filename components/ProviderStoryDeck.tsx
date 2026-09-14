@@ -416,7 +416,12 @@ export function ProviderStoryDeck({
 
           {/* Story Outro / Call to Action */}
           <div className="sf-story-outro">
-            <div className="sf-story-outro-ornament" aria-hidden="true">✦ ✦ ✦</div>
+            {/* Was three ✦ glyphs. A typographic ornament borrowed from a
+                wedding invitation, rendered in whatever the fallback font
+                decides — and on a face that lacks the glyph it becomes three
+                tofu boxes. A hairline says "a section ends here" without
+                depending on a character being present. */}
+            <div className="sf-story-outro-ornament" aria-hidden="true" />
             <h3>Experience personalized, regenerative care.</h3>
             <p>
               Whether you are exploring PRF for the first time or looking for a practitioner who listens,

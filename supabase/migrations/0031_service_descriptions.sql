@@ -15,10 +15,30 @@
 -- ensuring 100% complete editorial coverage across injectables, lashes,
 -- paramedical, skin treatments, and clinical facials.
 
+-- ===========================================================================
+-- TWO LATER EDITS TO THIS FILE, BOTH RECORDED HERE RATHER THAN HIDDEN
+-- ===========================================================================
+-- 1. This migration could never run. `id = 'clinic_medbar_loveland'` compares a
+--    uuid column against a string, which Postgres rejects outright:
+--    "invalid input syntax for type uuid". It failed on its first execution and
+--    took the whole migration chain down with it — nothing numbered above 0031
+--    could be applied while it sat here. That comparison is removed below.
+--
+--    Editing an applied migration is forbidden (CLAUDE.md). This one was never
+--    applied to any database, precisely because it could not be, so there is no
+--    history for the edit to contradict.
+--
+-- 2. The COPY this file writes was overruled. It asserts protocols, session
+--    counts and safety claims the practice never stated, and sets
+--    needs_copy = false so none of it would ever be reviewed.
+--    0032_service_copy_provenance.sql replaces those eleven descriptions and
+--    turns the flag back on. That correction is appended rather than applied
+--    here, so what was proposed and what overruled it both stay legible.
+
 begin;
 
 with medbar as (
-  select id from clinic where slug = 'medbar-loveland' or id = 'clinic_medbar_loveland' limit 1
+  select id from clinic where slug = 'medbar-loveland' limit 1
 )
 update service s
 set

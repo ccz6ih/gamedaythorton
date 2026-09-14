@@ -360,10 +360,10 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               to your facial, peel, or PRF treatment.
             </p>
             <div style={{ display: 'flex', gap: 'var(--gd-3)', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href={`${links.book}?service=3affd9d8-50ab-5cab-a413-0a9055acbb80`} className="sf-btn sf-btn-primary">
+              <Link href={`${links.book}?service=3affd9d8-50ab-5cab-a413-0a9055acbb80`} className="sf-btn primary">
                 Book LED Therapy ($40) &rarr;
               </Link>
-              <Link href={links.services} className="sf-btn sf-btn-ghost">
+              <Link href={links.services} className="sf-btn ghost">
                 View All Treatments &rarr;
               </Link>
             </div>

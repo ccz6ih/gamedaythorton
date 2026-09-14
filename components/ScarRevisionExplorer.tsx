@@ -166,10 +166,10 @@ export function ScarRevisionExplorer({ bookUrl }: { bookUrl: string }) {
             depth, and cellular pigmentation candidacy.
           </p>
           <div className="sf-scar-actions">
-            <Link href={`${bookUrl}?service=68ea65e5-3598-5f10-93f2-6b886a8f9021`} className="sf-btn sf-btn-ghost">
+            <Link href={`${bookUrl}?service=68ea65e5-3598-5f10-93f2-6b886a8f9021`} className="sf-btn ghost">
               Free 15-Min Consult &rarr;
             </Link>
-            <Link href={`${bookUrl}?service=2909d933-4de7-560b-810b-cd22d9be475b`} className="sf-btn sf-btn-primary">
+            <Link href={`${bookUrl}?service=2909d933-4de7-560b-810b-cd22d9be475b`} className="sf-btn primary">
               Reserve Revision Session &rarr;
             </Link>
           </div>

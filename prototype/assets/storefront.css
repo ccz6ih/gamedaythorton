@@ -255,7 +255,8 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 3.5rem 1fr auto;
+  /* Tracks the icon box, which lost its 56px medallion and is now a 40px mark. */
+  grid-template-columns: 2.5rem 1fr auto;
   gap: var(--gd-3) var(--gd-6);
   padding: var(--gd-6) var(--gd-4);
   margin-inline: calc(-1 * var(--gd-4));
@@ -274,30 +275,32 @@
 /* --------------------------------------------------------------------------
    LUXURY ARTISAN SERVICE ICON MEDALLIONS & MICRO-ANIMATIONS
    -------------------------------------------------------------------------- */
+/* THE MARK, NOT THE MEDALLION.
+ *
+ * Each service mark sat inside a gold coin: a diagonal gradient, an accent
+ * border, a drop shadow AND an inset highlight to fake a bevel, then a 1.08
+ * scale-up and a lift on hover. Six effects stacked on a 56px circle, thirty
+ * times down one page.
+ *
+ * The line art underneath is good and is kept. What is removed is the object it
+ * was embossed onto — the gradient, the ring, both shadows and the pop. Drawn
+ * small and dim, the mark anchors its row and then gets out of the way of the
+ * treatment name and the price, which are what somebody is actually reading.
+ *
+ * The hover cue moves to colour alone, and only that: scaling an element on
+ * hover moves the text next to it in the reader's peripheral vision for no
+ * information gained.
+ */
 .sf-item-icon-box {
   display: grid;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--gd-r-full);
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--gd-surface-raised) 85%, transparent) 0%,
-    color-mix(in srgb, var(--gd-accent) 15%, transparent) 100%);
-  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 55%, transparent);
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.45);
-  color: var(--gd-accent);
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--gd-text-dim);
   flex: none;
-  transition: transform var(--gd-fast) var(--gd-ease),
-              border-color var(--gd-fast) var(--gd-ease),
-              box-shadow var(--gd-fast) var(--gd-ease),
-              color var(--gd-fast) var(--gd-ease);
+  transition: color var(--gd-fast) var(--gd-ease);
 }
-.sf-item:hover .sf-item-icon-box {
-  border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent), inset 0 1px 3px rgba(255, 255, 255, 0.7);
-  color: color-mix(in srgb, var(--gd-accent) 85%, #fff);
-}
+.sf-item:hover .sf-item-icon-box { color: var(--gd-accent); }
 .sf-service-svg {
   width: 1.85rem;
   height: 1.85rem;
@@ -548,7 +551,9 @@
 }
 .sf-item:hover .sf-item-photo {
   border-color: var(--gd-accent);
-  transform: scale(1.05);
+  /* Was scale(1.05). A portrait that swells when the cursor passes nudges the
+     text beside it and tells the reader nothing the border colour has not
+     already said. */
 }
 
 .sf-item-body { min-width: 0; }
@@ -1993,7 +1998,7 @@
   transition: all var(--gd-fast) var(--gd-ease);
 }
 .sf-product-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10%; display: block; }
-.sf-product-thumb:hover { border-color: var(--gd-accent); transform: translateY(-1px); }
+.sf-product-thumb:hover { border-color: var(--gd-accent); }
 .sf-product-thumb.is-active {
   border-color: var(--gd-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--gd-accent) 40%, transparent);
@@ -2119,13 +2124,16 @@
   border-radius: var(--gd-r-md);
   background: var(--gd-accent);
   color: var(--brand-accent-ink);
-  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent);
-  transition: all var(--gd-fast) var(--gd-ease);
+  /* No coloured glow. A gold button casting gold light was the single most
+     dated thing on the page — the reference ships a flat pill and lets the
+     fill carry it. The 1px lift stays: that is a button affordance, not
+     decoration. */
+  transition: background var(--gd-fast) var(--gd-ease),
+              transform var(--gd-fast) var(--gd-ease);
 }
 .sf-add.sf-add-lg:hover:not(:disabled) {
   background: var(--gd-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px -2px color-mix(in srgb, var(--gd-accent) 60%, transparent);
 }
 .sf-add.is-added {
   background: var(--gd-in-range) !important;
@@ -2133,118 +2141,156 @@
 }
 
 /* Studio Guarantee & Clean Badges */
-.sf-product-perks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--gd-2) var(--gd-4);
-  padding: var(--gd-4);
-  background: color-mix(in srgb, var(--gd-surface-raised) 40%, transparent);
-  border: 1px solid var(--gd-border);
-  border-radius: var(--gd-r-md);
-  margin-bottom: var(--gd-6);
-}
-.sf-perk-item {
+/* ------------------------------------------------- product spec row --
+ *
+ * Replaces a four-up grid of emoji badges. Set as a definition list because
+ * that is what it is — a label and a value — which also means a screen reader
+ * announces "Brand, Green Envee" rather than two unrelated fragments.
+ *
+ * No border, no fill, no icon. Two hairlines and the type does the rest; the
+ * label is small, dim and uppercase, the value is body text. That contrast is
+ * the entire design, and it is the reason it reads as expensive rather than
+ * busy.
+ */
+.sf-product-spec {
   display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.82rem;
-  color: var(--gd-text-muted);
+  flex-wrap: wrap;
+  gap: var(--gd-5) var(--gd-7);
+  margin: 0 0 var(--gd-6);
+  padding: var(--gd-4) 0;
+  border-top: 1px solid var(--gd-border);
+  border-bottom: 1px solid var(--gd-border);
 }
-.sf-perk-icon {
-  color: var(--gd-accent);
-  font-size: 0.95rem;
-  flex: none;
+.sf-product-spec > div { display: flex; flex-direction: column; gap: .3rem; }
+.sf-product-spec dt {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-text-dim);
+}
+.sf-product-spec dd {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text);
 }
 
 /* Accordion Details */
+/* ------------------------------------------------------ accordions --
+ *
+ * HAIRLINES, NOT BOXES.
+ *
+ * These were three stacked cards — each with its own border, its own fill, its
+ * own corner radius, and an accent border when open. Three boxes inside a
+ * fourth box, on a page that is already a two-column card. Every one of those
+ * edges is a line the eye has to resolve before it can read the label, and the
+ * cumulative effect is a page that looks assembled from components rather than
+ * designed.
+ *
+ * A single hairline between rows does the same job. It groups them, it marks
+ * where one ends and the next begins, and it disappears the moment you start
+ * reading — which is the point. Restraint is what the expensive-looking
+ * reference does, and it is not a style, it is the removal of one.
+ *
+ * The open row is marked by the chevron alone. No colour change, no border, no
+ * fill: the body text appearing underneath is already unambiguous.
+ */
 .sf-product-accordions {
   display: flex;
   flex-direction: column;
-  gap: var(--gd-2);
-  margin-top: var(--gd-2);
+  margin-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
 }
-.sf-accordion {
-  border: 1px solid var(--gd-border);
-  border-radius: var(--gd-r-md);
-  background: var(--gd-surface);
-  overflow: hidden;
-  transition: border-color var(--gd-fast) var(--gd-ease);
-}
-.sf-accordion[open] {
-  border-color: color-mix(in srgb, var(--gd-accent) 45%, var(--gd-border));
-}
+.sf-accordion { border-bottom: 1px solid var(--gd-border); }
 .sf-accordion summary {
-  padding: var(--gd-4) var(--gd-5);
-  font-family: var(--brand-display-font);
-  font-size: 1.15rem;
-  font-weight: 600;
+  padding: var(--gd-4) 0;
+  font-size: var(--gd-step-0);
+  font-weight: 500;
   cursor: pointer;
   list-style: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--gd-4);
   user-select: none;
   color: var(--gd-text);
   transition: color var(--gd-fast) var(--gd-ease);
 }
 .sf-accordion summary::-webkit-details-marker { display: none; }
 .sf-accordion summary:hover { color: var(--gd-accent); }
+/* The focus ring has to be drawn deliberately: `list-style:none` on a summary
+   removes the marker, and several browsers drop the default outline with it. */
+.sf-accordion summary:focus-visible {
+  outline: 2px solid var(--gd-accent);
+  outline-offset: 3px;
+}
 .sf-accordion-arrow {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
   transition: transform var(--gd-fast) var(--gd-ease);
-  margin-right: 0.25rem;
+  opacity: .55;
 }
 .sf-accordion[open] .sf-accordion-arrow {
-  transform: rotate(-135deg);
+  transform: rotate(-135deg) translate(-2px, -2px);
 }
 .sf-accordion-body {
-  padding: 0 var(--gd-5) var(--gd-5);
-  font-size: 0.94rem;
-  line-height: 1.65;
+  padding: 0 0 var(--gd-5);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
   color: var(--gd-text-muted);
-  border-top: 1px solid color-mix(in srgb, var(--gd-border) 60%, transparent);
-  padding-top: var(--gd-4);
+  max-width: var(--sf-measure);
 }
 .sf-accordion-body p { margin: 0 0 var(--gd-3); }
 .sf-accordion-body p:last-child { margin-bottom: 0; }
 
 /* -------------------------------------------------- Hims-Style Benefit Pillars -- */
+/* ---------------------------------------------------- benefit pillars --
+ *
+ * Three bordered cards with a big accent numeral became three columns of
+ * plain type.
+ *
+ * The numerals were the giveaway. 01 / 02 / 03 in the accent colour at nearly
+ * 2rem is louder than the headings it labels, and it is counting to three —
+ * information the reader already has from looking at three columns. The card
+ * borders were doing the same redundant work: separating things that are
+ * already separated by a wide gap.
+ *
+ * What replaces them is space. A generous column gap, a heading with real air
+ * under it, and body copy held to a readable measure.
+ */
 .sf-pillars-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--gd-5);
-  margin-top: var(--gd-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
 }
-.sf-pillar-card {
-  padding: var(--gd-6);
-  border-radius: var(--gd-r-lg);
-  background: var(--gd-surface);
-  border: 1px solid var(--gd-border);
-  display: flex;
-  flex-direction: column;
-}
+.sf-pillar-card { display: flex; flex-direction: column; }
+/* Kept in the markup as a quiet ordinal rather than deleted, so the columns
+   still read as a sequence in a screen reader and on one narrow column. */
 .sf-pillar-num {
-  font-family: var(--brand-display-font);
-  font-size: 1.75rem;
-  color: var(--gd-accent);
-  margin-bottom: var(--gd-3);
-  opacity: 0.9;
+  font-size: .68rem;
+  letter-spacing: .16em;
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-4);
 }
 .sf-pillar-card h3 {
   font-family: var(--brand-display-font);
-  font-size: 1.25rem;
-  margin: 0 0 var(--gd-2);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
   color: var(--gd-text);
+  text-wrap: balance;
 }
 .sf-pillar-card p {
   margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
   color: var(--gd-text-muted);
+  max-width: 34ch;
 }
 
 /* ---------------------------------------------------- Routine Roadmap Step -- */
@@ -2256,38 +2302,39 @@
   margin-top: var(--gd-6);
   scrollbar-width: thin;
 }
+/* The eight steps read as a rule with marks along it rather than eight pressed
+ * buttons. The old version gave every step a border, a fill and a radius and
+ * then gave the current one an accent fill AND an accent border AND a coloured
+ * glow — three signals for one bit of information, on the busiest element of
+ * the page.
+ *
+ * Now the line under each step carries it: faint for the rest, accent and
+ * full-strength for this product's step. One signal, and the row stops
+ * competing with the product photograph above it. */
 .sf-step-pill {
   flex: 1;
-  min-width: 8rem;
-  padding: var(--gd-3) var(--gd-4);
-  border-radius: var(--gd-r-md);
-  background: var(--gd-surface);
-  border: 1px solid var(--gd-border);
+  min-width: 7rem;
+  padding: var(--gd-3) 0;
+  border-top: 2px solid var(--gd-border);
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  transition: all var(--gd-fast) var(--gd-ease);
+  gap: 0.25rem;
+  transition: border-color var(--gd-fast) var(--gd-ease);
 }
-.sf-step-pill.is-active {
-  border-color: var(--gd-accent);
-  background: color-mix(in srgb, var(--gd-accent) 12%, var(--gd-surface));
-  box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--gd-accent) 30%, transparent);
-}
+.sf-step-pill.is-active { border-top-color: var(--gd-accent); }
 .sf-step-pill .sf-step-idx {
   font-family: var(--gd-font);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gd-accent);
-  font-weight: 700;
+  color: var(--gd-text-dim);
 }
+.sf-step-pill.is-active .sf-step-idx { color: var(--gd-accent); }
 .sf-step-pill .sf-step-name {
-  font-family: var(--brand-display-font);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gd-text);
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
   white-space: nowrap;
 }
+.sf-step-pill.is-active .sf-step-name { color: var(--gd-text); }
 
 .sf-why-routine-grid {
   display: grid;
@@ -2295,23 +2342,24 @@
   gap: var(--gd-6);
   margin-top: var(--gd-6);
 }
-.sf-why-card {
-  padding: var(--gd-6);
-  border-radius: var(--gd-r-lg);
-  background: var(--gd-surface);
-  border: 1px solid var(--gd-border);
-}
+/* Same treatment as the pillars: the border and fill were separating two
+   blocks that a column gap already separates. */
+.sf-why-card { padding: 0; }
 .sf-why-card h3 {
   font-family: var(--brand-display-font);
-  font-size: 1.35rem;
-  margin: 0 0 var(--gd-2);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
   color: var(--gd-text);
+  text-wrap: balance;
 }
 .sf-why-card p {
   margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
   color: var(--gd-text-muted);
+  max-width: 42ch;
 }
 
 /* ---------------------------------------------------- In-Studio Paired Services -- */
@@ -2321,20 +2369,19 @@
   gap: var(--gd-5);
   margin-top: var(--gd-6);
 }
+/* No lift, no drop shadow. A card that jumps two pixels and casts a shadow on
+   hover is a 2016 gesture; it also animates `all`, which means the browser is
+   asked to consider transitioning every property on the element. A border that
+   warms to the accent says "this is interactive" just as clearly and costs
+   nothing. */
 .sf-paired-service-card {
-  padding: var(--gd-5);
-  border-radius: var(--gd-r-lg);
-  background: var(--gd-surface);
-  border: 1px solid var(--gd-border);
+  padding: var(--gd-5) 0 0;
+  border-top: 1px solid var(--gd-border);
   display: flex;
   flex-direction: column;
-  transition: all var(--gd-fast) var(--gd-ease);
+  transition: border-color var(--gd-fast) var(--gd-ease);
 }
-.sf-paired-service-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--gd-accent);
-  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.12);
-}
+.sf-paired-service-card:hover { border-top-color: var(--gd-accent); }
 .sf-paired-head {
   display: flex;
   align-items: center;
@@ -2790,10 +2837,11 @@
   margin-top: var(--gd-4);
 }
 .sf-story-outro-ornament {
-  color: var(--gd-accent);
-  font-size: var(--gd-step--1);
-  letter-spacing: .4em;
-  opacity: .8;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--gd-accent);
+  margin: 0 auto var(--gd-5);
+  opacity: .55;
 }
 .sf-story-outro h3 {
   font-family: var(--brand-display-font);
@@ -3164,7 +3212,6 @@
 }
 .sf-editorial-card:hover {
   border-color: var(--gd-border-strong);
-  transform: translateY(-2px);
 }
 
 .sf-editorial-card.highlight {
@@ -3336,7 +3383,6 @@
   border: 1px solid var(--gd-border-strong);
   border-radius: var(--gd-r-xl, var(--gd-r-lg));
   padding: clamp(1.5rem, 4vw, 2.75rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: var(--gd-6);
@@ -3430,7 +3476,6 @@
   border-color: var(--gd-accent);
   color: var(--brand-accent-ink);
   font-weight: 600;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--gd-accent) 40%, transparent);
 }
 
 /* Secondary Filter Bar (Category / Downtime) */
@@ -3488,7 +3533,7 @@
 
 .sf-matcher-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: var(--gd-4);
 }
 
@@ -3505,7 +3550,6 @@
 }
 .sf-matcher-card:hover {
   border-color: var(--gd-accent-line);
-  transform: translateY(-2px);
 }
 .sf-matcher-card.highlight {
   border-color: var(--gd-accent);
@@ -3668,10 +3712,17 @@
 /* The letter fallback needs dark ink now the tile is light. */
 .sf-card-img > span { color: color-mix(in srgb, #16201A 45%, transparent); }
 
+/* The warm ground the product floats on.
+ *
+ * More padding than looks necessary, deliberately. A bottle photographed on
+ * white and then shown edge-to-edge reads as a catalogue thumbnail; the same
+ * bottle with a wide margin of ground around it reads as a product shot. The
+ * space is doing the work, and it is the cheapest luxury signal available —
+ * every reference we are working from spends it generously. */
 .sf-product-main,
 .sf-product-thumb { background: #EFE7DA; }
-.sf-product-main img,
-.sf-product-thumb img { padding: 6%; }
+.sf-product-main img { padding: 11%; }
+.sf-product-thumb img { padding: 8%; }
 
 /* --------------------------------------------------- duration pills -- */
 /**
@@ -3706,7 +3757,6 @@
   border: 1px solid var(--gd-border-strong);
   border-radius: var(--gd-r-xl, var(--gd-r-lg));
   padding: clamp(1.5rem, 4vw, 2.75rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: var(--gd-6);
@@ -3757,14 +3807,13 @@
 .sf-led-tab:hover {
   border-color: var(--led-glow, var(--gd-accent));
   color: var(--gd-text);
-  transform: translateY(-1px);
 }
 .sf-led-tab.is-active {
   background: color-mix(in srgb, var(--led-glow, var(--gd-accent)) 18%, var(--gd-surface-raised));
   border-color: var(--led-glow, var(--gd-accent));
   color: var(--gd-text);
   font-weight: 600;
-  box-shadow: 0 0 16px color-mix(in srgb, var(--led-glow, var(--gd-accent)) 35%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--led-glow, var(--gd-accent)) 25%, transparent);
 }
 .sf-led-dot {
   width: .65rem;
@@ -3974,7 +4023,6 @@
   border: 1px solid var(--gd-border-strong);
   border-radius: var(--gd-r-xl, var(--gd-r-lg));
   padding: clamp(1.5rem, 4vw, 2.75rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: var(--gd-6);
@@ -4029,7 +4077,6 @@
   border-color: var(--gd-accent);
   color: var(--brand-accent-ink);
   font-weight: 600;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--gd-accent) 40%, transparent);
 }
 .sf-facial-pill-dot {
   width: .4rem;
@@ -4056,7 +4103,6 @@
 }
 .sf-facial-card:hover {
   border-color: var(--gd-accent-line);
-  transform: translateY(-2px);
 }
 .sf-facial-badge {
   font-size: var(--gd-step--2);
@@ -4168,7 +4214,6 @@
   border: 1px solid var(--gd-border-strong);
   border-radius: var(--gd-r-xl, var(--gd-r-lg));
   padding: clamp(1.5rem, 4vw, 2.75rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: var(--gd-6);
@@ -4216,14 +4261,12 @@
 .sf-scar-tab:hover {
   border-color: var(--gd-accent-line);
   color: var(--gd-text);
-  transform: translateY(-1px);
 }
 .sf-scar-tab.is-active {
   background: var(--gd-accent);
   border-color: var(--gd-accent);
   color: var(--brand-accent-ink);
   font-weight: 600;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--gd-accent) 40%, transparent);
 }
 .sf-scar-tab-icon {
   font-size: .8em;
@@ -5113,5 +5156,741 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   THE GUIDE PAGES — /prf/compare, /prf/aftercare
+   --------------------------------------------------------------------------
+   These shipped with thirty class names that no stylesheet ever defined, so
+   both pages were rendering as undecorated HTML: stacked divs, browser-default
+   <details> triangles, bullet lists running the full width of the window. They
+   are the pages meant to bring people in from search and then read as though
+   the practice knows what it is doing, and they were the least finished thing
+   on the site.
 
+   Written in the same language as the rest of the storefront now that the
+   ornament has come off: hairlines instead of boxes, space instead of borders,
+   a small dim label against a large light heading. Nothing here has a
+   gradient, a drop shadow, or an icon.
+   -------------------------------------------------------------------------- */
 
+/* ----------------------------------------------------------- breadcrumb -- */
+.sf-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-5);
+}
+.sf-breadcrumb a { color: var(--gd-text-muted); text-decoration: none; }
+.sf-breadcrumb a:hover {
+  color: var(--gd-accent);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+.sf-breadcrumb-sep { opacity: .4; }
+
+/* ------------------------------------------------------- numbered steps --
+ * Four preparation steps. The numeral is a quiet ordinal above the heading
+ * rather than a display-size accent character — the same correction made to
+ * the benefit pillars on the product page, for the same reason: it was set
+ * larger than the heading it labelled.
+ */
+.sf-aftercare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
+}
+.sf-aftercare-card { display: flex; flex-direction: column; }
+.sf-aftercare-step-num {
+  font-size: .68rem;
+  letter-spacing: .16em;
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-4);
+}
+.sf-aftercare-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-aftercare-card p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+
+/* ------------------------------------------------------------- timeline --
+ * Recovery, hour by hour. One rule runs down the left and each period hangs
+ * off it, so the eye can travel the sequence without reading a word — which
+ * is what somebody three days post-treatment is actually doing.
+ */
+.sf-timeline-list {
+  margin-top: var(--gd-7);
+  border-left: 1px solid var(--gd-border);
+  padding-left: clamp(1.25rem, 4vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-7);
+}
+.sf-timeline-item { position: relative; }
+/* The mark sits ON the rule. The ring is painted in the page ground so the
+   line appears to pass behind the dot rather than through it. */
+.sf-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * clamp(1.25rem, 4vw, 2.5rem) - 3.5px);
+  top: .45rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gd-accent);
+  box-shadow: 0 0 0 4px var(--gd-bg);
+}
+.sf-timeline-badge {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-timeline-content h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+}
+.sf-timeline-content p {
+  margin: 0 0 var(--gd-3);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-timeline-content ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  max-width: var(--sf-measure);
+}
+.sf-timeline-content li {
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+.sf-timeline-content li::marker { color: var(--gd-text-dim); }
+
+/* ---------------------------------------------------------- detail list -- */
+.sf-detail-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  max-width: var(--sf-measure);
+}
+.sf-detail-list li {
+  font-size: var(--gd-step--1);
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+}
+.sf-detail-list li::marker { color: var(--gd-text-dim); }
+
+/* ----------------------------------------------------- comparison cards -- */
+.sf-compare-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
+}
+.sf-compare-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+  padding-top: var(--gd-5);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-compare-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-compare-card p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+.sf-compare-tag {
+  align-self: flex-start;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+}
+/* The one place a fill is justified: this is an aside, and it has to read as
+   set apart from the comparison it interrupts. Even here it is a tint and a
+   left rule, not a bordered, rounded, shadowed panel. */
+.sf-compare-callout {
+  margin-top: var(--gd-7);
+  padding: var(--gd-5) var(--gd-6);
+  border-left: 2px solid var(--gd-accent);
+  background: color-mix(in srgb, var(--gd-accent) 5%, transparent);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+}
+.sf-compare-callout p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-compare-callout p + p { margin-top: var(--gd-3); }
+
+/* ------------------------------------------------------------------ faq --
+ * The same hairline rows as the product-page accordions, so the two read as
+ * one component rather than two answers to the same question.
+ */
+.sf-faq-list {
+  margin-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
+  max-width: 52rem;
+}
+.sf-faq-item { border-bottom: 1px solid var(--gd-border); }
+.sf-faq-q {
+  padding: var(--gd-4) var(--gd-6) var(--gd-4) 0;
+  font-size: var(--gd-step-0);
+  color: var(--gd-text);
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-faq-q::-webkit-details-marker { display: none; }
+.sf-faq-q:hover { color: var(--gd-accent); }
+/* list-style:none on a summary takes the default focus ring with it in
+   several browsers, so it is drawn back explicitly. */
+.sf-faq-q:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 3px; }
+/* A plus that becomes a minus: two rules, the vertical one rotated flat when
+   open. Cheaper than a glyph, and it cannot fall back to a tofu box. */
+.sf-faq-q::before,
+.sf-faq-q::after {
+  content: "";
+  position: absolute;
+  right: .35rem;
+  top: 50%;
+  width: .6rem;
+  height: 1px;
+  background: currentColor;
+  opacity: .55;
+  transition: transform var(--gd-fast) var(--gd-ease);
+}
+.sf-faq-q::after { transform: rotate(90deg); }
+.sf-faq-item[open] .sf-faq-q::after { transform: rotate(0deg); }
+.sf-faq-a {
+  margin: 0;
+  padding: 0 var(--gd-6) var(--gd-5) 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+
+/* ------------------------------------------------------------ cta block -- */
+.sf-cta-block {
+  padding-top: var(--gd-7);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-cta-block h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-cta-block p {
+  margin: 0 0 var(--gd-5);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-cta-actions { display: flex; flex-wrap: wrap; gap: var(--gd-3); }
+
+/* ----------------------------------------------------------- cluster nav -- */
+.sf-cluster-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-3);
+  margin-top: var(--gd-5);
+}
+
+/* ------------------------------------------------------ restored: buy row --
+ * .sf-product-buy lost its rule in 5cbc7ed while staying in the markup, so
+ * the quantity stepper and the add button had been laying out as raw inline
+ * blocks on every product page since that commit.
+ */
+.sf-product-buy {
+  display: flex;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  align-items: center;
+  margin: var(--gd-6) 0 var(--gd-4);
+}
+
+/* --------------------------------------------------------------------------
+   TREATMENT MATCHER — the concern picker on /prf
+   --------------------------------------------------------------------------
+   Seventeen of its class names had no rule either, so the pills, the
+   recommendation panel and the two prose columns were rendering as plain
+   stacked text on the page that is meant to convert search traffic.
+   -------------------------------------------------------------------------- */
+
+.sf-matcher-head { max-width: var(--sf-measure); }
+.sf-matcher-eyebrow {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-3);
+}
+.sf-matcher-desc {
+  margin: var(--gd-3) 0 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+
+/* The concern pills. Selected state is a filled pill; the rest are hairline
+   outlines. One signal, no shadow, no scale. */
+.sf-matcher-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin: var(--gd-6) 0;
+}
+.sf-matcher-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .55rem 1rem;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-full);
+  background: transparent;
+  color: var(--gd-text-muted);
+  font: inherit;
+  font-size: var(--gd-step--1);
+  cursor: pointer;
+  transition: color var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              background var(--gd-fast) var(--gd-ease);
+}
+.sf-matcher-pill:hover { color: var(--gd-text); border-color: var(--gd-border-strong); }
+.sf-matcher-pill:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+.sf-matcher-pill.is-active {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--brand-accent-ink);
+}
+/* The dot only earns its place on the unselected pills — on the filled one it
+   would be a mark on a mark. */
+.sf-matcher-pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .45;
+  flex: none;
+}
+.sf-matcher-pill.is-active .sf-matcher-pill-dot { opacity: 0; }
+
+.sf-matcher-match-tag {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-matcher-treatment-name {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-matcher-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin-top: var(--gd-3);
+}
+.sf-matcher-stat-badge {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+}
+/* The two facts are separated by a hairline rather than by giving each one a
+   bordered chip of its own. */
+.sf-matcher-stat-badge + .sf-matcher-stat-badge {
+  padding-left: var(--gd-3);
+  border-left: 1px solid var(--gd-border);
+}
+
+.sf-matcher-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: var(--gd-6);
+  margin-top: var(--gd-6);
+  padding-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-matcher-col { min-width: 0; }
+.sf-matcher-section-title {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-text-dim);
+  margin: 0 0 var(--gd-2);
+  font-weight: 400;
+}
+.sf-matcher-prose {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+.sf-matcher-benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.sf-matcher-benefits li {
+  display: flex;
+  gap: .6rem;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+.sf-matcher-check { color: var(--gd-accent); flex: none; }
+.sf-matcher-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-3);
+  margin-top: var(--gd-5);
+}
+
+/* ------------------------------------------------------------- errors --
+ * .sf-error had no rule anywhere, which meant a failed booking or a declined
+ * basket action printed its message in body text the same colour and size as
+ * everything around it. The one message on the page that must not be missed
+ * was the one with no styling at all.
+ */
+.sf-error {
+  margin: var(--gd-4) 0 0;
+  padding: var(--gd-3) var(--gd-4);
+  border-left: 2px solid var(--gd-danger, #b4433a);
+  background: color-mix(in srgb, var(--gd-danger, #b4433a) 8%, transparent);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text);
+}
+
+/* --------------------------------------------------------------------------
+   THE SECOND WAVE OF GUIDE PAGES — /facials, /led-light-therapy, /scar-revision
+   --------------------------------------------------------------------------
+   Same story as /prf/compare and /prf/aftercare: shipped with class names no
+   stylesheet defined, so the hero lead, the statistic row, the comparison
+   tables and the FAQs were all rendering as plain stacked text.
+
+   Their buttons were worse than unstyled — they asked for `sf-btn-primary`,
+   where the component has always been `sf-btn primary`. A near-miss on a class
+   name produces no error and no styling, so the calls to action on three pages
+   were rendering as bare links. That is fixed in the markup rather than by
+   adding an alias here, because an alias would keep the wrong name alive.
+
+   Everything below matches the language of the rest of the storefront:
+   hairlines, space, a small dim label against a large light heading.
+   -------------------------------------------------------------------------- */
+
+.sf-hero-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-4);
+}
+.sf-hero-crumbs a { color: var(--gd-text-muted); text-decoration: none; }
+.sf-hero-crumbs a:hover {
+  color: var(--gd-accent);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+
+.sf-hero-lead { max-width: 46rem; }
+/* The display face carries the emphasis; italic here is the brand's own
+   gesture, matched to how .sf-display uses <i> elsewhere. */
+.sf-italic { font-style: italic; }
+
+/* ------------------------------------------------------------ stat row --
+ * Four figures under the hero. Set as large light numerals over small dim
+ * labels, divided by hairlines — the same relationship as the product spec
+ * row, which is the other place this pattern appears.
+ */
+.sf-matrix-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
+  gap: var(--gd-5) var(--gd-6);
+  margin-top: var(--gd-7);
+  padding: var(--gd-5) 0;
+  border-top: 1px solid var(--gd-border);
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-matrix-stat { display: flex; flex-direction: column; gap: .35rem; }
+.sf-matrix-stat .val {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-3);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--gd-text);
+  font-variant-numeric: tabular-nums;
+}
+.sf-matrix-stat .lbl {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gd-text-dim);
+  line-height: 1.4;
+}
+
+/* ----------------------------------------------------- comparison table --
+ * Wide tables are the one thing allowed to scroll sideways, in their own
+ * container, so the page body never does.
+ */
+.sf-matrix-wrapper {
+  margin-top: var(--gd-6);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sf-matrix-wrapper:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+.sf-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--gd-step--1);
+  min-width: 34rem;
+}
+.sf-matrix-table th,
+.sf-matrix-table td {
+  text-align: left;
+  padding: var(--gd-3) var(--gd-4);
+  border-bottom: 1px solid var(--gd-border);
+  vertical-align: top;
+  color: var(--gd-text-muted);
+  line-height: 1.55;
+}
+.sf-matrix-table thead th {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gd-text-dim);
+  font-weight: 400;
+  white-space: nowrap;
+}
+.sf-matrix-table tbody th,
+.sf-matrix-table tbody td:first-child { color: var(--gd-text); }
+.sf-matrix-table tbody tr:last-child td,
+.sf-matrix-table tbody tr:last-child th { border-bottom: 0; }
+
+/* ------------------------------------------------------ editorial cards -- */
+.sf-editorial-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
+}
+.sf-facial-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gd-2);
+  margin-bottom: var(--gd-2);
+}
+
+/* -------------------------------------------------------------- faq v2 --
+ * A second FAQ component with its own class names arrived alongside the
+ * first. Rather than leave two looks on one site, it is given the same
+ * hairline rows as .sf-faq-list and the product accordions.
+ */
+.sf-faq-grid {
+  margin-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
+  max-width: 52rem;
+}
+.sf-faq-grid > details { border-bottom: 1px solid var(--gd-border); }
+.sf-faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gd-4);
+  padding: var(--gd-4) 0;
+  font-size: var(--gd-step-0);
+  color: var(--gd-text);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-faq-question::-webkit-details-marker { display: none; }
+.sf-faq-question:hover { color: var(--gd-accent); }
+.sf-faq-question:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 3px; }
+.sf-faq-arrow {
+  width: .45rem;
+  height: .45rem;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform var(--gd-fast) var(--gd-ease);
+  opacity: .55;
+}
+details[open] > .sf-faq-question .sf-faq-arrow {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+.sf-faq-answer {
+  padding: 0 0 var(--gd-5);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-faq-answer p { margin: 0 0 var(--gd-3); }
+.sf-faq-answer p:last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------- the last few --
+ * Classes that were in the markup with no rule anywhere. Small, but each one
+ * was a thing somebody wrote intending it to do something.
+ */
+
+/* Footer link column. The layout was being carried by an inline style object
+   on the element; it belongs here, where the rest of the footer lives. */
+.sf-foot-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.sf-cart { display: block; }
+
+.sf-story-profile-info { min-width: 0; }
+
+.sf-scar-tab-name { display: block; }
+
+/* NAMED "spin" AND NEVER SPINNING.
+ *
+ * A dashed ring on the PRF marks, drawn to rotate — the class says so — with
+ * no animation defined anywhere. It has been sitting still since it shipped.
+ * Slow enough to read as a mechanism rather than a loading spinner, which is
+ * what a fast one on a marketing page would be mistaken for. */
+@keyframes sf-prf-spin { to { transform: rotate(360deg); } }
+.sf-prf-icon-spin {
+  transform-origin: 16px 16px;
+  animation: sf-prf-spin 18s linear infinite;
+}
+/* tokens.css already blanket-disables animation under reduced motion; this is
+   restated because an element that only exists to rotate should visibly opt
+   out rather than rely on a global. */
+@media (prefers-reduced-motion: reduce) {
+  .sf-prf-icon-spin { animation: none; }
+}
+
+/* The discipline mark on the home-page deck. Sized here because the SVG
+   carries only a viewBox, and an <svg> with no width resolves to the CSS
+   default of 300x150 — the card was reserving a third of its height for a
+   48-unit drawing. */
+.sf-deck-icon-svg {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   DECK ARTWORK — the motion these were drawn for
+   ---------------------------------------------------------------------------
+   The home-page discipline deck ships four line drawings whose parts are named
+   for movement — orbit rings, a vortex stream, a pulse of target nodes, a
+   stipple matrix — with no animation defined for any of them. They have been
+   sitting still since they shipped, which is the same thing that happened to
+   .sf-prf-icon-spin.
+
+   Slow, and small. The file already sets the convention at 8-18s for this kind
+   of ambient motion (see .sf-vortex-outer), and anything faster on a page
+   someone is trying to read a price on stops being atmosphere and starts being
+   a distraction. Nothing here moves more than a few percent.
+   --------------------------------------------------------------------------- */
+
+@keyframes sf-deck-orbit { to { transform: rotate(360deg); } }
+@keyframes sf-deck-drift {
+  0%, 100% { stroke-dashoffset: 0; opacity: .3; }
+  50%      { stroke-dashoffset: -20; opacity: .55; }
+}
+@keyframes sf-deck-pulse {
+  0%, 100% { opacity: .45; }
+  50%      { opacity: 1; }
+}
+
+/* The rings turn about the middle of the 220x110 viewBox. transform-box is
+   required: without it an SVG child rotates about the origin of the whole
+   user-coordinate system and swings off the canvas. */
+.sf-orbit-outer,
+.sf-orbit-mid {
+  transform-origin: 110px 55px;
+  transform-box: view-box;
+}
+.sf-orbit-outer { animation: sf-deck-orbit 40s linear infinite; }
+.sf-orbit-mid   { animation: sf-deck-orbit 28s linear infinite reverse; }
+
+/* The dashed stream reads as flow by moving its dashes rather than the path,
+   so the drawing itself never shifts. */
+.sf-vortex-stream {
+  stroke-dasharray: 6 8;
+  animation: sf-deck-drift 9s ease-in-out infinite;
+}
+
+.sf-target-nodes  { animation: sf-deck-pulse 4.5s ease-in-out infinite; }
+.sf-stipple-matrix { animation: sf-deck-pulse 6s ease-in-out infinite; }
+
+/* tokens.css disables animation globally under reduced motion; restated here
+   because every rule above exists only to move something. */
+@media (prefers-reduced-motion: reduce) {
+  .sf-orbit-outer,
+  .sf-orbit-mid,
+  .sf-vortex-stream,
+  .sf-target-nodes,
+  .sf-stipple-matrix { animation: none; }
+}

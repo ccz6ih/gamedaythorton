@@ -299,7 +299,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
             {isSpa && (
               <div>
                 <h4>Guides &amp; Science</h4>
-                <ul className="sf-foot-links" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <ul className="sf-foot-links">
                   <li><Link href={links.prf}>PRF Regenerative Guide</Link></li>
                   <li><Link href={links.prfCompare}>Compare PRF vs PRP &amp; Fillers</Link></li>
                   <li><Link href={links.prfAftercare}>PRF Pre-Care &amp; Recovery</Link></li>

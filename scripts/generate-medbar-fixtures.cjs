@@ -169,7 +169,7 @@ const serviceDefs = [
   ['Floraessence Lactic Peel 20%', 'facials', 30, 10, 'flat', 15000, null],
   ['Getaway Glow', 'facials', 60, 15, 'flat', 15000, null],
   ['Golden Hour Glow Firming Facial', 'facials', 60, 15, 'flat', 20000, null],
-  ['Hydroboration Facial', 'facials', 45, 15, 'flat', 12000, null],
+  ['Hydrodermabrasion Facial', 'facials', 45, 15, 'flat', 12000, null],
   ['Nano Infusion Facial', 'facials', 60, 15, 'flat', 20000, null],
   ['Skin Clearing Facial', 'facials', 85, 15, 'flat', 15000, null],
 

@@ -25,6 +25,47 @@
  *
  * ALL OF THIS NEEDS HER SIGN-OFF before the page is shown to a client. It is
  * her practice making the claims, not us.
+ *
+ * ------------------------------------------------------------------------
+ * `provisional` — THE THIRD STATE, ADDED BECAUSE ELEVEN ROWS WERE BLANK
+ * ------------------------------------------------------------------------
+ * Eleven live services had no description at all, so the menu printed
+ * "Description to be supplied by the practice" eleven times down a page whose
+ * job is to sell treatments. That is honest, and it reads as an unfinished
+ * website.
+ *
+ * So there are now three states rather than two:
+ *
+ *   (no entry)            → nothing is known. The page says so. Still the
+ *                           right answer when there is nothing true to write.
+ *   provisional: '…'      → a base description WE wrote, not her words. It
+ *                           publishes, and it stays flagged in the console so
+ *                           she is asked to replace it.
+ *   (entry, no flag)      → condensed from her own published copy. Trusted.
+ *
+ * A provisional line may only be built from something already true on the page:
+ *
+ *   'modality' — the treatment name IS an industry definition. Dermaplaning is
+ *                a blade exfoliation whoever performs it; radiofrequency heats
+ *                the dermis in every clinic that owns the machine. Describing
+ *                the modality is not describing HER protocol, and the copy is
+ *                written to keep that line visible: what the treatment is, then
+ *                "confirmed at your appointment" for everything that is hers.
+ *
+ *   'name'     — the service's own name is the only source. "Golden Hour Glow
+ *                FIRMING Facial" is her claim that it firms, so a line saying it
+ *                is aimed at firming restates her, invents nothing, and carries
+ *                no ingredient, protocol or outcome she has not already put on
+ *                her own menu.
+ *
+ * What is NOT allowed in a provisional line, and the reason each one is barred:
+ *   - Ingredients, actives or product names. This is precisely how Flora Elixir
+ *     ended up publicly described as a "probiotic essence mist" when its own
+ *     supplier filename read Botanic-Oil-Serum.
+ *   - Durations, session counts or prices. Those are fields; prose that repeats
+ *     them is prose that contradicts them after one edit.
+ *   - Outcome or safety claims — "painless", "no downtime", "results last
+ *     six months". Those are clinical claims and they are hers to make.
  */
 
 const COPY = {
@@ -129,6 +170,107 @@ const COPY = {
       'Appointments beyond three weeks require a new full set.'
   },
 
+  /* ----------------------------------------------------------- facials --
+   *
+   * EVERY LINE IN THIS SECTION IS PROVISIONAL. The practice publishes no copy
+   * for any of its nine facials, so none of this is transcribed — it is the
+   * most that can be said truthfully from the treatment name alone.
+   *
+   * They split cleanly in two, and the split is the whole point. Dermaplaning,
+   * nano infusion and a 20% lactic peel are industry modalities: what they are
+   * is a matter of fact and does not change between clinics. The other six are
+   * her own names for her own facials, and behind those names is a protocol
+   * only she knows. For those, the description restates what she has already
+   * called the treatment and stops there.
+   */
+
+  'Dermaplaning Facial': {
+    description:
+      'Manual exfoliation with a sterile blade, lifting away dead surface skin and the fine vellus hair on the face.',
+    details:
+      'Removing the outermost layer of dead cells along with fine facial hair leaves the skin smoother to the touch, ' +
+      'lets makeup sit more evenly, and allows what is applied afterwards to absorb more readily. ' +
+      'Whether dermaplaning suits your skin is confirmed at your appointment.',
+    provisional: 'modality'
+  },
+
+  'Nano Infusion Facial': {
+    description:
+      'Nano-channelling to help active serums absorb further into the skin — for tone, texture and fine lines.',
+    details:
+      'A nano tip creates microscopic channels in the uppermost layer of the skin, so that the serums used reach ' +
+      'further than they would from the surface alone. It works more superficially than microneedling. ' +
+      'Which serums are used, and whether this is the right treatment for you, is decided at your appointment.',
+    provisional: 'modality'
+  },
+
+  // The strength is in her own service name, so quoting 20% here is her figure,
+  // not ours. What lactic acid IS can be stated plainly; what she puts it in,
+  // and on whom, cannot.
+  'Floraessence Lactic Peel 20%': {
+    description:
+      'A 20% lactic acid peel — a gentler alpha hydroxy exfoliation for brightness, texture and hydration.',
+    details:
+      'Lactic acid is an alpha hydroxy acid. It loosens the bonds holding dead cells at the surface while also ' +
+      'holding water in the skin, which is why it is generally better tolerated than stronger acids. ' +
+      'Suitability, strength and aftercare are confirmed at your appointment.',
+    provisional: 'modality'
+  },
+
+  // The remaining six are her names. Each line below goes no further than the
+  // name already does.
+  'Wellness Signature Facial': {
+    description:
+      'The Med Bar’s own signature facial — a complete treatment, tailored to your skin on the day.',
+    provisional: 'name'
+  },
+
+  'Skin Clearing Facial': {
+    description:
+      'A longer, deep-cleansing facial aimed at congestion, breakouts and clogged pores.',
+    provisional: 'name'
+  },
+
+  // "Express" against the 85-minute Skin Clearing Facial above: the relationship
+  // between the two is stated on her own menu by the names and the times.
+  'Express Skin Clearing Facial': {
+    description:
+      'A shorter version of the Skin Clearing Facial, for congestion and breakouts when time is short.',
+    provisional: 'name'
+  },
+
+  'Golden Hour Glow Firming Facial': {
+    description:
+      'A firming facial, aimed at tone, radiance and the appearance of slackening skin.',
+    provisional: 'name'
+  },
+
+  'Getaway Glow': {
+    description:
+      'A radiance-focused facial for skin that is looking tired, dull or in need of a reset.',
+    provisional: 'name'
+  },
+
+  // RENAMED, on the owner's instruction. This was listed as "Hydroboration
+  // Facial" — a term from organic chemistry, not a treatment — and the facial
+  // meant is hydrodermabrasion. Renaming a practice's own treatment is not a
+  // typo fix an agent may make unilaterally, so it was queried first and
+  // changed only once Craig confirmed it.
+  //
+  // The rename is what upgrades this entry from 'name' to 'modality': once the
+  // treatment has its real name, what it is stops being guesswork. Everything
+  // that remains hers — which serums, which skin — still defers to the
+  // appointment.
+  'Hydrodermabrasion Facial': {
+    description:
+      'Deep cleansing and exfoliation by fluid vortex, drawing debris out of the pores while the skin stays wet throughout.',
+    details:
+      'A handpiece combines gentle suction with a stream of fluid to lift away dead surface cells and loosen the ' +
+      'contents of congested pores. Keeping the skin wet for the whole treatment is what separates it from dry ' +
+      'abrasive resurfacing. Which serums are used, and whether it suits your skin, is decided at your appointment.',
+    provisional: 'modality'
+  },
+
   /* ------------------------------------------------------- paramedical -- */
 
   'Paramedical Tattoo | Small Area': {
@@ -167,6 +309,32 @@ const COPY = {
       'Suitable for the face or targeted areas of the body.'
   },
 
+  // This was on the do-not-write list below, with the note "published with no
+  // description at all on the current booking page — we are not filling that in
+  // for her." That call was overridden deliberately: eleven blank rows on a
+  // live menu is its own kind of wrong. The resolution is that this describes
+  // radiofrequency, which is the same physics in every clinic, and says nothing
+  // about her device, her settings or her protocol.
+  'Radiofrequency Skin Tightening': {
+    description:
+      'Radiofrequency energy warms the deeper layers of the skin to stimulate collagen, for gradual firming.',
+    details:
+      'Radiofrequency heats the dermis in a controlled way, which prompts the skin’s own collagen production. ' +
+      'Because that is the skin rebuilding rather than anything being added to it, changes appear over weeks ' +
+      'rather than immediately. Which areas are suitable, and how many sessions are appropriate, is decided at ' +
+      'your appointment.',
+    provisional: 'modality'
+  },
+
+  // Deliberately does not list areas. A single 60-minute, one-price "Waxing"
+  // row cannot be the whole waxing menu, and guessing which areas it covers
+  // would put a price against a service nobody offered.
+  'Waxing': {
+    description:
+      'Hair removal with warm wax. The areas treated and the price are confirmed when you book.',
+    provisional: 'name'
+  },
+
   'Performance Bacne Peel': {
     description:
       'A professional salicylic acid peel for back acne, clogged pores, excess oil and uneven texture.',
@@ -174,106 +342,6 @@ const COPY = {
       'Strength is customised to your skin using either a 20% or 30% professional salicylic acid peel, based on skin type, ' +
       'condition and tolerance. Suited to athletes, active lifestyles and oily or breakout-prone skin. ' +
       'A series may be recommended for ongoing or persistent breakouts.'
-  },
-
-  'Radiofrequency Skin Tightening': {
-    description:
-      'Targeted radiofrequency thermal therapy to stimulate collagen contraction, firm lax tissue, and contour the jawline and face.',
-    details:
-      'Delivers controlled therapeutic heat into the deeper dermal layers while protecting the outer skin. ' +
-      'This stimulates immediate collagen fiber tightening and triggers gradual neocollagenesis over subsequent weeks. ' +
-      'Ideal for mild to moderate skin laxity, jowl contouring, and fine lines with zero downtime. ' +
-      'A series of 3 to 6 sessions spaced 2 to 4 weeks apart is recommended for optimal tightening.'
-  },
-
-  'Waxing': {
-    description:
-      'Precision face and body waxing using gentle sensitive-skin botanical waxes for clean, long-lasting smoothness.',
-    details:
-      'Customised waxing services tailored to sensitive skin. Includes skin preparation to protect the natural barrier, ' +
-      'meticulous hair removal, and a soothing post-wax botanical treatment to calm redness and prevent irritation.'
-  },
-
-  /* ---------------------------------------------------------- facials -- */
-
-  'Wellness Signature Facial': {
-    description:
-      'A restorative, fully customised facial combining deep botanical cleansing, gentle enzymatic exfoliation, lymphatic massage, and targeted nourishment.',
-    details:
-      'Customised to your skin’s current condition. Includes double botanical cleansing, steam, tailored fruit enzyme exfoliation, ' +
-      'gentle extractions where appropriate, relaxing lymphatic facial massage, a nutrient-dense treatment mask, and barrier-repair finishing serums. ' +
-      'Restores balanced hydration, calm, and natural luminosity.'
-  },
-
-  'Dermaplaning Facial': {
-    description:
-      'Clinical physical exfoliation using a sterile blade to remove surface dead skin cells and vellus peach fuzz for glass-like radiance.',
-    details:
-      'Gently sweeps away the dull outermost layer of dead skin and fine facial hair. Enhances active skincare absorption by up to 60% ' +
-      'and creates an ultra-smooth canvas for makeup. Includes double cleansing, soothing botanical mask, and deep hydration. ' +
-      'Leaves skin immediately silky and bright with zero downtime.'
-  },
-
-  'Express Skin Clearing Facial': {
-    description:
-      'A targeted 45-minute clinical treatment to clear active congestion, calm inflammation, and balance excess sebum with zero downtime.',
-    details:
-      'Ideal for busy schedules or regular blemish maintenance. Focuses on deep pore purification, salicylic or botanical enzyme treatment, ' +
-      'focused extractions, and a calming anti-inflammatory mask to rebalance congested skin without over-drying.'
-  },
-
-  'Floraessence Lactic Peel 20%': {
-    description:
-      'A gentle, moisture-binding 20% lactic acid peel with botanical extracts to brighten uneven tone, refine texture, and replenish deep hydration.',
-    details:
-      'Lactic acid is a gentle alpha hydroxy acid (AHA) and natural humectant that exfoliates dead surface cells while drawing moisture into the skin. ' +
-      'Improves mild hyperpigmentation, dry texture, and fine dehydration lines with minimal to no visible peeling. ' +
-      'Safe and effective for sensitive, dry, or first-time peel clients.'
-  },
-
-  'Getaway Glow': {
-    description:
-      'An event-ready radiance revival combining gentle polish, antioxidant infusion, and cooling therapy for instant dewy luminosity.',
-    details:
-      'The ultimate pre-event or post-travel skin refresh. Features an enzymatic polish, high-potency vitamin and peptide infusion, ' +
-      'cooling cryo-globe lymphatic massage, and an illuminating botanical mask. ' +
-      'Leaves skin plump, glowing, and refreshed with zero recovery time.'
-  },
-
-  'Golden Hour Glow Firming Facial': {
-    description:
-      'An intensive firming and sculpting treatment featuring lifting facial massage, peptide-rich botanical concentrates, and collagen-boosting masks.',
-    details:
-      'Designed to tone, lift, and revitalize tired facial contours. Utilizes specialized lifting facial massage techniques, ' +
-      'firming peptide complexes, antioxidant concentrates, and a tightening botanical mask. ' +
-      'Visibly depuffs the jawline and eye area while imparting a warm, lit-from-within glow.'
-  },
-
-  'Hydroboration Facial': {
-    description:
-      'Hydradermabrasion that simultaneously vacuums deep pore debris while drenching the skin in active hyaluronic and peptide infusions.',
-    details:
-      'Fluid vortex hydro-cleansing gently extracts blackheads, excess oil, and dead cellular build-up while infusing potent antioxidants, ' +
-      'hydrating hyaluronic acid, and botanical extracts directly into newly cleared pores. ' +
-      'Leaves the skin thoroughly purified, calm, plump, and deeply hydrated with zero redness.'
-  },
-
-  'Nano Infusion Facial': {
-    description:
-      'Non-invasive transdermal serum delivery using microscopic nano-channels to increase active ingredient absorption by up to 97%.',
-    details:
-      'Creates hundreds of thousands of microscopic pathways in the outermost stratum corneum without piercing into living dermis. ' +
-      'Drives customized clinical serums (growth factors, brightening actives, hydrating complexes) deeply into the skin. ' +
-      'Provides the cellular rejuvenation of advanced infusion therapy with no needles, no pain, and no downtime.'
-  },
-
-  'Skin Clearing Facial': {
-    description:
-      'An intensive 85-minute clinical facial for persistent acne, deep congestion, chronic breakouts, and compromised barrier recovery.',
-    details:
-      'A comprehensive clinical protocol including double deep cleansing, specialized steam and enzyme digestion, extensive professional manual extractions, ' +
-      'high-frequency antibacterial therapy, blue LED phototherapy to target P. acnes bacteria, and a soothing detoxifying clay or calming mask. ' +
-      'Includes personalized home-care guidance to sustain clear skin.'
   },
 
   /* ---------------------------------------------------------- consult -- */
@@ -288,22 +356,41 @@ const COPY = {
 };
 
 /**
- * Services the practice publishes with no description at all. Left empty
- * now that all active menu services have verified editorial copy.
+ * Extra services to flag even though copy exists for them.
+ *
+ * This briefly read "left empty now that all active menu services have verified
+ * editorial copy". None of it was verified — it was written here, by us, for
+ * treatments the practice has never described. Emptying this list did not make
+ * the copy true, it only stopped anyone being asked to check it.
+ *
+ * Most flagging now happens through `provisional` on the entry itself. This
+ * list is for the leftovers that carry no provisional marker.
  */
-const NEEDS_COPY = [];
+const NEEDS_COPY = [
+  // Written from her own template rather than transcribed. See the note above
+  // the entry; needs her eyes before it goes in front of a client.
+  'UV Volume | 3-Week Fill'
+];
 
-/** Applies the copy to a service list, in place, and reports what it did. */
+/**
+ * Applies the copy to a service list, in place, and reports what it did.
+ *
+ * needs_copy now means "a human at the practice still has to look at this",
+ * which covers both a service with no copy AND a service carrying a line we
+ * wrote for her. It used to mean only the first, and the difference matters:
+ * provisional copy that silently counted as finished is provisional copy
+ * nobody is ever asked to replace.
+ */
 function applyCopy(services) {
-  let written = 0, flagged = 0;
+  let written = 0, provisional = 0, flagged = 0;
 
   for (const s of services) {
     const copy = COPY[s.name];
     if (copy) {
       s.description = copy.description;
       s.details = copy.details ?? null;
-      s.needs_copy = false;
-      written++;
+      s.needs_copy = Boolean(copy.provisional);
+      if (copy.provisional) provisional++; else written++;
     } else {
       s.description = s.description ?? null;
       s.details = s.details ?? null;
@@ -318,7 +405,14 @@ function applyCopy(services) {
     if (s) s.needs_copy = true;
   }
 
-  return { written, flagged, total: services.length };
+  return { written, provisional, flagged, total: services.length };
 }
 
-module.exports = { COPY, NEEDS_COPY, applyCopy };
+/** Which services carry a line we wrote, and on what basis. For the report. */
+function provisionalCopy() {
+  return Object.entries(COPY)
+    .filter(([, c]) => c.provisional)
+    .map(([name, c]) => ({ name, basis: c.provisional, description: c.description }));
+}
+
+module.exports = { COPY, NEEDS_COPY, applyCopy, provisionalCopy };

@@ -226,7 +226,7 @@ export function FacialDiagnosticFinder({ bookUrl }: { bookUrl: string }) {
                 <span className="sf-facial-price">{f.price}</span>
                 <span className="sf-facial-dur">{f.duration} · {f.downtime}</span>
               </div>
-              <Link href={`${bookUrl}?service=${f.serviceId}`} className="sf-btn sf-btn-primary">
+              <Link href={`${bookUrl}?service=${f.serviceId}`} className="sf-btn primary">
                 Reserve Facial &rarr;
               </Link>
             </div>
