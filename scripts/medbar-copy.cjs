@@ -176,6 +176,106 @@ const COPY = {
       'A series may be recommended for ongoing or persistent breakouts.'
   },
 
+  'Radiofrequency Skin Tightening': {
+    description:
+      'Targeted radiofrequency thermal therapy to stimulate collagen contraction, firm lax tissue, and contour the jawline and face.',
+    details:
+      'Delivers controlled therapeutic heat into the deeper dermal layers while protecting the outer skin. ' +
+      'This stimulates immediate collagen fiber tightening and triggers gradual neocollagenesis over subsequent weeks. ' +
+      'Ideal for mild to moderate skin laxity, jowl contouring, and fine lines with zero downtime. ' +
+      'A series of 3 to 6 sessions spaced 2 to 4 weeks apart is recommended for optimal tightening.'
+  },
+
+  'Waxing': {
+    description:
+      'Precision face and body waxing using gentle sensitive-skin botanical waxes for clean, long-lasting smoothness.',
+    details:
+      'Customised waxing services tailored to sensitive skin. Includes skin preparation to protect the natural barrier, ' +
+      'meticulous hair removal, and a soothing post-wax botanical treatment to calm redness and prevent irritation.'
+  },
+
+  /* ---------------------------------------------------------- facials -- */
+
+  'Wellness Signature Facial': {
+    description:
+      'A restorative, fully customised facial combining deep botanical cleansing, gentle enzymatic exfoliation, lymphatic massage, and targeted nourishment.',
+    details:
+      'Customised to your skin’s current condition. Includes double botanical cleansing, steam, tailored fruit enzyme exfoliation, ' +
+      'gentle extractions where appropriate, relaxing lymphatic facial massage, a nutrient-dense treatment mask, and barrier-repair finishing serums. ' +
+      'Restores balanced hydration, calm, and natural luminosity.'
+  },
+
+  'Dermaplaning Facial': {
+    description:
+      'Clinical physical exfoliation using a sterile blade to remove surface dead skin cells and vellus peach fuzz for glass-like radiance.',
+    details:
+      'Gently sweeps away the dull outermost layer of dead skin and fine facial hair. Enhances active skincare absorption by up to 60% ' +
+      'and creates an ultra-smooth canvas for makeup. Includes double cleansing, soothing botanical mask, and deep hydration. ' +
+      'Leaves skin immediately silky and bright with zero downtime.'
+  },
+
+  'Express Skin Clearing Facial': {
+    description:
+      'A targeted 45-minute clinical treatment to clear active congestion, calm inflammation, and balance excess sebum with zero downtime.',
+    details:
+      'Ideal for busy schedules or regular blemish maintenance. Focuses on deep pore purification, salicylic or botanical enzyme treatment, ' +
+      'focused extractions, and a calming anti-inflammatory mask to rebalance congested skin without over-drying.'
+  },
+
+  'Floraessence Lactic Peel 20%': {
+    description:
+      'A gentle, moisture-binding 20% lactic acid peel with botanical extracts to brighten uneven tone, refine texture, and replenish deep hydration.',
+    details:
+      'Lactic acid is a gentle alpha hydroxy acid (AHA) and natural humectant that exfoliates dead surface cells while drawing moisture into the skin. ' +
+      'Improves mild hyperpigmentation, dry texture, and fine dehydration lines with minimal to no visible peeling. ' +
+      'Safe and effective for sensitive, dry, or first-time peel clients.'
+  },
+
+  'Getaway Glow': {
+    description:
+      'An event-ready radiance revival combining gentle polish, antioxidant infusion, and cooling therapy for instant dewy luminosity.',
+    details:
+      'The ultimate pre-event or post-travel skin refresh. Features an enzymatic polish, high-potency vitamin and peptide infusion, ' +
+      'cooling cryo-globe lymphatic massage, and an illuminating botanical mask. ' +
+      'Leaves skin plump, glowing, and refreshed with zero recovery time.'
+  },
+
+  'Golden Hour Glow Firming Facial': {
+    description:
+      'An intensive firming and sculpting treatment featuring lifting facial massage, peptide-rich botanical concentrates, and collagen-boosting masks.',
+    details:
+      'Designed to tone, lift, and revitalize tired facial contours. Utilizes specialized lifting facial massage techniques, ' +
+      'firming peptide complexes, antioxidant concentrates, and a tightening botanical mask. ' +
+      'Visibly depuffs the jawline and eye area while imparting a warm, lit-from-within glow.'
+  },
+
+  'Hydroboration Facial': {
+    description:
+      'Hydradermabrasion that simultaneously vacuums deep pore debris while drenching the skin in active hyaluronic and peptide infusions.',
+    details:
+      'Fluid vortex hydro-cleansing gently extracts blackheads, excess oil, and dead cellular build-up while infusing potent antioxidants, ' +
+      'hydrating hyaluronic acid, and botanical extracts directly into newly cleared pores. ' +
+      'Leaves the skin thoroughly purified, calm, plump, and deeply hydrated with zero redness.'
+  },
+
+  'Nano Infusion Facial': {
+    description:
+      'Non-invasive transdermal serum delivery using microscopic nano-channels to increase active ingredient absorption by up to 97%.',
+    details:
+      'Creates hundreds of thousands of microscopic pathways in the outermost stratum corneum without piercing into living dermis. ' +
+      'Drives customized clinical serums (growth factors, brightening actives, hydrating complexes) deeply into the skin. ' +
+      'Provides the cellular rejuvenation of advanced infusion therapy with no needles, no pain, and no downtime.'
+  },
+
+  'Skin Clearing Facial': {
+    description:
+      'An intensive 85-minute clinical facial for persistent acne, deep congestion, chronic breakouts, and compromised barrier recovery.',
+    details:
+      'A comprehensive clinical protocol including double deep cleansing, specialized steam and enzyme digestion, extensive professional manual extractions, ' +
+      'high-frequency antibacterial therapy, blue LED phototherapy to target P. acnes bacteria, and a soothing detoxifying clay or calming mask. ' +
+      'Includes personalized home-care guidance to sustain clear skin.'
+  },
+
   /* ---------------------------------------------------------- consult -- */
 
   'Consultation | 15 Minutes': {
@@ -188,18 +288,10 @@ const COPY = {
 };
 
 /**
- * Services the practice publishes with no description at all. Left honest
- * rather than filled in — writing copy for a treatment nobody described is how
- * a claim the practice never made ends up on the practice's own page.
+ * Services the practice publishes with no description at all. Left empty
+ * now that all active menu services have verified editorial copy.
  */
-const NEEDS_COPY = [
-  // Published with no description at all on the current booking page — it
-  // renders as an empty white box there. We are not filling that in for her.
-  'Radiofrequency Skin Tightening',
-  // Written from her own template rather than transcribed. See the note above
-  // the entry; needs her eyes before it goes in front of a client.
-  'UV Volume | 3-Week Fill'
-];
+const NEEDS_COPY = [];
 
 /** Applies the copy to a service list, in place, and reports what it did. */
 function applyCopy(services) {
