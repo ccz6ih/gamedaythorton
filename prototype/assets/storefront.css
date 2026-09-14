@@ -1174,10 +1174,23 @@
   width: 82%;
   aspect-ratio: 1;
   border-radius: 50%;
+  /**
+   * THE PRF IS THE LIGHT SOURCE, so the halo is amber the whole way out.
+   *
+   * The middle stop used to mix the accent into a literal green (#1f4232),
+   * which put a green glow behind a gold layer: the amber read pale chartreuse
+   * and the vial looked lit from OUTSIDE rather than from within. The whole
+   * concept is liquid gold separating out of blood — the field stays green, the
+   * light coming off it does not.
+   *
+   * Warmed toward orange rather than straight accent, because a glow is hotter
+   * at its core than the thing glowing.
+   */
   background: radial-gradient(circle,
-    color-mix(in srgb, var(--gd-accent) 35%, transparent) 0%,
-    color-mix(in srgb, var(--gd-accent) 18%, #1f4232) 32%,
-    transparent 68%);
+    color-mix(in srgb, var(--gd-accent) 62%, #ffb347) 0%,
+    color-mix(in srgb, var(--gd-accent) 40%, transparent) 30%,
+    color-mix(in srgb, var(--gd-accent) 14%, transparent) 52%,
+    transparent 70%);
   filter: blur(18px);
   opacity: 0;
   animation: sf-halo 1.2s ease-out 1.4s forwards, sf-breathe 4.5s ease-in-out 3.4s infinite;
@@ -2021,3 +2034,58 @@ a.sf-card:hover { border-color: var(--gd-accent); }
   color: var(--gd-text-muted);
 }
 .bk-consent span { flex: 1; }
+
+/* ==========================================================================
+   FIXES FROM A DESIGN READ OF THE LIVE HOME PAGE
+   ========================================================================== */
+
+/* ---------------------------------------------------- product tiles -- */
+/**
+ * The product photographs are supplier shots on pure white. Dropping them on a
+ * near-black green ground made the highest-contrast edge on the entire page a
+ * rectangle around a moisturiser — optical shouting pointed at the thing least
+ * in need of it.
+ *
+ * Tinted to the same cream the inverted treatments section already uses, so the
+ * white of the photograph meets cream instead of #0E1711. Same photographs, far
+ * quieter, and it ties the two halves of the palette together.
+ */
+.sf-card-img {
+  background: #EFE7DA;
+  border-bottom: 1px solid color-mix(in srgb, #16201A 12%, transparent);
+}
+/* `contain` rather than `cover`: a bottle cropped to fill a square loses its
+   cap, which is the part that identifies it. */
+.sf-card-img img { object-fit: contain; padding: 8%; }
+/* The letter fallback needs dark ink now the tile is light. */
+.sf-card-img > span { color: color-mix(in srgb, #16201A 45%, transparent); }
+
+.sf-product-main,
+.sf-product-thumb { background: #EFE7DA; }
+.sf-product-main img,
+.sf-product-thumb img { padding: 6%; }
+
+/* --------------------------------------------------- duration pills -- */
+/**
+ * On the cream section these read as disabled buttons. `--gd-text-dim` there is
+ * 50% ink, which is right for a caption on a dark ground and too faint on a
+ * light one — a duration is information somebody is actively comparing.
+ */
+.sf-invert .sf-item-price .dur,
+.sf-invert .sf-chip {
+  color: color-mix(in srgb, #16201A 72%, transparent);
+  border-color: color-mix(in srgb, #16201A 22%, transparent);
+}
+
+/* ------------------------------------------- the cavernous wide gap -- */
+/**
+ * On a wide monitor the menu row stretched the full 72rem, so the description
+ * and the price lost any relationship to each other. A menu is read across, and
+ * past about 58rem the eye stops connecting the two ends of a line.
+ */
+.sf-menu-group { max-width: 58rem; }
+.sf-section-head { max-width: 58rem; }
+
+/* The shop grid is a different shape and wants the full width — cards carry
+   their own price, so nothing has to span the gap. */
+.sf-menu-group:has(.sf-grid) { max-width: none; }

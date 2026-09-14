@@ -142,7 +142,18 @@ export default async function StorefrontLayout({ children, params }: Props) {
     ['bg', '--gd-bg'],
     ['surfaceColor', '--gd-surface'],
     ['surfaceRaised', '--gd-surface-raised'],
-    ['borderColor', '--gd-border']
+    ['borderColor', '--gd-border'],
+    /**
+     * TEXT AS WELL AS SURFACES, and leaving it out was a real bug.
+     *
+     * The kit repainted the ground green and left the type on tokens.css's
+     * neutral greys. A neutral grey on a warm green ground reads COOL — body
+     * copy was rendering blue-grey, the only cool note anywhere on the site,
+     * and looked like an unstyled link or a broken span rather than prose.
+     */
+    ['text', '--gd-text'],
+    ['textMuted', '--gd-text-muted'],
+    ['textDim', '--gd-text-dim']
   ];
   for (const [key, token] of SURFACE_KEYS) {
     if (brand[key]) style[token] = brand[key];

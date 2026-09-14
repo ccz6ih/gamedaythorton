@@ -30,6 +30,9 @@ type BrandKit = {
   surfaceRaised?: string;
   borderColor?: string;
   displayFont?: string;
+  text?: string;
+  textMuted?: string;
+  textDim?: string;
   logoHeight?: number;
   logoUrl?: string;
 };
@@ -155,7 +158,10 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
     ['bg', '--gd-bg'],
     ['surfaceColor', '--gd-surface'],
     ['surfaceRaised', '--gd-surface-raised'],
-    ['borderColor', '--gd-border']
+    ['borderColor', '--gd-border'],
+    ['text', '--gd-text'],
+    ['textMuted', '--gd-text-muted'],
+    ['textDim', '--gd-text-dim']
   ];
   for (const [key, token] of SURFACES) {
     const value = brand[key];
