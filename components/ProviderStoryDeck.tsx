@@ -86,7 +86,7 @@ const MEDBAR_JAMIE_CHAPTERS: StoryChapter[] = [
     highlight: 'Harnessing the body’s own natural growth factors with zero synthetic additives.',
     text: [
       "Her interest in natural and regenerative approaches led her to become a Certified Phlebotomy Technician and to expand her training into regenerative aesthetics, including platelet-rich fibrin (PRF), which uses components derived from a client’s own blood.",
-      "She is especially drawn to treatments that work with the body’s own natural cellular processes to stimulate genuine collagen restoration."
+      "She is especially drawn to treatments that work with the body’s own processes rather than against them."
     ]
   },
   {

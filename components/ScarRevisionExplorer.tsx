@@ -24,10 +24,10 @@ const SCAR_TYPES: ScarCategory[] = [
     commonExamples: 'C-Section, Tummy Tuck (Abdominoplasty), Breast Augmentation/Reduction, Thyroidectomy, Orthopedic Scars',
     recommendedSerum: 'NUE Regen (Skin Cell Renewal Formulation)',
     serumDetails:
-      'Infused with multi-peptides, hyaluronic acid, and botanical growth factors that trigger fibroblasts to break down rigid, fibrous scar tissue and synthesize smooth, flexible type I & III collagen.',
+      'Carries multi-peptides, hyaluronic acid and botanical growth factors, and is used with the aim of softening dense scar tissue over a course of treatment.',
     mechanism:
-      'Inkless revision uses sterile micro-channels to deliver bio-active serums directly into the scar bed without pigment. This softens dense surgical collagen bundles, flattens raised borders, and stimulates cellular repigmentation so the scar blends naturally into surrounding skin tone.',
-    expectedSessions: '2 to 4 sessions',
+      'Inkless revision uses sterile micro-channels to deliver serums into the scar itself, with no pigment added. The aim is a scar that reads less sharply against the skin around it rather than one that has been covered ovlly into surrounding skin tone.',
+    expectedSessions: 'Set at consultation',
     sessionInterval: '6 to 8 weeks apart',
     sizingTier: 'Small to Medium Area ($200 – $300)',
     priceEstimate: '$200 – $300 per session',
@@ -57,7 +57,7 @@ const SCAR_TYPES: ScarCategory[] = [
       'High-potency cellular regeneration serum that stimulates deep microcirculation and encourages healthy epithelial migration across damaged dermal tissue.',
     mechanism:
       'Targeted inkless micro-needling loosens restricted fibrotic scar tissue, improves tissue mobility, and encourages dormant melanocytes at the scar borders to migrate inward, naturally evening out skin discoloration without synthetic tattoo inks.',
-    expectedSessions: '2 to 4 sessions',
+    expectedSessions: 'Set at consultation',
     sessionInterval: '6 to 8 weeks apart',
     sizingTier: 'Small to Medium Area ($200 – $300)',
     priceEstimate: '$200 – $300 per session',

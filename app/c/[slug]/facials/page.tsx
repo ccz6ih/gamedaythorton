@@ -34,18 +34,18 @@ export async function generateMetadata(
   return {
     title: 'Clinical Facials in Loveland, CO | Colorado Altitude Skincare Directory',
     description:
-      'Explore customized clinical facials at The Med Bar in Loveland, CO. Hydroboration, Dermaplaning, Nano Infusion, Lactic Peels, and Acne Protocols designed for Colorado skin.'
+      'Explore customized clinical facials at The Med Bar in Loveland, CO. Hydrodermabrasion, Dermaplaning, Nano Infusion, Lactic Peels, and Acne Protocols designed for Colorado skin.'
   };
 }
 
 const FACIAL_FAQS = [
   {
     q: 'Why does living in Colorado (5,000+ ft altitude) require specialized clinical facials?',
-    a: 'Northern Colorado’s high-desert environment combines low atmospheric humidity (often 15–25%), rapid barometric pressure shifts, and 25% higher UV radiation than sea level. This accelerates Transepidermal Water Loss (TEWL), depletes natural lipid ceramides, and thickens the outer stratum corneum with dead, dehydrated cells. Regular clinical facials like Hydroboration and Dermaplaning clear this build-up and infuse deep hydration directly into living cells.'
+    a: 'Northern Colorado’s high-desert environment combines low atmospheric humidity (often 15–25%), rapid barometric pressure shifts, and 25% higher UV radiation than sea level. This accelerates Transepidermal Water Loss (TEWL), depletes natural lipid ceramides, and thickens the outer stratum corneum with dead, dehydrated cells. Regular clinical facials like Hydrodermabrasion and Dermaplaning clear this build-up and infuse deep hydration directly into living cells.'
   },
   {
-    q: 'What is the difference between Hydroboration and traditional microdermabrasion?',
-    a: 'Traditional microdermabrasion uses dry abrasive crystals or diamond tips that can pull and irritate dry or sensitive skin. Hydroboration (fluid vortex hydradermabrasion) uses simultaneous liquid suction: it vacuums blackheads and dead cells while simultaneously drenching the pore with pressurized hyaluronic acid, peptides, and botanical antioxidants. You get deeper cleansing with zero irritation, zero scratching, and zero redness.'
+    q: 'What is the difference between Hydrodermabrasion and traditional microdermabrasion?',
+    a: 'Traditional microdermabrasion uses dry abrasive crystals or diamond tips that can pull and irritate dry or sensitive skin. Hydrodermabrasion uses simultaneous liquid suction: it vacuums blackheads and dead cells while simultaneously drenching the pore with pressurized hyaluronic acid, peptides, and botanical antioxidants. It is the gentler of the two on dry or sensitive skin, because nothing abrasive is dragged across the surface.'
   },
   {
     q: 'Will dermaplaning cause my facial hair (peach fuzz) to grow back thicker or darker?',
@@ -53,7 +53,7 @@ const FACIAL_FAQS = [
   },
   {
     q: 'How does Nano Infusion differ from Microneedling with PRF?',
-    a: 'PRF Microneedling uses surgical-grade micro-needles that penetrate into the living dermis to trigger genuine collagen induction and platelet growth factor absorption (with 24–48 hours of mild pinkness). Nano Infusion uses microscopic silicone pyramids that only create pathways in the dead stratum corneum. It boosts topical serum absorption by up to 97% with zero needles, zero pain, and zero downtime.'
+    a: 'PRF Microneedling works into the living dermis using your own platelet-rich fibrin, and some pinkness afterwards is usual. Nano Infusion uses microscopic silicone pyramids that only create pathways in the dead stratum corneum. It helps serums absorb better than they would from the surface alone, without piercing the living dermis — which is also why it does not do what microneedling does.'
   },
   {
     q: 'How often should I receive a clinical facial at The Med Bar?',
@@ -140,12 +140,12 @@ export default async function FacialsDirectoryPage({ params }: { params: Promise
               <span className="lbl">Altitude Engineered</span>
             </div>
             <div className="sf-matrix-stat">
-              <span className="val">+60–97%</span>
-              <span className="lbl">Active Nutrient Uptake</span>
+              <span className="val">9</span>
+              <span className="lbl">Facials On The Menu</span>
             </div>
             <div className="sf-matrix-stat">
-              <span className="val">100%</span>
-              <span className="lbl">Clean Botanical Actives</span>
+              <span className="val">Green Envee</span>
+              <span className="lbl">The Line Used In Treatment</span>
             </div>
           </div>
         </div>
@@ -270,39 +270,39 @@ export default async function FacialsDirectoryPage({ params }: { params: Promise
               </thead>
               <tbody>
                 <tr>
-                  <th scope="row"><b>Hydroboration</b></th>
+                  <th scope="row"><b>Hydrodermabrasion</b></th>
                   <td>Fluid vortex vacuum suction + fluid pressure</td>
                   <td>Clogged pores, blackheads, cellular dehydration</td>
                   <td>High (direct fluid drenching)</td>
-                  <td>Zero downtime</td>
+                  <td>Little to none</td>
                 </tr>
                 <tr>
                   <th scope="row"><b>Dermaplaning</b></th>
                   <td>Sterile surgical blade physical exfoliation</td>
                   <td>Dead stratum corneum &amp; vellus peach fuzz</td>
-                  <td>+60% active absorption</td>
-                  <td>Zero downtime</td>
+                  <td>Improved, once the surface layer is cleared</td>
+                  <td>Little to none</td>
                 </tr>
                 <tr>
                   <th scope="row"><b>Nano Infusion</b></th>
                   <td>Microscopic transdermal silicone channels</td>
                   <td>Deep serum delivery without piercing dermis</td>
-                  <td>+97% active absorption</td>
-                  <td>Zero downtime</td>
+                  <td>Improved, via the channels it creates</td>
+                  <td>Little to none</td>
                 </tr>
                 <tr>
                   <th scope="row"><b>Lactic Acid 20% Peel</b></th>
                   <td>AHA humectant chemical exfoliation</td>
                   <td>Uneven tone, sun spots, dry flaking</td>
                   <td>Moderate</td>
-                  <td>Zero to mild flaking</td>
+                  <td>Some flaking is common</td>
                 </tr>
                 <tr>
                   <th scope="row"><b>RF Skin Tightening</b></th>
                   <td>Controlled deep dermal radiofrequency heat</td>
                   <td>Collagen fiber contraction &amp; jawline contouring</td>
                   <td>N/A (Thermal remodeling)</td>
-                  <td>Zero downtime</td>
+                  <td>Little to none</td>
                 </tr>
               </tbody>
             </table>

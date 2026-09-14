@@ -244,7 +244,7 @@ export default async function PrfAftercarePage({ params }: { params: Promise<{ s
               <div className="sf-timeline-content">
                 <h3>Collagen Maturation & Peak Density</h3>
                 <p>
-                  Newly synthesized collagen matrix matures, resulting in firmer under-eye tissue,
+                  This is the period over which any change in firmness and texture tends to appear,
                   smoother overall texture, and improved follicle health across the treated series.
                 </p>
                 <ul>

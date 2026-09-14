@@ -344,7 +344,7 @@ export default async function ProductPage({ params }: Props) {
                 {isCleanser
                   ? 'Cleanses deeply without disrupting the acid mantle, preventing the rebound oil production caused by harsh foaming cleansers.'
                   : isSerumOrPeel
-                  ? 'Micro-molecular botanical extracts penetrate deep into epidermis layers to target texture, fine lines, and dullness at the root.'
+                  ? 'A concentrated formula, applied to clean skin so it is not working through anything else.'
                   : 'Restores essential lipids and ceramides lost through altitude and dry Colorado climate, locking in moisture all day.'}
               </p>
             </div>

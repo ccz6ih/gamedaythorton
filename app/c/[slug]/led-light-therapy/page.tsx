@@ -40,23 +40,23 @@ export async function generateMetadata(
 const LED_FAQS = [
   {
     q: 'How does LED Light Therapy actually work inside skin cells?',
-    a: 'LED Light Therapy operates through photobiomodulation (PBM). Specific wavelengths of light (measured in nanometers) penetrate the epidermis and dermis, where they are absorbed by chromophores—specifically cytochrome c oxidase within cell mitochondria. This photon absorption triggers an immediate surge in adenosine triphosphate (ATP) cellular energy, stimulates collagen synthesis by fibroblasts, improves microcirculation, and modulates pro-inflammatory cytokines.'
+    a: 'LED Light Therapy operates through photobiomodulation (PBM). Specific wavelengths of light (measured in nanometers) penetrate the epidermis and dermis, where they are absorbed by chromophores—specifically cytochrome c oxidase within cell mitochondria. Absorption is thought to raise cellular ATP production, support fibroblast activity, improve local circulation and moderate inflammation. That is the proposed mechanism rather than a measured outcome, and it is why results are described here in terms of what the light does rather than what it guarantees.'
   },
   {
     q: 'Does LED Light Therapy contain harmful UV rays or cause sunburn?',
-    a: 'No. Clinical LED light therapy utilizes narrow-band visible and near-infrared light spectrums (ranging from 415nm to 830nm) that are 100% free of damaging ultraviolet (UVA/UVB) radiation. It causes zero thermal damage, zero burning, and zero DNA mutation. It is safe for all skin types and Fitzpatrick tones year-round.'
+    a: 'No. Clinical LED light therapy utilizes narrow-band visible and near-infrared light spectrums (ranging from 415nm to 830nm) that contain no ultraviolet (UVA/UVB) light. It is non-thermal and non-ablative — nothing is burned, removed or broken — and it is used across skin types. Whether it suits you is confirmed at your appointment.'
   },
   {
     q: 'Why should I add LED Light Therapy after PRF or Microneedling?',
-    a: 'When combined with regenerative procedures like PRF (Platelet-Rich Fibrin) or microneedling, LED therapy acts as a biological recovery accelerator. Red and amber wavelengths stimulate cellular ATP, reduce acute swelling (edema), calm surface redness (erythema), and stimulate fibroblasts to utilize PRF growth factors more efficiently, cutting post-procedure recovery time by up to 50%.'
+    a: 'When combined with regenerative procedures like PRF (Platelet-Rich Fibrin) or microneedling, LED therapy acts as a biological recovery accelerator. Red and amber wavelengths stimulate cellular ATP, reduce acute swelling (edema), calm surface redness (erythema), and and is often added after a procedure for that reason. How much difference it makes to recovery varies from person to person, so no figure is quoted.'
   },
   {
     q: 'How many LED Light Therapy sessions do I need to see results?',
-    a: 'For acute post-procedure recovery and instant radiance, a single 30-minute session provides visible calming and glow. For chronic conditions like active inflammatory acne, rosacea, or collagen rebuilding, a clinical series of 4 to 8 sessions spaced 1 to 2 weeks apart is recommended for cumulative, long-lasting cellular remodeling.'
+    a: 'For acute post-procedure recovery and instant radiance, a single 30-minute session provides visible calming and glow. For ongoing concerns it is usually recommended as a course rather than a single visit, and how many sessions is decided with you at your appointment.'
   },
   {
     q: 'What should I expect during a 30-minute LED treatment at The Med Bar?',
-    a: 'Your session begins with a gentle botanical cleanse to ensure optimal photon penetration. Protective blackout eye shields are placed over your eyes, and the calibrated LED phototherapy panel is positioned inches above your skin. You will experience a soothing, gentle warmth and pure relaxation for 20–30 minutes with zero pain. The session concludes with barrier-repair finishing serums and clean mineral SPF.'
+    a: 'Your session begins with a gentle botanical cleanse to ensure optimal photon penetration. Protective blackout eye shields are placed over your eyes, and the calibrated LED phototherapy panel is positioned inches above your skin. Most people describe it as a gentle warmth, and the panel does not touch the skin. The session concludes with barrier-repair finishing serums and clean mineral SPF.'
   },
   {
     q: 'Can I do LED therapy if I have sensitive or rosacea-prone skin?',
@@ -121,8 +121,8 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               <span className="ln"><span className="sf-italic">LED Light Therapy Guide.</span></span>
             </h1>
             <p className="sf-lede">
-              Harnessing specific nanometer light spectrums to fuel cellular mitochondria, eliminate acne bacteria,
-              stimulate genuine collagen synthesis, and accelerate healing with zero UV radiation and zero downtime.
+              Narrow-band visible and near-infrared light, used on the skin at wavelengths chosen for what you came in for.
+              No ultraviolet, nothing ablative, and you can go straight back to your day.
             </p>
           </div>
 
@@ -133,16 +133,16 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               <span className="lbl">Clinical Wavelengths</span>
             </div>
             <div className="sf-matrix-stat">
-              <span className="val">0%</span>
-              <span className="lbl">UV Radiation &amp; Thermal Risk</span>
+              <span className="val">Non-UV</span>
+              <span className="lbl">Visible &amp; Near-Infrared Light</span>
             </div>
             <div className="sf-matrix-stat">
-              <span className="val">+200%</span>
-              <span className="lbl">Cellular ATP Synthesis</span>
+              <span className="val">Non-ablative</span>
+              <span className="lbl">Nothing Is Removed Or Broken</span>
             </div>
             <div className="sf-matrix-stat">
-              <span className="val">0 Min</span>
-              <span className="lbl">Recovery &amp; Downtime</span>
+              <span className="val">30 Min</span>
+              <span className="lbl">Typical Session</span>
             </div>
           </div>
         </div>
@@ -173,8 +173,8 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               <h3>Cytochrome C Oxidase Activation</h3>
               <p>
                 Specific light wavelengths pass through the stratum corneum and are captured by photo-acceptor
-                chromophores inside cell mitochondria. This activates the enzyme <b>cytochrome c oxidase</b>,
-                accelerating the electron transport chain.
+                chromophores inside cell mitochondria. The photo-acceptor understood to do most of this work is
+                <b>cytochrome c oxidase</b>, an enzyme in the electron transport chain.
               </p>
             </article>
 
@@ -182,9 +182,10 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               <span className="sf-editorial-tag">Phase 2 · Cellular Energy Surge</span>
               <h3>ATP Synthesis &amp; Nitric Oxide Release</h3>
               <p>
-                Stimulated mitochondria produce up to <b>200% more Adenosine Triphosphate (ATP)</b>—the biological fuel
-                cells require to repair damage, divide, and synthesize structural proteins. Simultaneously, microvascular
-                nitric oxide is released, boosting oxygen and nutrient delivery.
+                The proposed mechanism is that absorbed light increases mitochondrial production of adenosine
+                triphosphate (ATP), the fuel cells use to repair damage, divide and build structural proteins, and
+                that nitric oxide release improves local blood flow. How much of an increase, and in whom, is not
+                settled — so no figure is quoted here.
               </p>
             </article>
 
@@ -192,9 +193,9 @@ export default async function LedLightTherapyPage({ params }: { params: Promise<
               <span className="sf-editorial-tag">Phase 3 · Tissue Remodeling</span>
               <h3>Neocollagenesis &amp; Inflammation Modulation</h3>
               <p>
-                Energized dermal fibroblasts synthesize new type I collagen and elastin fibers while down-regulating
-                collagen-degrading matrix metalloproteinases (MMPs). Inflammatory cytokines are cleared, soothing redness
-                and accelerating tissue remodeling.
+                Over the following weeks the skin is thought to lay down new collagen and elastin, and to moderate the
+                enzymes that break collagen down. Changes of this kind appear gradually rather than after a single
+                session.
               </p>
             </article>
           </div>

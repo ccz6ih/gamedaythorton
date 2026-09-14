@@ -36,7 +36,8 @@
     "test:analytics": "node scripts/analytics-test.cjs",
     "test:images": "node scripts/image-test.cjs",
     "test:images:live": "node scripts/image-sweep.cjs",
-    "test:css": "node scripts/css-test.cjs"
+    "test:css": "node scripts/css-test.cjs",
+    "test:claims": "node scripts/claims-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

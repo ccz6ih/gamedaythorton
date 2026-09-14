@@ -41,7 +41,7 @@ export async function generateMetadata(
 const SCAR_FAQS = [
   {
     q: 'What is the difference between inkless scar revision and camouflage tattooing?',
-    a: 'Traditional camouflage tattooing implants colored ink pigments into the scar to match surrounding skin tone. However, tattoo pigments can oxidize, shift in color over time (turning yellow, orange, or grey), and cannot tan when your skin is exposed to the sun. Inkless scar revision implants zero ink; instead, it delivers specialized botanical peptide serums (NUE Regen/Bright) that stimulate your body’s own fibroblasts and melanocytes to rebuild flexible collagen and restore natural melanin production from within.'
+    a: 'Traditional camouflage tattooing implants colored ink pigments into the scar to match surrounding skin tone. However, tattoo pigments can oxidize, shift in color over time (turning yellow, orange, or grey), and cannot tan when your skin is exposed to the sun. Inkless scar revision adds no pigment at all; instead it delivers the NUE Regen and NUE Bright professional serums, which are intended to support your body’s own fibroblasts and melanocytes to rebuild flexible collagen and restore natural melanin production from within.'
   },
   {
     q: 'What types of scars and stretch marks can be treated with inkless revision?',
@@ -49,7 +49,7 @@ const SCAR_FAQS = [
   },
   {
     q: 'How many sessions are required, and when will I see results?',
-    a: 'Most clients require 2 to 4 sessions spaced 6 to 8 weeks apart. Because inkless revision relies on genuine biological collagen remodeling and cellular melanin migration, improvements develop progressively over 60 to 90 days following each session. Results are permanent because the underlying tissue structure has been genuinely restored.'
+    a: 'How many sessions a scar needs depends on the scar, and the plan is set with you at consultation. Because the work relies on the skin remodelling itself rather than on pigment being deposited, changes appear gradually over the weeks after each session rather than immediately.'
   },
   {
     q: 'Is inkless scar revision painful?',

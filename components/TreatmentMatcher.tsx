@@ -44,9 +44,9 @@ const CONCERNS: ConcernOption[] = [
     priceNote: '$450 per session',
     timeEstimate: '60 minutes',
     whyItWorks:
-      'The under-eye area has extremely thin skin with minimal subcutaneous fat. 100% autologous PRF delivers concentrated platelets and a slow-releasing fibrin scaffold directly into the tissue, stimulating natural collagen renewal without synthetic filler risk.',
+      'The skin under the eye is thin and has little fat beneath it. PRF is made from your own blood — platelets and fibrin, nothing synthetic added — and is placed there to work with your own repair process rather than to add volume.',
     whatToExpect:
-      'Mild temporary fullness and redness for 24–48 hours. Progressive improvement in skin density and tone develops over 4–8 weeks. A series of 2–3 sessions is commonly recommended.',
+      'Some temporary fullness and redness is usual at first. Because PRF works with your own healing rather than adding volume, changes appear gradually, and whether a series suits you is decided at your consultation.',
     keyBenefits: [
       'Zero synthetic additives or foreign filler risk',
       'Naturally thickens and strengthens delicate under-eye skin',
@@ -82,7 +82,7 @@ const CONCERNS: ConcernOption[] = [
     whyItWorks:
       'Concentrated autologous PRF and specialized Nue Strand signaling are delivered to dormant or miniaturized follicles. Biological growth factors improve localized micro-circulation and follicle vitality.',
     whatToExpect:
-      'Minimal scalp tenderness for 1–2 days. Follicle cycles operate slowly, with early density and shedding reduction typically noticed after 2–3 sessions spaced monthly.',
+      'Some scalp tenderness is usual at first. Hair grows on a slow cycle, so this is a treatment measured in months rather than days, and the plan is set with you at your consultation.',
     keyBenefits: [
       'Works with your existing living follicles to restore natural density',
       'Non-surgical and drug-free regenerative approach',
@@ -114,9 +114,9 @@ const CONCERNS: ConcernOption[] = [
     priceNote: 'from $200 – $400',
     timeEstimate: '60 – 120 minutes',
     whyItWorks:
-      'Inkless scar revision uses microscopic needle stimulation infused with specialized therapeutic serums to break down fibrotic scar tissue and trigger localized cellular melanin and collagen regeneration without pigment.',
+      'Inkless scar revision works the scar with fine needles and serums rather than tattooing colour into it, with the aim of softening how the scar reads against the skin around it.',
     whatToExpect:
-      'Treated tissue turns pink and heals over 4–6 weeks. Texture flattens and natural pigmentation gradually blends with surrounding healthy skin over 1–3 sessions.',
+      'Treated tissue is pink while it heals. Texture and tone change gradually rather than immediately, and how many sessions a scar needs depends on the scar — that is what the consultation is for.',
     keyBenefits: [
       '100% ink-free — works by waking up your own natural skin pigment',
       'Flattens raised scars and smooths indented stretch mark textures',

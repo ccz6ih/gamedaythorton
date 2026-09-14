@@ -54,7 +54,7 @@ const COMPARISON_FAQS = [
   },
   {
     q: 'How long do PRF results last compared to fillers and PRP?',
-    a: 'Because PRF stimulates your body’s own genuine collagen and elastin synthesis, the biological improvements in skin density and texture can last 9 to 12 months or longer after completing a recommended series of 2–3 sessions. Dermal fillers typically last 6 to 12 months depending on the product, and PRP benefits typically last 6 to 9 months.'
+    a: 'Because PRF works through your own healing rather than by adding a material, changes in skin density and texture develop gradually and are not permanent, so treatment is usually repeated. How long they hold varies from person to person, and how many sessions suit you is decided at your consultation — unlike a filler, nothing is being added that then wears off on a predictable schedule.'
   },
   {
     q: 'Is there any downtime with PRF compared to fillers?',
@@ -260,7 +260,7 @@ export default async function PrfComparePage({ params }: { params: Promise<{ slu
               </p>
               <p>
                 <strong>PRF does not add synthetic volume.</strong> Instead, it thickens the delicate
-                dermal architecture naturally by stimulating your body to produce new collagen and elastin fibers.
+                the skin's own structure, rather than adding volume from outside it.
                 The result is a rested, smoother appearance without altering facial anatomy or risking synthetic gel migration.
               </p>
               <div className="sf-compare-callout">

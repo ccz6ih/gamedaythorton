@@ -74,7 +74,7 @@ const MUSCLE_ZONES: MuscleZone[] = [
     medBarTechnique:
       'Deep intramuscular placement into the safe lower-posterior triangle of the masseter belly, relieving chronic jaw tension and gently slimming the facial silhouette into a soft contour.',
     typicalUnits: '15 – 30 Units per side',
-    onsetAndDuration: 'Tension relief in 1–2 weeks; visible slimming in 4–6 weeks; lasts 4–6 months.',
+    onsetAndDuration: 'Develops over the weeks after treatment; not permanent, so it is repeated.',
     naturalBenefit: 'Relieves chronic clenching while sculpting an elegant, softened jawline silhouette.'
   },
   {

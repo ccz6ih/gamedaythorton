@@ -38,7 +38,7 @@ const WAVELENGTHS: WavelengthInfo[] = [
       'Chronic inflammation & dull cellular turnover'
     ],
     mechanism:
-      'Photons at 630–830nm penetrate into the deep dermis where they are absorbed by cytochrome c oxidase within cell mitochondria. This boosts adenosine triphosphate (ATP) cellular energy by up to 200%, stimulating fibroblasts to synthesize new pro-collagen I and elastin fibers while inhibiting matrix metalloproteinases (MMPs) that break down collagen.',
+      'Photons at 630–830nm penetrate into the deep dermis where they are absorbed by cytochrome c oxidase within cell mitochondria. Absorption is thought to raise cellular ATP production, support fibroblasts in laying down new collagen and elastin, and moderate the enzymes that break collagen down.',
     synergy: 'Pairs exceptionally with PRF Microneedling and Radiofrequency Tightening to accelerate collagen remodeling.'
   },
   {
@@ -123,7 +123,7 @@ const WAVELENGTHS: WavelengthInfo[] = [
     ],
     mechanism:
       'Combines the antibacterial power of 415nm blue light with the regenerative, collagen-boosting stimulation of 630nm red light. It sanitizes active acne bacteria while simultaneously promoting dermal healing to prevent post-inflammatory scar formation.',
-    synergy: 'Pairs with Hydroboration Facials to clear deep sebum while stimulating cellular rejuvenation.'
+    synergy: 'Often added to a Hydrodermabrasion Facial in the same visit.'
   },
   {
     id: 'cyan',
@@ -164,7 +164,7 @@ const WAVELENGTHS: WavelengthInfo[] = [
       'Comprehensive pre-event radiance boost'
     ],
     mechanism:
-      'Full-spectrum therapeutic light penetrates the entire depth of the dermal matrix, activating multiple cellular chromophores simultaneously. It boosts microcirculation, improves active nutrient absorption, and firms skin tone for a vibrant, rested glow.',
+      'Several wavelengths at once, rather than one. It is chosen when more than one concern is being addressed in the same session, and what it targets is decided at your appointment.',
     synergy: 'Pairs with Nano Infusion and Getaway Glow Facials for multi-depth radiance.'
   }
 ];
@@ -181,7 +181,7 @@ export function LedSpectrumDial({ bookUrl }: { bookUrl: string }) {
         <h3 className="sf-led-explorer-title">Explore the 7 Clinical Wavelengths</h3>
         <p className="sf-led-explorer-subtitle">
           Select any therapeutic wavelength to see how specific light frequencies penetrate
-          skin layers, activate cellular mitochondria, and address targeted clinical concerns.
+          skin layers. Which one is used depends on what you came in for.
         </p>
       </div>
 
@@ -268,7 +268,7 @@ export function LedSpectrumDial({ bookUrl }: { bookUrl: string }) {
         <div className="sf-led-card-footer">
           <div className="sf-led-price-note">
             <span className="sf-led-price-val">from $40</span>
-            <span className="sf-led-price-time">30 Min · Zero Downtime</span>
+            <span className="sf-led-price-time">30 Min · Little to no downtime</span>
           </div>
           <Link href={`${bookUrl}?service=3affd9d8-50ab-5cab-a413-0a9055acbb80`} className="sf-btn primary">
             Reserve LED Therapy &rarr;

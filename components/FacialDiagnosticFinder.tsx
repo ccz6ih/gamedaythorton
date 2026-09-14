@@ -31,11 +31,11 @@ const CONCERNS = [
 const FACIAL_DATABASE: FacialMatch[] = [
   {
     id: 'hydroboration',
-    name: 'Hydroboration Facial',
+    name: 'Hydrodermabrasion Facial',
     category: 'Hydradermabrasion & Infusion',
     price: '$120',
     duration: '45 min',
-    downtime: 'Zero downtime',
+    downtime: 'Little to none',
     serviceId: 'ddd47915-309a-52fc-8bd0-0270524937f8',
     summary:
       'Simultaneously vacuums deep pore debris, dead skin, and blackheads while flooding newly cleared skin with pressurized hyaluronic acid, antioxidants, and peptide infusions.',
@@ -49,10 +49,10 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Physical Exfoliation & Polish',
     price: '$150',
     duration: '45 min',
-    downtime: 'Zero downtime (instant glow)',
+    downtime: 'Little to none',
     serviceId: '905d3530-3fbc-55dc-9cfc-76caa5dd92dd',
     summary:
-      'A precise clinical physical exfoliation using a sterile surgical blade to gently remove dull stratum corneum build-up and vellus peach fuzz, boosting skincare penetration by up to 60%.',
+      'A sterile blade lifts away dead surface skin and the fine vellus hair on the face, so the skin is smoother and what is applied afterwards absorbs more readily.',
     keyActives: ['Sterile Surgical Blade', 'Barrier Lipid Serums', 'Botanical Calming Mask', 'Squalane Barrier Oil'],
     altitudeBenefit: 'Removes the stubborn dry, dead surface layer typical of low-humidity climates so rich moisturizers and serums can actually absorb instead of sitting on top.',
     bestForTags: ['fuzz', 'dull', 'pigment']
@@ -63,12 +63,12 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Transdermal Serum Delivery',
     price: '$200',
     duration: '60 min',
-    downtime: 'Zero downtime',
+    downtime: 'Little to none',
     serviceId: '43a21192-c74e-55b7-b326-7c9e237d6875',
     summary:
-      'Creates hundreds of thousands of microscopic pathways in the outermost epidermis without piercing living dermis, boosting active clinical serum absorption by up to 97%.',
+      'Creates hundreds of thousands of microscopic pathways in the outermost epidermis without piercing living dermis, so serums reach further than they would from the surface alone.',
     keyActives: ['Epidermal Growth Factors', 'Niacinamide (Vitamin B3)', 'Botanical Brighteners', 'Multi-Weight Hyaluronic Acid'],
-    altitudeBenefit: 'Pushes deep hydration and corrective nutrients past the thickened high-altitude stratum corneum with zero needles, pain, or recovery.',
+    altitudeBenefit: 'Gets hydration past the surface layer that dry, high-altitude air thickens, without piercing the living dermis.',
     bestForTags: ['tewl', 'pigment', 'dull', 'sensitive']
   },
   {
@@ -91,7 +91,7 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Lifting & Sculpting Facial',
     price: '$200',
     duration: '60 min',
-    downtime: 'Zero downtime',
+    downtime: 'Little to none',
     serviceId: 'f169d079-2531-5bd2-83eb-7c58c8aafcf5',
     summary:
       'An intensive firming and contour-lifting facial featuring specialized lymphatic facial massage, peptide-rich botanical concentrates, and collagen-tightening botanical masks.',
@@ -119,7 +119,7 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Targeted Blemish Maintenance',
     price: '$120',
     duration: '45 min',
-    downtime: 'Zero downtime',
+    downtime: 'Little to none',
     serviceId: 'a475bb20-020e-5b08-a5bb-877b5520ca44',
     summary:
       'A focused 45-minute clinical treatment to clear active pore congestion, perform targeted extractions, and calm inflammation between full appointments.',
@@ -133,7 +133,7 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Pre-Event Radiance Revival',
     price: '$150',
     duration: '60 min',
-    downtime: 'Zero downtime (event-ready)',
+    downtime: 'Little to none',
     serviceId: '19eaf939-2efe-5c64-ac7a-df2fedb2ef76',
     summary:
       'The ultimate pre-event skin revival combining an enzymatic polish, high-potency vitamin and peptide infusion, cooling cryo-globe lymphatic massage, and an illuminating botanical mask.',
@@ -147,7 +147,7 @@ const FACIAL_DATABASE: FacialMatch[] = [
     category: 'Restorative Holistic Clinical',
     price: '$120',
     duration: '60 min',
-    downtime: 'Zero downtime',
+    downtime: 'Little to none',
     serviceId: 'dd82574a-590c-5dc4-9450-b62bbc63ba20',
     summary:
       'A restorative, fully customized facial combining double botanical cleansing, steam, tailored enzyme exfoliation, gentle extractions, lymphatic facial massage, and nutrient-dense barrier masks.',

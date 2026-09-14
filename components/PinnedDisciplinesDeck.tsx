@@ -117,11 +117,11 @@ const DISCIPLINES = [
     badge: '5,000+ Ft Engineered',
     specs: [
       { label: 'Formulations', val: 'Clean Botanical Green Envee' },
-      { label: 'Absorption Boost', val: '+60% to +97% Transdermal' },
+      { label: 'Focus', val: 'Surface Renewal & Infusion' },
       { label: 'Skin Focus', val: 'TEWL Barrier Rebuilding' },
-      { label: 'Treatment Downtime', val: 'Zero (Instant Radiant Dew)' }
+      { label: 'Treatment Downtime', val: 'Little to none' }
     ],
-    pills: ['Hydroboration Infusion', 'Dermaplaning Polish', 'Floraessence 20% Lactic Peel', 'Nano Infusion'],
+    pills: ['Hydrodermabrasion Infusion', 'Dermaplaning Polish', 'Floraessence 20% Lactic Peel', 'Nano Infusion'],
     guideUrlKey: 'facialsGuide' as const,
     guideLabel: 'Explore Facials Directory',
     bookServiceId: 'ddd47915-309a-52fc-8bd0-0270524937f8',
@@ -160,8 +160,8 @@ const DISCIPLINES = [
     specs: [
       { label: 'Biological Action', val: 'Endogenous Melanin Awakening' },
       { label: 'Tissue Remodeling', val: 'Type I & III Flexible Collagen' },
-      { label: 'Pigment Oxidation Risk', val: '0% (No Synthetic Ink)' },
-      { label: 'Average Protocol', val: '2 to 4 Sessions' }
+      { label: 'Pigment', val: 'None — inkless' },
+      { label: 'Protocol', val: 'Set at consultation' }
     ],
     pills: ['C-Section & Surgical Scars', 'Abdominal & Hip Stretch Marks', 'Injury & Trauma Scars'],
     guideUrlKey: 'scarRevision' as const,

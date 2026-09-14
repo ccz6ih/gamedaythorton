@@ -49,7 +49,7 @@ const INJECTABLE_FAQS = [
   },
   {
     q: 'How quickly does Jeuveau begin working, and how long does it last?',
-    a: 'Most clients begin to see softening of dynamic lines within 2 to 4 days following treatment, with full therapeutic onset achieved at day 10 to 14. Results typically last 3 to 4 months. With regular maintenance treatments spaced 12 to 16 weeks apart, the targeted muscles adapt to relaxation, requiring fewer units over time.'
+    a: 'Softening begins to appear within the first few days and continues to develop over the following week or two. It is not permanent, so treatment is repeated; how long it holds and how often you return varies from person to person and is discussed at your appointment.'
   },
   {
     q: 'What is a "Lip Flip" and how does it differ from lip filler?',
