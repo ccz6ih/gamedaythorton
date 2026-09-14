@@ -588,3 +588,148 @@ label.inline {
 @media (max-width: 640px) {
   .feed-when { display: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   THE CONSOLE ON A PHONE
+   ---------------------------------------------------------------------------
+   app.css has collapsed the shell to one column under 880px since the start,
+   pushing the rail off the left edge with translateX(-100%) and revealing a
+   `.rail-toggle` to bring it back. The toggle was never built, so below 880px
+   the console had no navigation at all — whatever screen you landed on was the
+   only one you could reach, and the sign-out button went with it.
+
+   This is the bar that opens it. Present in the markup at every width and
+   revealed only under the breakpoint, so dragging a desktop window narrow does
+   not reflow anything.
+   --------------------------------------------------------------------------- */
+
+.console-bar { display: none; }
+
+/* The scrim lives outside the media query so its transition is defined
+   whatever the width; it is only ever made visible below the breakpoint. */
+.rail-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--gd-med) var(--gd-ease);
+  /* Under the rail (80) and over everything else. */
+  z-index: 79;
+}
+
+@media (max-width: 880px) {
+  .console-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--gd-3);
+    padding: var(--gd-3) var(--gd-4);
+    background: var(--gd-surface);
+    border-bottom: 1px solid var(--gd-border);
+    position: sticky;
+    top: 0;
+    /* Below the rail and its scrim, above the page it sits on. */
+    z-index: 60;
+  }
+
+  /* A 44px target, because this is the one control that has to work first
+     time on a phone held in one hand at a front desk. */
+  .console-bar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    margin-left: calc(-1 * var(--gd-2));
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--gd-border);
+    border-radius: var(--gd-r-sm);
+    color: var(--gd-text);
+    cursor: pointer;
+  }
+  .console-bar-toggle:focus-visible {
+    outline: 2px solid var(--gd-accent);
+    outline-offset: 2px;
+  }
+
+  /* Three rules rather than a glyph. ☰ renders at a different weight and
+     baseline in every fallback font, and is missing from some of them. */
+  .console-bar-toggle .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 18px;
+  }
+  .console-bar-toggle .bars i {
+    display: block;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+  }
+
+  .console-bar-title { min-width: 0; line-height: 1.25; }
+  .console-bar-title .where {
+    display: block;
+    font-weight: 700;
+    font-size: .92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .console-bar-title .who {
+    display: block;
+    font-size: .72rem;
+    color: var(--gd-text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rail-scrim[data-open="1"] { opacity: 1; pointer-events: auto; }
+
+  /* The no-script path. The <noscript> link in the bar targets the rail by id,
+     and :target opens it without a line of JavaScript. Without this the button
+     above is a button that does nothing, which is the original fault wearing a
+     disguise. */
+  .rail:target { transform: none; }
+  .console-bar-nojs {
+    margin-left: auto;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--gd-accent);
+    text-decoration: none;
+    padding: var(--gd-2) var(--gd-3);
+    border: 1px solid var(--gd-border);
+    border-radius: var(--gd-r-sm);
+  }
+
+  /* app.css pins the rail below the 28px pilot banner. That banner is not
+     always rendered, and when it is not, a rail starting 28px down leaves a
+     strip of page showing above it. Full height, and the banner scrolls with
+     the document as it always did. */
+  .rail {
+    inset: 0 auto 0 0;
+    height: 100dvh;
+    /* Long menu, short phone: the rail itself has to scroll. */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Clear of the home indicator on a phone with no hardware button. */
+    padding-bottom: max(var(--gd-4), env(safe-area-inset-bottom));
+  }
+
+  /* The desktop rail is sticky and full-height; once it is a drawer it must
+     not also reserve a column. app.css already sets grid-template-columns:
+     1fr, this makes sure nothing in the flow reserves space for it. */
+  .shell { grid-template-rows: auto 1fr; }
+  .main { min-width: 0; }
+}
+
+/* .sr-only is already defined in app.css and is used here for the toggle's
+   accessible name — a button whose only content is three <i> elements has no
+   name without it. Not redefined. */
+
+@media (prefers-reduced-motion: reduce) {
+  .rail, .rail-scrim { transition: none; }
+}

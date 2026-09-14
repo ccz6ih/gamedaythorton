@@ -195,7 +195,8 @@ export default async function OrdersPage() {
         {done.length > 0 && (
           <section style={{ marginTop: 'var(--gd-8)' }}>
             <h2>Sent &amp; collected</h2>
-            <table className="table">
+            <div className="table-scroll">
+              <table className="table">
               <thead>
                 <tr><th>Order</th><th>Customer</th><th>Items</th><th className="num">Total</th><th>Paid</th></tr>
               </thead>
@@ -211,6 +212,7 @@ export default async function OrdersPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </section>
         )}
 
@@ -222,7 +224,8 @@ export default async function OrdersPage() {
               Baskets that reached the payment page and stopped there. Nothing was
               charged. Kept only so somebody who rings up can be found.
             </p>
-            <table className="table">
+            <div className="table-scroll">
+              <table className="table">
               <thead>
                 <tr><th>Order</th><th>Customer</th><th className="num">Would have been</th><th>Status</th><th>Started</th></tr>
               </thead>
@@ -241,6 +244,7 @@ export default async function OrdersPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </section>
         )}
       </div>

@@ -16,6 +16,7 @@ import { currentViewer, serverClient } from '@/lib/supabase/server';
 import { getClinic, hasModule } from '@/lib/db/queries';
 import { Brand, vocab } from '@/components/Brand';
 import { PilotBanner } from '@/components/PilotBanner';
+import { ConsoleShell } from '@/components/ConsoleShell';
 import { titleCase } from '@/lib/format';
 
 /**
@@ -90,8 +91,14 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
   return (
     <Brand clinic={clinic}>
       <PilotBanner pilotMode={process.env.PILOT_MODE !== 'false'} dbPilotMode={flags?.pilot_mode} />
-      <div className="shell" data-app="staff">
-        <nav className="rail" aria-label="Console navigation">
+      <ConsoleShell
+        clinicName={clinic?.location_name ?? clinic?.name ?? 'Clinic'}
+        /* Only what the bar needs to name the current screen. The icons and
+           the module gating stay on the server where they are decided. */
+        sections={nav.flatMap(item =>
+          item.href && item.label ? [{ href: item.href, label: item.label }] : []
+        )}
+        rail={<>
           <div className="rail-brand">
             {brand.logoUrl ? (
               <img
@@ -145,10 +152,10 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
               </button>
             </form>
           </div>
-        </nav>
-
-        <div className="main">{children}</div>
-      </div>
+        </>}
+      >
+        {children}
+      </ConsoleShell>
     </Brand>
   );
 }
