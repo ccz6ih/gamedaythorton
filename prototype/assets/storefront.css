@@ -255,53 +255,60 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 2.5rem 1fr auto;
-  gap: var(--gd-2) var(--gd-5);
+  grid-template-columns: 3.25rem 1fr auto;
+  gap: var(--gd-3) var(--gd-5);
   padding: var(--gd-5) var(--gd-4);
   margin-inline: calc(-1 * var(--gd-4));
   border-bottom: 1px solid var(--gd-border);
-  border-radius: var(--gd-r-sm);
+  border-radius: var(--gd-r-md);
   align-items: start;
-  transition: background var(--gd-fast) var(--gd-ease);
+  transition: background var(--gd-fast) var(--gd-ease), transform var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover {
-  background: color-mix(in srgb, var(--gd-surface-raised) 45%, transparent);
+  background: color-mix(in srgb, var(--gd-surface-raised) 55%, transparent);
 }
 .sf-item:last-child { border-bottom: none; }
 
 .sf-item-mark {
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
   border-radius: var(--gd-r-full);
-  border: 1px solid var(--gd-accent-line);
-  color: var(--gd-accent);
-  margin-top: .1rem;
-  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gd-accent) 24%, rgba(255,255,255,0.85)), color-mix(in srgb, var(--gd-accent) 10%, rgba(255,255,255,0.35)));
+  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 55%, transparent);
+  box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--gd-accent) 30%, transparent), inset 0 1px 2px rgba(255,255,255,0.85);
+  color: color-mix(in srgb, var(--gd-accent) 85%, #4a3400);
+  margin-top: .15rem;
+  flex: none;
+  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease), box-shadow var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover .sf-item-mark {
   border-color: var(--gd-accent);
-  transform: scale(1.05);
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 0 6px 20px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent), inset 0 1px 3px rgba(255,255,255,0.95);
 }
-.sf-item-mark svg { width: 1.25rem; height: 1.25rem; }
+.sf-item-mark svg { width: 1.65rem; height: 1.65rem; }
 
 /* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
    and drawn services still lines up down the left edge. */
 .sf-item-photo {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
   max-width: 100%;
   border-radius: var(--gd-r-full);
   object-fit: cover;
   display: block;
-  margin-top: .1rem;
-  border: 1px solid var(--gd-border);
-  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
+  margin-top: .15rem;
+  border: 1.5px solid var(--gd-border);
+  box-shadow: 0 4px 14px -2px rgba(0,0,0,0.08);
+  flex: none;
+  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease), box-shadow var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover .sf-item-photo {
   border-color: var(--gd-accent);
-  transform: scale(1.05);
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 0 6px 20px -2px color-mix(in srgb, var(--gd-accent) 35%, transparent);
 }
 
 .sf-item-body { min-width: 0; }
@@ -683,7 +690,9 @@
 @media (max-width: 640px) {
   .sf-person { grid-template-columns: 1fr; }
   .sf-portrait { max-width: 11rem; }
-  .sf-item { grid-template-columns: 2rem 1fr; gap: var(--gd-2) var(--gd-4); }
+  .sf-item { grid-template-columns: 2.75rem 1fr; gap: var(--gd-2) var(--gd-4); }
+  .sf-item-mark, .sf-item-photo { width: 2.75rem; height: 2.75rem; }
+  .sf-item-mark svg { width: 1.4rem; height: 1.4rem; }
   .sf-item-price { grid-column: 2 / -1; text-align: left; display: flex; gap: var(--gd-3); align-items: baseline; }
   .sf-item-price .dur { margin-top: 0; }
   .sf-item-cta { grid-column: 2 / -1; }
