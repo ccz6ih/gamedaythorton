@@ -30,6 +30,7 @@ import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { Centrifuge } from '@/components/Centrifuge';
 import { ProcessRail } from '@/components/ProcessRail';
+import { PrfIcon } from '@/components/PrfIcon';
 import { priceLabel } from '@/lib/format';
 import { PRF_PROCESS, PRF_TREATMENTS } from '@/lib/prf-content';
 
@@ -148,18 +149,22 @@ export default async function StorefrontPRF({ params }: { params: Promise<{ slug
 
           <dl className="sf-facts">
             <div className="sf-fact">
+              <PrfIcon name="blood" />
               <dt>Made from</dt>
               <dd>A small sample of your own blood — nothing donated, synthetic or animal-derived.</dd>
             </div>
             <div className="sf-fact">
+              <PrfIcon name="spin" />
               <dt>Processed by</dt>
               <dd>A centrifuge, in the treatment room, during the same visit. It never leaves the building.</dd>
             </div>
             <div className="sf-fact">
+              <PrfIcon name="place" />
               <dt>Applied as</dt>
               <dd>An injection (under the eyes), worked into microneedling channels, or massaged into the scalp, depending on the treatment.</dd>
             </div>
             <div className="sf-fact">
+              <PrfIcon name="origin" />
               <dt>Where it comes from</dt>
               <dd>First described for oral and maxillofacial surgery in the early 2000s, and since adopted across dermatology, aesthetics, orthopedics and hair restoration.</dd>
             </div>
