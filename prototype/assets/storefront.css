@@ -209,7 +209,7 @@
 .sf-section-head { margin-bottom: var(--gd-8); max-width: var(--sf-measure); }
 .sf-section-head h2 {
   font-family: var(--brand-display-font);
-  font-size: var(--gd-step-2);
+  font-size: clamp(2.1rem, 1.7rem + 1.3vw, 2.85rem);
   line-height: 1.1;
   letter-spacing: -.02em;
   margin: 0 0 var(--gd-3);
@@ -218,7 +218,7 @@
 .sf-section-head p {
   margin: 0;
   color: var(--gd-text-muted);
-  font-size: var(--gd-step-0);
+  font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
   line-height: 1.6;
   text-wrap: pretty;
 }
@@ -255,37 +255,53 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 2.25rem 1fr auto;
+  grid-template-columns: 2.5rem 1fr auto;
   gap: var(--gd-2) var(--gd-5);
-  padding-block: var(--gd-5);
+  padding: var(--gd-5) var(--gd-4);
+  margin-inline: calc(-1 * var(--gd-4));
   border-bottom: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
   align-items: start;
+  transition: background var(--gd-fast) var(--gd-ease);
+}
+.sf-item:hover {
+  background: color-mix(in srgb, var(--gd-surface-raised) 45%, transparent);
 }
 .sf-item:last-child { border-bottom: none; }
 
 .sf-item-mark {
   display: grid;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: var(--gd-r-full);
   border: 1px solid var(--gd-accent-line);
   color: var(--gd-accent);
   margin-top: .1rem;
+  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
 }
-.sf-item-mark svg { width: 1.15rem; height: 1.15rem; }
+.sf-item:hover .sf-item-mark {
+  border-color: var(--gd-accent);
+  transform: scale(1.05);
+}
+.sf-item-mark svg { width: 1.25rem; height: 1.25rem; }
 
 /* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
    and drawn services still lines up down the left edge. */
 .sf-item-photo {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   max-width: 100%;
   border-radius: var(--gd-r-full);
   object-fit: cover;
   display: block;
   margin-top: .1rem;
   border: 1px solid var(--gd-border);
+  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-item:hover .sf-item-photo {
+  border-color: var(--gd-accent);
+  transform: scale(1.05);
 }
 
 .sf-item-body { min-width: 0; }
@@ -371,9 +387,10 @@
 .sf-menu-group { scroll-margin-top: 5rem; }
 
 .sf-item-name {
-  font-size: var(--gd-step-0);
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.2rem, 1.08rem + 0.35vw, 1.45rem);
   font-weight: 600;
-  letter-spacing: -.005em;
+  letter-spacing: -.01em;
   margin: 0 0 var(--gd-1);
   display: flex;
   align-items: baseline;
@@ -383,9 +400,9 @@
 .sf-item-desc {
   margin: 0;
   color: var(--gd-text-muted);
-  font-size: var(--gd-step--1);
-  line-height: 1.55;
-  max-width: 46ch;
+  font-size: clamp(0.94rem, 0.9rem + 0.15vw, 1.05rem);
+  line-height: 1.6;
+  max-width: 50ch;
   text-wrap: pretty;
 }
 .sf-item-price {
@@ -395,13 +412,14 @@
 }
 .sf-item-price .amount {
   display: block;
-  font-size: var(--gd-step-0);
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.2rem, 1.08rem + 0.35vw, 1.45rem);
   font-weight: 700;
   letter-spacing: -.01em;
 }
 .sf-item-price .dur {
   display: block;
-  font-size: var(--gd-step--2);
+  font-size: var(--gd-step--1);
   color: var(--gd-text-dim);
   margin-top: var(--gd-1);
 }

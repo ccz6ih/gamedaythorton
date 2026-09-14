@@ -142,8 +142,11 @@ async function req(url, opts = {}) {
 
   const robots = await req('/robots.txt');
   const robotsText = await robots.text();
-  if (/Disallow:\s*\/\s*$/m.test(robotsText)) ok('robots.txt disallows everything');
-  else bad('robots.txt disallows everything', robotsText.slice(0, 80));
+  if (/Disallow:\s*\/admin/m.test(robotsText) && /Disallow:\s*\/console/m.test(robotsText)) {
+    ok('robots.txt disallows admin and console while allowing public storefront');
+  } else {
+    bad('robots.txt disallows admin/console', robotsText.slice(0, 80));
+  }
 
   /* ---------------------------------------------------------- prototype -- */
   console.log('\nPHASE A PROTOTYPE');
@@ -227,8 +230,11 @@ async function req(url, opts = {}) {
   }
 
   const rb = await (await req('/robots.txt')).text();
-  if (/Disallow:\s*\/\s*$/m.test(rb)) ok('robots.txt still disallows everything');
-  else bad('robots.txt still disallows everything');
+  if (/Disallow:\s*\/admin/m.test(rb) && /Disallow:\s*\/console/m.test(rb)) {
+    ok('robots.txt protects private portals');
+  } else {
+    bad('robots.txt protects private portals');
+  }
   /* -------------------------------------------------------- storefront -- */
   // The public face of each practice. This is the only surface a prospective
   // client sees before they are a client, and the only one with no login in

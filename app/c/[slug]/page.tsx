@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import {
-  getStorefront, getStorefrontServices, getStorefrontProviders, hoursLines
+  getStorefront, getStorefrontServices, getStorefrontProviders, getStorefrontProducts, hoursLines
 } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
@@ -72,9 +72,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
 
   const links = storefrontLinks(await storefrontBase(slug));
 
-  const [services, providers] = await Promise.all([
+  const [services, providers, products] = await Promise.all([
     getStorefrontServices(clinic.id),
-    getStorefrontProviders(clinic.id)
+    getStorefrontProviders(clinic.id),
+    getStorefrontProducts(clinic.id)
   ]);
 
   const isSpa = clinic.practice_type === 'med_spa';
@@ -171,12 +172,23 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                     <ServiceIcon name={s.name} category={s.category} />
                   </span>
                   <div className="sf-item-body">
-                    <h3 className="sf-item-name">{s.name}</h3>
+                    <h3 className="sf-item-name">
+                      <Link href={`${links.book}?service=${encodeURIComponent(s.id)}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {s.name}
+                      </Link>
+                    </h3>
                     {s.description && <p className="sf-item-desc">{s.description}</p>}
                   </div>
                   <div className="sf-item-price">
                     <span className="amount">{priceLabel(s)}</span>
                     <span className="dur">{s.duration_min} min</span>
+                    <Link
+                      href={`${links.book}?service=${encodeURIComponent(s.id)}`}
+                      className="sf-btn ghost sm"
+                      style={{ marginTop: 'var(--gd-2)', display: 'inline-flex' }}
+                    >
+                      Book
+                    </Link>
                   </div>
                 </article>
               ))}
@@ -186,7 +198,67 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
               <Link href={links.services} className="sf-btn ghost">
                 All {services.length} treatments &amp; pricing
               </Link>
-              <Link href={links.shop} className="sf-btn ghost">Shop</Link>
+              <Link href={links.shop} className="sf-btn ghost">Explore Shop</Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {products.length > 0 && (
+        <section className="sf-section sf-bordered">
+          <div className="sf-wrap">
+            <div className="sf-section-head">
+              <div className="sf-eyebrow">Green Envee Botanicals</div>
+              <h2>Take-home skincare ritual</h2>
+              <p>
+                The organic, cold-pressed plant formulas used in our treatment rooms.
+                Formulated to calm, protect, and extend your regenerative results at home.
+              </p>
+            </div>
+
+            <div className="sf-grid">
+              {products.slice(0, 4).map(p => {
+                const hasSecondary = Boolean(p.secondary_image_path);
+                return (
+                  <article className="sf-card" key={p.id}>
+                    <div className={`sf-card-img${hasSecondary ? ' has-hover-img' : ''}`}>
+                      {p.image_path ? (
+                        <>
+                          <img className="sf-card-img-primary" src={p.image_path} alt={p.name} loading="lazy" />
+                          {p.secondary_image_path && (
+                            <img className="sf-card-img-hover" src={p.secondary_image_path} alt={`${p.name} alternate view`} loading="lazy" />
+                          )}
+                        </>
+                      ) : (
+                        <span aria-hidden="true">{p.name.slice(0, 1)}</span>
+                      )}
+                    </div>
+
+                    <div className="sf-card-body">
+                      {p.brand && <div className="sf-card-brand">{p.brand}</div>}
+                      <h3>
+                        {p.slug
+                          ? <Link href={`${links.shop}/${p.slug}`}>{p.name}</Link>
+                          : p.name}
+                      </h3>
+                      {p.description && <p className="sf-card-desc">{p.description}</p>}
+                    </div>
+
+                    <div className="sf-card-foot">
+                      <span className="sf-card-price">{money(p.price_cents)}</span>
+                      <Link href={`${links.shop}/${p.slug ?? ''}`} className="sf-btn ghost sm">
+                        View product
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className="sf-actions" style={{ marginTop: 'var(--gd-8)' }}>
+              <Link href={links.shop} className="sf-btn primary">
+                Shop all {products.length} products &rarr;
+              </Link>
             </div>
           </div>
         </section>

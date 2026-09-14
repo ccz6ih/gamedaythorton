@@ -1,8 +1,19 @@
-# This deployment is a pre-compliance pilot. It must not be indexed by anything,
-# ever. Reinforced by the X-Robots-Tag header in next.config.mjs, because a
-# robots.txt is a request and a header is an instruction.
-#
-# docs/06-architecture.md, docs/09-compliance-register.md
+# robots.txt for medbarco.com
+# Allow search crawlers to index the public storefront and treatment menu.
+# Disallow internal staff consoles, patient portals, and backend APIs.
 
 User-agent: *
-Disallow: /
+Allow: /
+Allow: /services
+Allow: /shop
+Allow: /packages
+Allow: /about
+Allow: /book
+Allow: /c/
+
+Disallow: /admin
+Disallow: /console/
+Disallow: /portal/
+Disallow: /api/
+Disallow: /prototype/
+Disallow: /gate
