@@ -53,32 +53,81 @@ type Props = {
   product: Omit<CartLine, 'qty'>;
   /** Checkout is not configured; the button explains instead of lying. */
   disabled?: boolean;
+  /** Renders full product page buy box with quantity counter */
+  showQuantity?: boolean;
 };
 
-export function AddToCart({ slug, product, disabled }: Props) {
+export function AddToCart({ slug, product, disabled, showQuantity }: Props) {
   const [ready, setReady] = useState(false);
   const [said, setSaid] = useState<string | null>(null);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => setReady(true), []);
 
   useEffect(() => {
     if (!said) return;
-    const t = window.setTimeout(() => setSaid(null), 2200);
+    const t = window.setTimeout(() => setSaid(null), 2400);
     return () => window.clearTimeout(t);
   }, [said]);
 
   if (disabled) return null;
 
+  if (showQuantity) {
+    return (
+      <div className="sf-buybox">
+        <div className="sf-qty-row">
+          <div className="sf-qty-picker" role="group" aria-label="Quantity">
+            <button
+              type="button"
+              className="sf-qty-btn"
+              aria-label="Decrease quantity"
+              disabled={!ready || qty <= 1}
+              onClick={() => setQty(q => Math.max(1, q - 1))}
+            >
+              &minus;
+            </button>
+            <span className="sf-qty-val" aria-live="polite">{qty}</span>
+            <button
+              type="button"
+              className="sf-qty-btn"
+              aria-label="Increase quantity"
+              disabled={!ready || qty >= CART_MAX_QTY}
+              onClick={() => setQty(q => Math.min(CART_MAX_QTY, q + 1))}
+            >
+              &#43;
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className={`sf-add sf-add-lg${said ? ' is-added' : ''}`}
+            disabled={!ready}
+            aria-live="polite"
+            onClick={() => {
+              const result = addLine(slug, product, qty);
+              setSaid(
+                result === 'added' ? `Added ${qty > 1 ? `${qty} items ` : ''}to bag ✓` :
+                result === 'max' ? 'Max quantity reached' : 'Basket full'
+              );
+            }}
+          >
+            {said ?? `Add to bag · $${((product.priceCents * qty) / 100).toFixed(2)}`}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
-      className="sf-add"
+      className={`sf-add${said ? ' is-added' : ''}`}
       disabled={!ready}
       aria-live="polite"
       onClick={() => {
         const result = addLine(slug, product);
         setSaid(
-          result === 'added' ? 'Added' :
+          result === 'added' ? 'Added ✓' :
           result === 'max' ? 'Max 10' : 'Basket full'
         );
       }}
