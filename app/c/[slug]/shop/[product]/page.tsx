@@ -9,13 +9,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import {
-  getStorefront, getStorefrontProduct, getRelatedProducts
+  getStorefront, getStorefrontProduct, getRelatedProducts, getStorefrontServices, type StorefrontService
 } from '@/lib/db/storefront';
 import { shopTaxBps, checkoutAvailable } from '@/lib/db/shop';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { AddToCart } from '@/components/AddToCart';
 import { ProductGallery } from '@/components/ProductGallery';
-import { money, titleCase } from '@/lib/format';
+import { ServiceIcon } from '@/components/ServiceIcon';
+import { money, titleCase, priceLabel } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,10 +46,21 @@ const STEP_MAP: Record<string, string> = {
   eye_care: 'Step 06 · Eye Care',
   moisturizer: 'Step 07 · Moisturize & Seal',
   spf: 'Step 08 · Daily Defense SPF',
-  facial_oil: 'Botanical Facial Oil',
-  lip_care: 'Lip Barrier Care',
-  kit: 'Complete Skincare Kit'
+  facial_oil: 'Step 08 · Botanical Facial Oil',
+  lip_care: 'Specialty · Lip Barrier Care',
+  kit: 'Complete Routine Kit'
 };
+
+const ROUTINE_STEPS = [
+  { key: 'cleanser', num: '01', name: 'Cleanse' },
+  { key: 'exfoliator', num: '02', name: 'Exfoliate' },
+  { key: 'toner', num: '03', name: 'Tone' },
+  { key: 'masque', num: '04', name: 'Masque' },
+  { key: 'serum', num: '05', name: 'Serum' },
+  { key: 'eye_care', num: '06', name: 'Eye Care' },
+  { key: 'moisturizer', num: '07', name: 'Moisturize' },
+  { key: 'spf', num: '08', name: 'SPF / Oil' }
+];
 
 const HOW_TO_USE: Record<string, { when: string; how: string; proTip: string }> = {
   cleanser: {
@@ -98,6 +110,65 @@ const HOW_TO_USE: Record<string, { when: string; how: string; proTip: string }> 
   }
 };
 
+function getPairedServices(category: string, productName: string, allServices: StorefrontService[]): StorefrontService[] {
+  const name = productName.toLowerCase();
+  const cat = category.toLowerCase();
+
+  // 1. Eye care products -> PRF Under-Eye & Golden Hour Facial
+  if (/eye/i.test(cat) || /eye/i.test(name)) {
+    return allServices.filter(s =>
+      /under-?eye|golden hour|wellness signature/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 2. Peels / Exfoliants / Post-peel kits
+  if (/exfoliat|peel|post peel/i.test(cat) || /peel|scrub|glycolic|lactic|post peel/i.test(name)) {
+    return allServices.filter(s =>
+      /lactic|peel|microneedl|bacne|dermaplan/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 3. Acne / Clarifying routines
+  if (/acne|clarify|clear repair/i.test(name)) {
+    return allServices.filter(s =>
+      /clearing|bacne|hydroboration/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 4. Hair restoration oils / serums
+  if (/hair|scalp/i.test(name) || /vahati/i.test(name)) {
+    return allServices.filter(s =>
+      /hair|nue strand|wellness signature/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 5. Serums, Peptides, Collagen, Hyaluronic
+  if (/serum/i.test(cat) || /collagen|glow c|retinal|mandelic/i.test(name)) {
+    return allServices.filter(s =>
+      /microneedl|nano infusion|golden hour|tightening|dermaplan/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 6. Masques (Restore, Firm Collagen, Potent C)
+  if (/masque/i.test(cat) || /masque/i.test(name)) {
+    return allServices.filter(s =>
+      /wellness signature|led|golden hour|getaway/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 7. Cleansers / Toners / Mists
+  if (/cleanse|toner/i.test(cat) || /cleansing|mist|soothe|purify/i.test(name)) {
+    return allServices.filter(s =>
+      /wellness signature|dermaplan|hydroboration|clearing/i.test(s.name)
+    ).slice(0, 3);
+  }
+
+  // 8. Default fallback
+  return allServices.filter(s =>
+    /wellness signature|dermaplan|consult/i.test(s.name)
+  ).slice(0, 3);
+}
+
 export default async function ProductPage({ params }: Props) {
   const { slug, product: productSlug } = await params;
   const clinic = await getStorefront(slug);
@@ -106,9 +177,10 @@ export default async function ProductPage({ params }: Props) {
   const product = await getStorefrontProduct(clinic.id, productSlug);
   if (!product) notFound();
 
-  const [taxBps, related] = await Promise.all([
+  const [taxBps, related, services] = await Promise.all([
     shopTaxBps(clinic.id),
-    getRelatedProducts(clinic.id, product.category, product.id)
+    getRelatedProducts(clinic.id, product.category, product.id),
+    getStorefrontServices(clinic.id)
   ]);
 
   const links = storefrontLinks(await storefrontBase(slug));
@@ -123,6 +195,11 @@ export default async function ProductPage({ params }: Props) {
 
   const isSerumOrPeel = /serum|exfoliat|peel/i.test(product.category);
   const isCleanser = /cleanse|toner/i.test(product.category);
+
+  const pairedServices = getPairedServices(product.category, product.name, services);
+
+  // Active step matching for the 8-step stepper
+  const activeStepKey = product.category === 'facial_oil' ? 'spf' : product.category;
 
   return (
     <>
@@ -278,6 +355,139 @@ export default async function ProductPage({ params }: Props) {
             </div>
 
             <div className="sf-pillar-card">
+              <span className="sf-pillar-num">03</span>
+              <h3>Regenerative Treatment Synergy</h3>
+              <p>
+                Formulated to work in synergy with in-studio PRF, microneedling, and peel treatments,
+                extending your clinical results between appointments.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY THIS ROUTINE & 8-STEP SYSTEM SECTION */}
+      <section className="sf-section sf-bordered">
+        <div className="sf-wrap">
+          <div className="sf-section-head">
+            <div className="sf-eyebrow">The 8-Step System</div>
+            <h2>Why the routine sequence matters</h2>
+            <p>
+              Skincare is about molecular penetration order. Applying active formulas in the correct
+              order ensures each layer absorbs fully rather than evaporating or blocking the next.
+            </p>
+          </div>
+
+          {/* Stepper Timeline Bar */}
+          <div className="sf-routine-stepper" role="group" aria-label="8-Step Skincare Routine">
+            {ROUTINE_STEPS.map(st => {
+              const isActive = st.key === activeStepKey;
+              return (
+                <div key={st.key} className={`sf-step-pill${isActive ? ' is-active' : ''}`}>
+                  <span className="sf-step-idx">{st.num} {isActive ? '★ This Step' : ''}</span>
+                  <span className="sf-step-name">{st.name}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="sf-why-routine-grid">
+            <div className="sf-why-card">
+              <h3>Molecular Density Hierarchy</h3>
+              <p>
+                We apply products from <b>lightest molecular weight to heaviest</b>: water-based essences and active serums first so they penetrate deep into the dermal matrix. Richer lipid creams and botanical oils go last to create a breathable, protective seal over active nutrients.
+              </p>
+            </div>
+            <div className="sf-why-card">
+              <h3>The Colorado Altitude Defense</h3>
+              <p>
+                At 5,000+ feet altitude, dry mountain air accelerates <b>transepidermal water loss (TEWL)</b>. Layering hydration on damp skin and locking it with botanical ceramides ensures your skin maintains cellular moisture throughout the day instead of drying out by afternoon.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED IN IN-STUDIO TREATMENTS */}
+      {pairedServices.length > 0 && (
+        <section className="sf-section sf-bordered sf-invert">
+          <div className="sf-wrap">
+            <div className="sf-section-head">
+              <div className="sf-eyebrow">Clinical In-Studio Care</div>
+              <h2>Experience this formula in treatment</h2>
+              <p>
+                These signature in-studio treatments incorporate this exact botanical formula
+                or work in clinical synergy with it to accelerate your results.
+              </p>
+            </div>
+
+            <div className="sf-paired-services-grid">
+              {pairedServices.map(s => (
+                <article className="sf-paired-service-card" key={s.id}>
+                  <div className="sf-paired-head">
+                    <div className="sf-item-icon-box" aria-hidden="true">
+                      <ServiceIcon name={s.name} category={s.category} />
+                    </div>
+                    <div>
+                      <h3 className="sf-paired-card-title">{s.name}</h3>
+                      <span className="sf-paired-card-meta">{s.duration_min} min · {titleCase(s.category)}</span>
+                    </div>
+                  </div>
+
+                  {s.description && <p className="sf-paired-desc">{s.description}</p>}
+
+                  <div className="sf-paired-foot">
+                    <span className="sf-paired-price">{priceLabel(s)}</span>
+                    <Link
+                      href={`${links.book}?service=${encodeURIComponent(s.id)}`}
+                      className="sf-item-reserve"
+                    >
+                      Book In-Studio <span>&rarr;</span>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Complete The Ritual / Related Products */}
+      {related.length > 0 && (
+        <section className="sf-section sf-bordered">
+          <div className="sf-wrap">
+            <div className="sf-section-head">
+              <div className="sf-eyebrow">Complementary Steps</div>
+              <h2>Complete your daily ritual</h2>
+              <p>Pair with these companion formulas to complete your morning and evening skincare ritual.</p>
+            </div>
+
+            <div className="sf-grid">
+              {related.map(r => (
+                <Link className="sf-card" key={r.id} href={`${links.shop}/${r.slug}`}>
+                  <div className="sf-card-img">
+                    {r.image_path
+                      ? <img src={r.image_path} alt={r.name} loading="lazy" />
+                      : <span aria-hidden="true">{r.name.slice(0, 1)}</span>}
+                  </div>
+                  <div className="sf-card-body">
+                    {r.brand && <div className="sf-card-brand">{r.brand}</div>}
+                    <h3>{r.name}</h3>
+                    {r.description && <p className="sf-card-desc">{r.description}</p>}
+                  </div>
+                  <div className="sf-card-foot">
+                    <span className="sf-card-price">{money(r.price_cents)}</span>
+                    <span className="sf-chip">View &rarr;</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
               <span className="sf-pillar-num">03</span>
               <h3>Regenerative Treatment Synergy</h3>
               <p>
