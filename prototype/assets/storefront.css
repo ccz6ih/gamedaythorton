@@ -4774,4 +4774,344 @@
   }
 }
 
+/* ==========================================================================
+   FACIAL MUSCULATURE EXPLORER & JEUVEAU GUIDE
+   ========================================================================== */
+.sf-muscle-explorer {
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-xl, var(--gd-r-lg));
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-6);
+}
+
+.sf-muscle-explorer-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-2);
+}
+.sf-muscle-explorer-title {
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.2rem);
+  font-weight: 400;
+  letter-spacing: -.015em;
+  color: var(--gd-text);
+  margin: 0;
+}
+.sf-muscle-explorer-sub {
+  font-size: var(--gd-step-0);
+  color: var(--gd-text-muted);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 54ch;
+}
+
+/* Grid Layout: Diagram & Button Rail (Left) + Detailed Analysis (Right) */
+.sf-muscle-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  align-items: start;
+}
+
+.sf-muscle-diagram-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-4);
+}
+
+.sf-face-diagram-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 13;
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.sf-face-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  color: var(--gd-accent, #D4AF37);
+  overflow: visible;
+}
+
+.sf-active-muscle-path {
+  filter: drop-shadow(0 0 10px currentColor);
+  animation: sf-muscle-pulse 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes sf-muscle-pulse {
+  0%, 100% { fill-opacity: 0.35; stroke-width: 1.6; }
+  50% { fill-opacity: 0.7; stroke-width: 2.2; filter: drop-shadow(0 0 16px currentColor); }
+}
+
+.sf-face-active-label {
+  position: absolute;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--gd-step--2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gd-accent);
+  background: color-mix(in srgb, var(--gd-surface) 85%, transparent);
+  border: 1px solid var(--gd-border);
+  padding: 0.3em 0.8em;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.sf-face-spark {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  animation: sf-deck-pulse 2s infinite ease-in-out;
+}
+
+/* Zone Buttons List */
+.sf-muscle-zone-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-2);
+}
+.sf-muscle-zone-btn {
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  padding: 0.65rem 1rem;
+  font: inherit;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  cursor: pointer;
+  transition: all var(--gd-fast) var(--gd-ease);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+}
+.sf-muscle-zone-btn:hover {
+  background: color-mix(in srgb, var(--gd-accent) 10%, var(--gd-surface-raised));
+  border-color: var(--gd-accent-line);
+  color: var(--gd-text);
+  transform: translateX(2px);
+}
+.sf-muscle-zone-btn.is-active {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--brand-accent-ink, #16201A);
+  font-weight: 600;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--gd-accent) 40%, transparent);
+}
+.sf-zone-btn-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.sf-zone-btn-text {
+  flex: 1;
+}
+
+/* Right Column: In-Depth Anatomical Analysis Card */
+.sf-muscle-detail-card {
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-lg);
+  padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-4);
+}
+
+.sf-muscle-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--gd-3);
+  border-bottom: 1px solid var(--gd-border);
+}
+
+.sf-muscle-latin-badge {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--gd-accent);
+}
+.sf-muscle-name {
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.85rem);
+  font-weight: 400;
+  color: var(--gd-text);
+  margin: 0.2rem 0 0.3rem;
+  line-height: 1.2;
+}
+.sf-muscle-target {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sf-muscle-dosing-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  padding: 0.45rem 0.85rem;
+}
+.sf-dosing-lbl {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.sf-dosing-val {
+  font-size: var(--gd-step--1);
+  font-weight: 600;
+  color: var(--gd-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Comparison Matrix (Flaw vs Med Bar Standard) */
+.sf-muscle-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gd-3);
+}
+.sf-muscle-compare-card {
+  border-radius: var(--gd-r-md);
+  padding: var(--gd-3) var(--gd-4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.sf-muscle-compare-card.warning {
+  background: color-mix(in srgb, #ef4444 6%, var(--gd-surface));
+  border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+}
+.sf-muscle-compare-card.success {
+  background: color-mix(in srgb, var(--gd-accent) 8%, var(--gd-surface));
+  border: 1px solid var(--gd-accent-line);
+}
+.sf-compare-badge {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+.sf-compare-badge.danger {
+  color: #fca5a5;
+}
+.sf-compare-badge.success {
+  color: var(--gd-accent);
+}
+.sf-compare-text {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Specs Details Box */
+.sf-muscle-specs-box {
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  padding: var(--gd-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+}
+.sf-muscle-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.sf-muscle-spec-lbl {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--gd-accent);
+}
+.sf-muscle-spec-body {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+.sf-muscle-spec-body.highlight {
+  color: var(--gd-text);
+  font-weight: 500;
+}
+
+/* Card Action Foot */
+.sf-muscle-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gd-3);
+  padding-top: var(--gd-3);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-muscle-price-note {
+  display: flex;
+  flex-direction: column;
+}
+.sf-muscle-price-val {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 700;
+  color: var(--gd-text);
+}
+.sf-muscle-price-sub {
+  font-size: var(--gd-step--2);
+  color: var(--gd-text-dim);
+}
+
+.sf-muscle-actions {
+  display: flex;
+  gap: var(--gd-2);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .sf-muscle-grid {
+    grid-template-columns: 1fr;
+  }
+  .sf-muscle-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  .sf-muscle-card-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sf-muscle-actions .sf-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+
 

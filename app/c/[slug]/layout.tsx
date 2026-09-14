@@ -303,6 +303,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
                   <li><Link href={links.prf}>PRF Regenerative Guide</Link></li>
                   <li><Link href={links.prfCompare}>Compare PRF vs PRP &amp; Fillers</Link></li>
                   <li><Link href={links.prfAftercare}>PRF Pre-Care &amp; Recovery</Link></li>
+                  <li><Link href={links.injectablesGuide}>Precision Injectables &amp; Jeuveau®</Link></li>
                   <li><Link href={links.facialsGuide}>Colorado Altitude Facials</Link></li>
                   <li><Link href={links.ledLightTherapy}>7-Wavelength LED Therapy</Link></li>
                   <li><Link href={links.scarRevision}>Inkless Scar &amp; Stretch Marks</Link></li>
