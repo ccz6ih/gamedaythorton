@@ -166,7 +166,7 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             </div>
 
             <div className="sf-menu-group" style={{ marginTop: 'var(--gd-8)' }}>
-              {signature.map((s, index) => {
+              {signature.map(s => {
                 const badge = s.name.includes('Jeuveau')
                   ? 'Neurotoxin'
                   : s.name.includes('Hair')
@@ -179,12 +179,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
                   ? 'Scar Revision'
                   : null;
 
-                const numStr = String(index + 1).padStart(2, '0');
-
                 return (
                   <article className="sf-item" key={s.id}>
-                    <div className="sf-item-num" aria-hidden="true">
-                      <span>{numStr}</span>
+                    <div className="sf-item-icon-box" aria-hidden="true">
+                      <ServiceIcon name={s.name} category={s.category} />
                     </div>
 
                     <div className="sf-item-body">

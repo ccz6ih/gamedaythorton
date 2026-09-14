@@ -255,7 +255,7 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 2.75rem 1fr auto;
+  grid-template-columns: 3.5rem 1fr auto;
   gap: var(--gd-3) var(--gd-6);
   padding: var(--gd-6) var(--gd-4);
   margin-inline: calc(-1 * var(--gd-4));
@@ -266,21 +266,148 @@
               border-color var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover {
-  background: color-mix(in srgb, var(--gd-surface-raised) 45%, transparent);
+  background: color-mix(in srgb, var(--gd-surface-raised) 50%, transparent);
   border-color: color-mix(in srgb, var(--gd-accent) 35%, transparent);
 }
 .sf-item:last-child { border-bottom: none; }
 
-/* Editorial index number */
-.sf-item-num {
-  font-family: var(--brand-display-font);
-  font-size: 1.45rem;
-  font-weight: 400;
+/* --------------------------------------------------------------------------
+   LUXURY ARTISAN SERVICE ICON MEDALLIONS & MICRO-ANIMATIONS
+   -------------------------------------------------------------------------- */
+.sf-item-icon-box {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--gd-r-full);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--gd-surface-raised) 85%, transparent) 0%,
+    color-mix(in srgb, var(--gd-accent) 15%, transparent) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 55%, transparent);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.45);
   color: var(--gd-accent);
-  letter-spacing: 0.04em;
-  opacity: 0.85;
-  display: flex;
-  align-items: center;
+  flex: none;
+  transition: transform var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              box-shadow var(--gd-fast) var(--gd-ease),
+              color var(--gd-fast) var(--gd-ease);
+}
+.sf-item:hover .sf-item-icon-box {
+  border-color: var(--gd-accent);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent), inset 0 1px 3px rgba(255, 255, 255, 0.7);
+  color: color-mix(in srgb, var(--gd-accent) 85%, #fff);
+}
+.sf-service-svg {
+  width: 1.85rem;
+  height: 1.85rem;
+  overflow: visible;
+}
+
+/* 1. Eye Flutter & Blink (Lashes & PRF Under-Eye) */
+.sf-eye-lid-upper {
+  transform-origin: 12px 13.5px;
+  animation: sf-blink 4.5s ease-in-out infinite;
+}
+.sf-lash-1, .sf-lash-2, .sf-lash-3, .sf-lash-4, .sf-lash-5 {
+  transform-origin: 12px 13.5px;
+  animation: sf-lash-flutter 4.5s ease-in-out infinite;
+}
+.sf-eye-pupil {
+  animation: sf-pupil-shift 6s ease-in-out infinite;
+}
+.sf-under-glow {
+  animation: sf-glow-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes sf-blink {
+  0%, 44%, 48%, 100% { transform: scaleY(1); }
+  46%                 { transform: scaleY(0.15) translateY(4px); }
+}
+@keyframes sf-lash-flutter {
+  0%, 44%, 48%, 100% { transform: scaleY(1); opacity: 1; }
+  46%                 { transform: scaleY(0.2) translateY(3px); opacity: 0.4; }
+  72%                 { transform: rotate(1deg); }
+  76%                 { transform: rotate(-1deg); }
+}
+@keyframes sf-pupil-shift {
+  0%, 100% { transform: translateX(0); }
+  30%, 45% { transform: translateX(-0.6px); }
+  60%, 75% { transform: translateX(0.6px); }
+}
+@keyframes sf-glow-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.95; filter: drop-shadow(0 0 3px var(--gd-accent)); }
+}
+
+/* 2. PRF Droplet Breathing & Floating Bio-Platelets */
+.sf-drop-body {
+  transform-origin: 12px 14px;
+  animation: sf-drop-breathe 3.8s ease-in-out infinite;
+}
+.sf-platelet-1 { animation: sf-float-p1 3s ease-in-out infinite; }
+.sf-platelet-2 { animation: sf-float-p2 3.6s ease-in-out infinite; }
+.sf-platelet-3 { animation: sf-float-p3 4.2s ease-in-out infinite; }
+.sf-platelet-4 { animation: sf-float-p4 3.4s ease-in-out infinite; }
+
+@keyframes sf-drop-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); filter: drop-shadow(0 0 4px var(--gd-accent)); }
+}
+@keyframes sf-float-p1 {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50%      { transform: translateY(-1.5px); opacity: 0.6; }
+}
+@keyframes sf-float-p2 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.75; }
+  50%      { transform: translate(-1px, 1px); opacity: 1; }
+}
+@keyframes sf-float-p3 {
+  0%, 100% { transform: translateY(0); opacity: 0.8; }
+  50%      { transform: translateY(1.5px); opacity: 0.5; }
+}
+@keyframes sf-float-p4 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+  50%      { transform: translate(1px, -1px); opacity: 1; }
+}
+
+/* 3. Syringe Micro-Bead Spark */
+.sf-needle-bead {
+  animation: sf-bead-spark 2.8s ease-in-out infinite;
+}
+@keyframes sf-bead-spark {
+  0%, 100% { transform: scale(0.9); opacity: 0.7; }
+  50%      { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 3px #ffffff); }
+}
+
+/* 4. Microneedling Collagen Matrix Pulse */
+.sf-dot-0-0 { animation: sf-matrix-wave 2.4s ease-in-out 0.0s infinite; }
+.sf-dot-0-1 { animation: sf-matrix-wave 2.4s ease-in-out 0.2s infinite; }
+.sf-dot-0-2 { animation: sf-matrix-wave 2.4s ease-in-out 0.4s infinite; }
+.sf-dot-1-0 { animation: sf-matrix-wave 2.4s ease-in-out 0.3s infinite; }
+.sf-dot-1-1 { animation: sf-matrix-wave 2.4s ease-in-out 0.5s infinite; }
+.sf-dot-1-2 { animation: sf-matrix-wave 2.4s ease-in-out 0.7s infinite; }
+.sf-dot-2-0 { animation: sf-matrix-wave 2.4s ease-in-out 0.6s infinite; }
+.sf-dot-2-1 { animation: sf-matrix-wave 2.4s ease-in-out 0.8s infinite; }
+.sf-dot-2-2 { animation: sf-matrix-wave 2.4s ease-in-out 1.0s infinite; }
+
+@keyframes sf-matrix-wave {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.25); fill: #ffffff; }
+}
+
+/* 5. Hair Follicle Root Glow */
+.sf-hair-glow {
+  animation: sf-hair-pulse 3.2s ease-in-out infinite;
+}
+@keyframes sf-hair-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50%      { opacity: 1; transform: scale(1.3); filter: drop-shadow(0 0 4px var(--gd-accent)); }
+}
+
+/* 6. Paramedical Scar Spark */
+.sf-scar-spark {
+  animation: sf-bead-spark 3.2s ease-in-out 0.5s infinite;
 }
 
 .sf-item-eyebrow {
@@ -336,13 +463,13 @@
 /* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
    and drawn services still lines up down the left edge. */
 .sf-item-photo {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3.5rem;
+  height: 3.5rem;
   max-width: 100%;
   border-radius: var(--gd-r-full);
   object-fit: cover;
   display: block;
-  border: 1px solid var(--gd-border);
+  border: 1.5px solid var(--gd-border);
   flex: none;
   transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
 }
@@ -744,9 +871,9 @@
 @media (max-width: 640px) {
   .sf-person { grid-template-columns: 1fr; }
   .sf-portrait { max-width: 11rem; }
-  .sf-item { grid-template-columns: 2.25rem 1fr; gap: var(--gd-2) var(--gd-4); padding: var(--gd-5) var(--gd-3); }
-  .sf-item-num { font-size: 1.25rem; }
-  .sf-item-photo { width: 2.25rem; height: 2.25rem; }
+  .sf-item { grid-template-columns: 2.75rem 1fr; gap: var(--gd-2) var(--gd-4); padding: var(--gd-5) var(--gd-3); }
+  .sf-item-icon-box, .sf-item-photo { width: 2.75rem; height: 2.75rem; }
+  .sf-service-svg { width: 1.45rem; height: 1.45rem; }
   .sf-item-price { grid-column: 2 / -1; text-align: left; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: var(--gd-3); }
   .sf-item-price .dur { margin-top: 0; }
   .sf-item-cta { grid-column: 2 / -1; }

@@ -109,14 +109,14 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                 <p className="sf-cat-note">{CATEGORY_NOTE[group.category]}</p>
               )}
 
-              {group.items.map((s, index) => (
+              {group.items.map(s => (
                 <article className="sf-item" key={s.id}>
                   {s.image_path ? (
                     <img className="sf-item-photo" src={s.image_path} alt=""
                       width={72} height={72} loading="lazy" />
                   ) : (
-                    <div className="sf-item-num" aria-hidden="true">
-                      <span>{String(index + 1).padStart(2, '0')}</span>
+                    <div className="sf-item-icon-box" aria-hidden="true">
+                      <ServiceIcon name={s.name} category={s.category} />
                     </div>
                   )}
 
