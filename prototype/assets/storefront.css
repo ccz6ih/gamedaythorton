@@ -4829,3 +4829,463 @@
 }
 
 
+/* --------------------------------------------------------------------------
+   THE GUIDE PAGES — /prf/compare, /prf/aftercare
+   --------------------------------------------------------------------------
+   These shipped with thirty class names that no stylesheet ever defined, so
+   both pages were rendering as undecorated HTML: stacked divs, browser-default
+   <details> triangles, bullet lists running the full width of the window. They
+   are the pages meant to bring people in from search and then read as though
+   the practice knows what it is doing, and they were the least finished thing
+   on the site.
+
+   Written in the same language as the rest of the storefront now that the
+   ornament has come off: hairlines instead of boxes, space instead of borders,
+   a small dim label against a large light heading. Nothing here has a
+   gradient, a drop shadow, or an icon.
+   -------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------- breadcrumb -- */
+.sf-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-5);
+}
+.sf-breadcrumb a { color: var(--gd-text-muted); text-decoration: none; }
+.sf-breadcrumb a:hover {
+  color: var(--gd-accent);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+.sf-breadcrumb-sep { opacity: .4; }
+
+/* ------------------------------------------------------- numbered steps --
+ * Four preparation steps. The numeral is a quiet ordinal above the heading
+ * rather than a display-size accent character — the same correction made to
+ * the benefit pillars on the product page, for the same reason: it was set
+ * larger than the heading it labelled.
+ */
+.sf-aftercare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
+}
+.sf-aftercare-card { display: flex; flex-direction: column; }
+.sf-aftercare-step-num {
+  font-size: .68rem;
+  letter-spacing: .16em;
+  color: var(--gd-text-dim);
+  margin-bottom: var(--gd-4);
+}
+.sf-aftercare-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-aftercare-card p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+
+/* ------------------------------------------------------------- timeline --
+ * Recovery, hour by hour. One rule runs down the left and each period hangs
+ * off it, so the eye can travel the sequence without reading a word — which
+ * is what somebody three days post-treatment is actually doing.
+ */
+.sf-timeline-list {
+  margin-top: var(--gd-7);
+  border-left: 1px solid var(--gd-border);
+  padding-left: clamp(1.25rem, 4vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-7);
+}
+.sf-timeline-item { position: relative; }
+/* The mark sits ON the rule. The ring is painted in the page ground so the
+   line appears to pass behind the dot rather than through it. */
+.sf-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * clamp(1.25rem, 4vw, 2.5rem) - 3.5px);
+  top: .45rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gd-accent);
+  box-shadow: 0 0 0 4px var(--gd-bg);
+}
+.sf-timeline-badge {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-timeline-content h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+}
+.sf-timeline-content p {
+  margin: 0 0 var(--gd-3);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-timeline-content ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  max-width: var(--sf-measure);
+}
+.sf-timeline-content li {
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+.sf-timeline-content li::marker { color: var(--gd-text-dim); }
+
+/* ---------------------------------------------------------- detail list -- */
+.sf-detail-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  max-width: var(--sf-measure);
+}
+.sf-detail-list li {
+  font-size: var(--gd-step--1);
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+}
+.sf-detail-list li::marker { color: var(--gd-text-dim); }
+
+/* ----------------------------------------------------- comparison cards -- */
+.sf-compare-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: var(--gd-7) var(--gd-6);
+  margin-top: var(--gd-7);
+}
+.sf-compare-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+  padding-top: var(--gd-5);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-compare-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-compare-card p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+.sf-compare-tag {
+  align-self: flex-start;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+}
+/* The one place a fill is justified: this is an aside, and it has to read as
+   set apart from the comparison it interrupts. Even here it is a tint and a
+   left rule, not a bordered, rounded, shadowed panel. */
+.sf-compare-callout {
+  margin-top: var(--gd-7);
+  padding: var(--gd-5) var(--gd-6);
+  border-left: 2px solid var(--gd-accent);
+  background: color-mix(in srgb, var(--gd-accent) 5%, transparent);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+}
+.sf-compare-callout p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-compare-callout p + p { margin-top: var(--gd-3); }
+
+/* ------------------------------------------------------------------ faq --
+ * The same hairline rows as the product-page accordions, so the two read as
+ * one component rather than two answers to the same question.
+ */
+.sf-faq-list {
+  margin-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
+  max-width: 52rem;
+}
+.sf-faq-item { border-bottom: 1px solid var(--gd-border); }
+.sf-faq-q {
+  padding: var(--gd-4) var(--gd-6) var(--gd-4) 0;
+  font-size: var(--gd-step-0);
+  color: var(--gd-text);
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-faq-q::-webkit-details-marker { display: none; }
+.sf-faq-q:hover { color: var(--gd-accent); }
+/* list-style:none on a summary takes the default focus ring with it in
+   several browsers, so it is drawn back explicitly. */
+.sf-faq-q:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 3px; }
+/* A plus that becomes a minus: two rules, the vertical one rotated flat when
+   open. Cheaper than a glyph, and it cannot fall back to a tofu box. */
+.sf-faq-q::before,
+.sf-faq-q::after {
+  content: "";
+  position: absolute;
+  right: .35rem;
+  top: 50%;
+  width: .6rem;
+  height: 1px;
+  background: currentColor;
+  opacity: .55;
+  transition: transform var(--gd-fast) var(--gd-ease);
+}
+.sf-faq-q::after { transform: rotate(90deg); }
+.sf-faq-item[open] .sf-faq-q::after { transform: rotate(0deg); }
+.sf-faq-a {
+  margin: 0;
+  padding: 0 var(--gd-6) var(--gd-5) 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+
+/* ------------------------------------------------------------ cta block -- */
+.sf-cta-block {
+  padding-top: var(--gd-7);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-cta-block h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-cta-block p {
+  margin: 0 0 var(--gd-5);
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-cta-actions { display: flex; flex-wrap: wrap; gap: var(--gd-3); }
+
+/* ----------------------------------------------------------- cluster nav -- */
+.sf-cluster-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-3);
+  margin-top: var(--gd-5);
+}
+
+/* ------------------------------------------------------ restored: buy row --
+ * .sf-product-buy lost its rule in 5cbc7ed while staying in the markup, so
+ * the quantity stepper and the add button had been laying out as raw inline
+ * blocks on every product page since that commit.
+ */
+.sf-product-buy {
+  display: flex;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  align-items: center;
+  margin: var(--gd-6) 0 var(--gd-4);
+}
+
+/* --------------------------------------------------------------------------
+   TREATMENT MATCHER — the concern picker on /prf
+   --------------------------------------------------------------------------
+   Seventeen of its class names had no rule either, so the pills, the
+   recommendation panel and the two prose columns were rendering as plain
+   stacked text on the page that is meant to convert search traffic.
+   -------------------------------------------------------------------------- */
+
+.sf-matcher-head { max-width: var(--sf-measure); }
+.sf-matcher-eyebrow {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-3);
+}
+.sf-matcher-desc {
+  margin: var(--gd-3) 0 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+
+/* The concern pills. Selected state is a filled pill; the rest are hairline
+   outlines. One signal, no shadow, no scale. */
+.sf-matcher-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin: var(--gd-6) 0;
+}
+.sf-matcher-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .55rem 1rem;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-full);
+  background: transparent;
+  color: var(--gd-text-muted);
+  font: inherit;
+  font-size: var(--gd-step--1);
+  cursor: pointer;
+  transition: color var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              background var(--gd-fast) var(--gd-ease);
+}
+.sf-matcher-pill:hover { color: var(--gd-text); border-color: var(--gd-border-strong); }
+.sf-matcher-pill:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+.sf-matcher-pill.is-active {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--brand-accent-ink);
+}
+/* The dot only earns its place on the unselected pills — on the filled one it
+   would be a mark on a mark. */
+.sf-matcher-pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .45;
+  flex: none;
+}
+.sf-matcher-pill.is-active .sf-matcher-pill-dot { opacity: 0; }
+
+.sf-matcher-match-tag {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-matcher-treatment-name {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-matcher-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin-top: var(--gd-3);
+}
+.sf-matcher-stat-badge {
+  font-size: var(--gd-step--1);
+  color: var(--gd-text-muted);
+}
+/* The two facts are separated by a hairline rather than by giving each one a
+   bordered chip of its own. */
+.sf-matcher-stat-badge + .sf-matcher-stat-badge {
+  padding-left: var(--gd-3);
+  border-left: 1px solid var(--gd-border);
+}
+
+.sf-matcher-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: var(--gd-6);
+  margin-top: var(--gd-6);
+  padding-top: var(--gd-6);
+  border-top: 1px solid var(--gd-border);
+}
+.sf-matcher-col { min-width: 0; }
+.sf-matcher-section-title {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--gd-text-dim);
+  margin: 0 0 var(--gd-2);
+  font-weight: 400;
+}
+.sf-matcher-prose {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+.sf-matcher-benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.sf-matcher-benefits li {
+  display: flex;
+  gap: .6rem;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+.sf-matcher-check { color: var(--gd-accent); flex: none; }
+.sf-matcher-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-3);
+  margin-top: var(--gd-5);
+}
+
+/* ------------------------------------------------------------- errors --
+ * .sf-error had no rule anywhere, which meant a failed booking or a declined
+ * basket action printed its message in body text the same colour and size as
+ * everything around it. The one message on the page that must not be missed
+ * was the one with no styling at all.
+ */
+.sf-error {
+  margin: var(--gd-4) 0 0;
+  padding: var(--gd-3) var(--gd-4);
+  border-left: 2px solid var(--gd-critical);
+  background: color-mix(in srgb, var(--gd-critical) 8%, transparent);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.6;
+  color: var(--gd-text);
+}
