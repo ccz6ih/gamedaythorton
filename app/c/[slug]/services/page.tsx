@@ -109,20 +109,27 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                 <p className="sf-cat-note">{CATEGORY_NOTE[group.category]}</p>
               )}
 
-              {group.items.map(s => (
+              {group.items.map((s, index) => (
                 <article className="sf-item" key={s.id}>
                   {s.image_path ? (
                     <img className="sf-item-photo" src={s.image_path} alt=""
                       width={72} height={72} loading="lazy" />
                   ) : (
-                    <span className="sf-item-mark" aria-hidden="true">
-                      <ServiceIcon name={s.name} category={s.category} />
-                    </span>
+                    <div className="sf-item-num" aria-hidden="true">
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                    </div>
                   )}
 
                   <div className="sf-item-body">
                     <h3 className="sf-item-name">
-                      {s.name}
+                      <Link
+                        href={s.online_bookable
+                          ? `${links.book}?service=${encodeURIComponent(s.id)}`
+                          : `${links.enquire}?service=${encodeURIComponent(s.name)}`}
+                        className="sf-item-title-link"
+                      >
+                        {s.name}
+                      </Link>
                       {s.is_membership && <span className="sf-chip accent">membership</span>}
                       {!s.online_bookable && <span className="sf-chip">by enquiry</span>}
                       {s.requires_consent && <span className="sf-chip">consent form</span>}
@@ -154,13 +161,12 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                     <span className="amount">{priceLabel(s)}</span>
                     <span className="dur">{s.duration_min} min</span>
                     <Link
-                      className={`sf-btn ${s.online_bookable ? 'primary' : 'ghost'} sm`}
+                      className="sf-item-reserve"
                       href={s.online_bookable
                         ? `${links.book}?service=${encodeURIComponent(s.id)}`
                         : `${links.enquire}?service=${encodeURIComponent(s.name)}`}
-                      style={{ marginTop: 'var(--gd-1)' }}
                     >
-                      {s.online_bookable ? 'Book \u2192' : 'Enquire'}
+                      {s.online_bookable ? 'Reserve' : 'Enquire'} <span>&rarr;</span>
                     </Link>
                   </div>
                 </article>

@@ -744,10 +744,10 @@
 @media (max-width: 640px) {
   .sf-person { grid-template-columns: 1fr; }
   .sf-portrait { max-width: 11rem; }
-  .sf-item { grid-template-columns: 3rem 1fr; gap: var(--gd-3) var(--gd-4); padding: var(--gd-4) var(--gd-4); }
-  .sf-item-mark, .sf-item-photo { width: 3rem; height: 3rem; }
-  .sf-item-mark svg { width: 1.6rem; height: 1.6rem; }
-  .sf-item-price { grid-column: 2 / -1; text-align: left; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: var(--gd-2); }
+  .sf-item { grid-template-columns: 2.25rem 1fr; gap: var(--gd-2) var(--gd-4); padding: var(--gd-5) var(--gd-3); }
+  .sf-item-num { font-size: 1.25rem; }
+  .sf-item-photo { width: 2.25rem; height: 2.25rem; }
+  .sf-item-price { grid-column: 2 / -1; text-align: left; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: var(--gd-3); }
   .sf-item-price .dur { margin-top: 0; }
   .sf-item-cta { grid-column: 2 / -1; }
   .sf-nav-inner { gap: var(--gd-4); }
