@@ -283,7 +283,7 @@
     "sort_order": 12,
     "description": "For existing Volume clients returning 15–21 days after their last appointment.",
     "details": "Removal of grown-out extensions and additional volume fans restore the fullness and shape of your Volume set. Appointments beyond three weeks require a new full set.",
-    "needs_copy": false
+    "needs_copy": true
   },
   {
     "id": "mb_svc_14",
@@ -413,9 +413,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 18,
-    "description": "Targeted radiofrequency thermal therapy to stimulate collagen contraction, firm lax tissue, and contour the jawline and face.",
-    "details": "Delivers controlled therapeutic heat into the deeper dermal layers while protecting the outer skin. This stimulates immediate collagen fiber tightening and triggers gradual neocollagenesis over subsequent weeks. Ideal for mild to moderate skin laxity, jowl contouring, and fine lines with zero downtime. A series of 3 to 6 sessions spaced 2 to 4 weeks apart is recommended for optimal tightening.",
-    "needs_copy": false
+    "description": "Radiofrequency energy warms the deeper layers of the skin to stimulate collagen, for gradual firming.",
+    "details": "Radiofrequency heats the dermis in a controlled way, which prompts the skin’s own collagen production. Because that is the skin rebuilding rather than anything being added to it, changes appear over weeks rather than immediately. Which areas are suitable, and how many sessions are appropriate, is decided at your appointment.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_20",
@@ -435,9 +435,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 19,
-    "description": "Precision face and body waxing using gentle sensitive-skin botanical waxes for clean, long-lasting smoothness.",
-    "details": "Customised waxing services tailored to sensitive skin. Includes skin preparation to protect the natural barrier, meticulous hair removal, and a soothing post-wax botanical treatment to calm redness and prevent irritation.",
-    "needs_copy": false
+    "description": "Hair removal with warm wax. The areas treated and the price are confirmed when you book.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_21",
@@ -457,9 +457,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 20,
-    "description": "A restorative, fully customised facial combining deep botanical cleansing, gentle enzymatic exfoliation, lymphatic massage, and targeted nourishment.",
-    "details": "Customised to your skin’s current condition. Includes double botanical cleansing, steam, tailored fruit enzyme exfoliation, gentle extractions where appropriate, relaxing lymphatic facial massage, a nutrient-dense treatment mask, and barrier-repair finishing serums. Restores balanced hydration, calm, and natural luminosity.",
-    "needs_copy": false
+    "description": "The Med Bar’s own signature facial — a complete treatment, tailored to your skin on the day.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_22",
@@ -479,9 +479,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 21,
-    "description": "Clinical physical exfoliation using a sterile blade to remove surface dead skin cells and vellus peach fuzz for glass-like radiance.",
-    "details": "Gently sweeps away the dull outermost layer of dead skin and fine facial hair. Enhances active skincare absorption by up to 60% and creates an ultra-smooth canvas for makeup. Includes double cleansing, soothing botanical mask, and deep hydration. Leaves skin immediately silky and bright with zero downtime.",
-    "needs_copy": false
+    "description": "Manual exfoliation with a sterile blade, lifting away dead surface skin and the fine vellus hair on the face.",
+    "details": "Removing the outermost layer of dead cells along with fine facial hair leaves the skin smoother to the touch, lets makeup sit more evenly, and allows what is applied afterwards to absorb more readily. Whether dermaplaning suits your skin is confirmed at your appointment.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_23",
@@ -501,9 +501,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 22,
-    "description": "A targeted 45-minute clinical treatment to clear active congestion, calm inflammation, and balance excess sebum with zero downtime.",
-    "details": "Ideal for busy schedules or regular blemish maintenance. Focuses on deep pore purification, salicylic or botanical enzyme treatment, focused extractions, and a calming anti-inflammatory mask to rebalance congested skin without over-drying.",
-    "needs_copy": false
+    "description": "A shorter version of the Skin Clearing Facial, for congestion and breakouts when time is short.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_24",
@@ -523,9 +523,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 23,
-    "description": "A gentle, moisture-binding 20% lactic acid peel with botanical extracts to brighten uneven tone, refine texture, and replenish deep hydration.",
-    "details": "Lactic acid is a gentle alpha hydroxy acid (AHA) and natural humectant that exfoliates dead surface cells while drawing moisture into the skin. Improves mild hyperpigmentation, dry texture, and fine dehydration lines with minimal to no visible peeling. Safe and effective for sensitive, dry, or first-time peel clients.",
-    "needs_copy": false
+    "description": "A 20% lactic acid peel — a gentler alpha hydroxy exfoliation for brightness, texture and hydration.",
+    "details": "Lactic acid is an alpha hydroxy acid. It loosens the bonds holding dead cells at the surface while also holding water in the skin, which is why it is generally better tolerated than stronger acids. Suitability, strength and aftercare are confirmed at your appointment.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_25",
@@ -545,9 +545,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 24,
-    "description": "An event-ready radiance revival combining gentle polish, antioxidant infusion, and cooling therapy for instant dewy luminosity.",
-    "details": "The ultimate pre-event or post-travel skin refresh. Features an enzymatic polish, high-potency vitamin and peptide infusion, cooling cryo-globe lymphatic massage, and an illuminating botanical mask. Leaves skin plump, glowing, and refreshed with zero recovery time.",
-    "needs_copy": false
+    "description": "A radiance-focused facial for skin that is looking tired, dull or in need of a reset.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_26",
@@ -567,15 +567,15 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 25,
-    "description": "An intensive firming and sculpting treatment featuring lifting facial massage, peptide-rich botanical concentrates, and collagen-boosting masks.",
-    "details": "Designed to tone, lift, and revitalize tired facial contours. Utilizes specialized lifting facial massage techniques, firming peptide complexes, antioxidant concentrates, and a tightening botanical mask. Visibly depuffs the jawline and eye area while imparting a warm, lit-from-within glow.",
-    "needs_copy": false
+    "description": "A firming facial, aimed at tone, radiance and the appearance of slackening skin.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_27",
     "clinic_id": "clinic_medbar_loveland",
-    "name": "Hydroboration Facial",
-    "slug": "hydroboration-facial",
+    "name": "Hydrodermabrasion Facial",
+    "slug": "hydrodermabrasion-facial",
     "category": "facials",
     "duration_min": 45,
     "buffer_after_min": 15,
@@ -589,9 +589,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 26,
-    "description": "Hydradermabrasion that simultaneously vacuums deep pore debris while drenching the skin in active hyaluronic and peptide infusions.",
-    "details": "Fluid vortex hydro-cleansing gently extracts blackheads, excess oil, and dead cellular build-up while infusing potent antioxidants, hydrating hyaluronic acid, and botanical extracts directly into newly cleared pores. Leaves the skin thoroughly purified, calm, plump, and deeply hydrated with zero redness.",
-    "needs_copy": false
+    "description": "Deep cleansing and exfoliation by fluid vortex, drawing debris out of the pores while the skin stays wet throughout.",
+    "details": "A handpiece combines gentle suction with a stream of fluid to lift away dead surface cells and loosen the contents of congested pores. Keeping the skin wet for the whole treatment is what separates it from dry abrasive resurfacing. Which serums are used, and whether it suits your skin, is decided at your appointment.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_28",
@@ -611,9 +611,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 27,
-    "description": "Non-invasive transdermal serum delivery using microscopic nano-channels to increase active ingredient absorption by up to 97%.",
-    "details": "Creates hundreds of thousands of microscopic pathways in the outermost stratum corneum without piercing into living dermis. Drives customized clinical serums (growth factors, brightening actives, hydrating complexes) deeply into the skin. Provides the cellular rejuvenation of advanced infusion therapy with no needles, no pain, and no downtime.",
-    "needs_copy": false
+    "description": "Nano-channelling to help active serums absorb further into the skin — for tone, texture and fine lines.",
+    "details": "A nano tip creates microscopic channels in the uppermost layer of the skin, so that the serums used reach further than they would from the surface alone. It works more superficially than microneedling. Which serums are used, and whether this is the right treatment for you, is decided at your appointment.",
+    "needs_copy": true
   },
   {
     "id": "mb_svc_29",
@@ -633,9 +633,9 @@
     "online_bookable": true,
     "active": true,
     "sort_order": 28,
-    "description": "An intensive 85-minute clinical facial for persistent acne, deep congestion, chronic breakouts, and compromised barrier recovery.",
-    "details": "A comprehensive clinical protocol including double deep cleansing, specialized steam and enzyme digestion, extensive professional manual extractions, high-frequency antibacterial therapy, blue LED phototherapy to target P. acnes bacteria, and a soothing detoxifying clay or calming mask. Includes personalized home-care guidance to sustain clear skin.",
-    "needs_copy": false
+    "description": "A longer, deep-cleansing facial aimed at congestion, breakouts and clogged pores.",
+    "details": null,
+    "needs_copy": true
   },
   {
     "id": "mb_svc_30",

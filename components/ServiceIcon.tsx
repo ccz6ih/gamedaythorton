@@ -221,7 +221,7 @@ function DermaplaneBlade() {
   );
 }
 
-/** Hydroboration Facial — Swirling aqua-infusion vortex */
+/** Hydrodermabrasion Facial — Swirling aqua-infusion vortex */
 function HydroVortex() {
   return (
     <g className="sf-art-hydro">
@@ -507,7 +507,11 @@ const BY_NAME: [RegExp, () => React.JSX.Element][] = [
 
   // 3. Facials & Peels
   [/dermaplan/i, DermaplaneBlade],
-  [/hydroboration/i, HydroVortex],
+  // Matches both spellings. The treatment was listed as "Hydroboration Facial"
+  // — a term from organic chemistry — until it was renamed to hydrodermabrasion,
+  // and an icon that silently stopped matching is how a row loses its artwork
+  // without anyone noticing.
+  [/hydro(boration|dermabrasion)/i, HydroVortex],
   [/nano infusion/i, NanoInfusion],
   [/lactic|floraessence/i, LacticPeel],
   [/golden hour/i, GoldenFirming],

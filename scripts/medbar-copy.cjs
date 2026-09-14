@@ -251,14 +251,24 @@ const COPY = {
     provisional: 'name'
   },
 
-  // NAME QUERIED. "Hydroboration" is a term from organic chemistry and not a
-  // treatment; the facial this almost certainly means is hydrodermabrasion.
-  // Not corrected here, because renaming a practice's own treatment on its
-  // behalf is worse than leaving a typo standing. Flagged for Jamie.
-  'Hydroboration Facial': {
+  // RENAMED, on the owner's instruction. This was listed as "Hydroboration
+  // Facial" — a term from organic chemistry, not a treatment — and the facial
+  // meant is hydrodermabrasion. Renaming a practice's own treatment is not a
+  // typo fix an agent may make unilaterally, so it was queried first and
+  // changed only once Craig confirmed it.
+  //
+  // The rename is what upgrades this entry from 'name' to 'modality': once the
+  // treatment has its real name, what it is stops being guesswork. Everything
+  // that remains hers — which serums, which skin — still defers to the
+  // appointment.
+  'Hydrodermabrasion Facial': {
     description:
-      'A hydration-focused facial for skin that feels tight, dry or dehydrated.',
-    provisional: 'name'
+      'Deep cleansing and exfoliation by fluid vortex, drawing debris out of the pores while the skin stays wet throughout.',
+    details:
+      'A handpiece combines gentle suction with a stream of fluid to lift away dead surface cells and loosen the ' +
+      'contents of congested pores. Keeping the skin wet for the whole treatment is what separates it from dry ' +
+      'abrasive resurfacing. Which serums are used, and whether it suits your skin, is decided at your appointment.',
+    provisional: 'modality'
   },
 
   /* ------------------------------------------------------- paramedical -- */
