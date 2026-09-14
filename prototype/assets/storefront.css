@@ -255,7 +255,8 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 3.5rem 1fr auto;
+  /* Tracks the icon box, which lost its 56px medallion and is now a 40px mark. */
+  grid-template-columns: 2.5rem 1fr auto;
   gap: var(--gd-3) var(--gd-6);
   padding: var(--gd-6) var(--gd-4);
   margin-inline: calc(-1 * var(--gd-4));
@@ -274,30 +275,32 @@
 /* --------------------------------------------------------------------------
    LUXURY ARTISAN SERVICE ICON MEDALLIONS & MICRO-ANIMATIONS
    -------------------------------------------------------------------------- */
+/* THE MARK, NOT THE MEDALLION.
+ *
+ * Each service mark sat inside a gold coin: a diagonal gradient, an accent
+ * border, a drop shadow AND an inset highlight to fake a bevel, then a 1.08
+ * scale-up and a lift on hover. Six effects stacked on a 56px circle, thirty
+ * times down one page.
+ *
+ * The line art underneath is good and is kept. What is removed is the object it
+ * was embossed onto — the gradient, the ring, both shadows and the pop. Drawn
+ * small and dim, the mark anchors its row and then gets out of the way of the
+ * treatment name and the price, which are what somebody is actually reading.
+ *
+ * The hover cue moves to colour alone, and only that: scaling an element on
+ * hover moves the text next to it in the reader's peripheral vision for no
+ * information gained.
+ */
 .sf-item-icon-box {
   display: grid;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--gd-r-full);
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--gd-surface-raised) 85%, transparent) 0%,
-    color-mix(in srgb, var(--gd-accent) 15%, transparent) 100%);
-  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 55%, transparent);
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.45);
-  color: var(--gd-accent);
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--gd-text-dim);
   flex: none;
-  transition: transform var(--gd-fast) var(--gd-ease),
-              border-color var(--gd-fast) var(--gd-ease),
-              box-shadow var(--gd-fast) var(--gd-ease),
-              color var(--gd-fast) var(--gd-ease);
+  transition: color var(--gd-fast) var(--gd-ease);
 }
-.sf-item:hover .sf-item-icon-box {
-  border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent), inset 0 1px 3px rgba(255, 255, 255, 0.7);
-  color: color-mix(in srgb, var(--gd-accent) 85%, #fff);
-}
+.sf-item:hover .sf-item-icon-box { color: var(--gd-accent); }
 .sf-service-svg {
   width: 1.85rem;
   height: 1.85rem;
@@ -548,7 +551,9 @@
 }
 .sf-item:hover .sf-item-photo {
   border-color: var(--gd-accent);
-  transform: scale(1.05);
+  /* Was scale(1.05). A portrait that swells when the cursor passes nudges the
+     text beside it and tells the reader nothing the border colour has not
+     already said. */
 }
 
 .sf-item-body { min-width: 0; }
@@ -1993,7 +1998,7 @@
   transition: all var(--gd-fast) var(--gd-ease);
 }
 .sf-product-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10%; display: block; }
-.sf-product-thumb:hover { border-color: var(--gd-accent); transform: translateY(-1px); }
+.sf-product-thumb:hover { border-color: var(--gd-accent); }
 .sf-product-thumb.is-active {
   border-color: var(--gd-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--gd-accent) 40%, transparent);
@@ -2119,13 +2124,16 @@
   border-radius: var(--gd-r-md);
   background: var(--gd-accent);
   color: var(--brand-accent-ink);
-  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent);
-  transition: all var(--gd-fast) var(--gd-ease);
+  /* No coloured glow. A gold button casting gold light was the single most
+     dated thing on the page — the reference ships a flat pill and lets the
+     fill carry it. The 1px lift stays: that is a button affordance, not
+     decoration. */
+  transition: background var(--gd-fast) var(--gd-ease),
+              transform var(--gd-fast) var(--gd-ease);
 }
 .sf-add.sf-add-lg:hover:not(:disabled) {
   background: var(--gd-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px -2px color-mix(in srgb, var(--gd-accent) 60%, transparent);
 }
 .sf-add.is-added {
   background: var(--gd-in-range) !important;
@@ -3528,7 +3536,7 @@
 
 .sf-matcher-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   gap: var(--gd-4);
 }
 
@@ -3545,7 +3553,6 @@
 }
 .sf-matcher-card:hover {
   border-color: var(--gd-accent-line);
-  transform: translateY(-2px);
 }
 .sf-matcher-card.highlight {
   border-color: var(--gd-accent);
