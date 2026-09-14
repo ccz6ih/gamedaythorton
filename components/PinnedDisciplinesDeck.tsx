@@ -28,13 +28,32 @@ const DISCIPLINES = [
     guideLabel: 'Explore PRF Master Guide',
     bookServiceId: '183f72df-54e7-54b7-acfa-0fb0b0959522',
     iconSvg: (
-      <svg viewBox="0 0 48 48" className="sf-deck-icon-svg" aria-hidden="true">
-        <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
-        <circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
-        <path d="M24 8 C20 16 14 21 14 28 a10 10 0 0 0 20 0 c0-7-6-12-10-20 Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <circle cx="24" cy="28" r="3" fill="currentColor" />
-        <circle cx="31" cy="18" r="1.5" fill="currentColor" />
-        <circle cx="17" cy="20" r="1.5" fill="currentColor" />
+      <svg viewBox="0 0 220 110" className="sf-deck-art-svg sf-art-prf" aria-hidden="true">
+        <defs>
+          <radialGradient id="prfGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--card-accent)" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="var(--card-accent)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="110" cy="55" rx="75" ry="42" fill="url(#prfGlow)" />
+        <ellipse cx="110" cy="55" rx="88" ry="40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 6" opacity="0.3" className="sf-orbit-outer" />
+        <ellipse cx="110" cy="55" rx="62" ry="28" fill="none" stroke="currentColor" strokeWidth="1.2" opacity="0.5" className="sf-orbit-mid" />
+        <ellipse cx="110" cy="55" rx="36" ry="16" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" opacity="0.4" />
+        <g className="sf-art-fibrin-core">
+          <path d="M110 20 C95 38 82 52 82 66 a28 28 0 0 0 56 0 c0-14-13-28-28-46 Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M110 32 C100 44 92 54 92 64 a18 18 0 0 0 36 0 c0-10-8-20-18-32 Z" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
+          <circle cx="110" cy="66" r="4.5" fill="currentColor" className="sf-nucleus-spark" />
+          <circle cx="102" cy="56" r="2" fill="currentColor" opacity="0.85" />
+          <circle cx="118" cy="58" r="2.2" fill="currentColor" opacity="0.85" />
+          <circle cx="105" cy="74" r="1.8" fill="currentColor" opacity="0.75" />
+          <circle cx="116" cy="72" r="1.8" fill="currentColor" opacity="0.75" />
+        </g>
+        <path d="M82 66 C65 68 48 60 35 52" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+        <path d="M138 66 C155 68 172 60 185 52" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+        <circle cx="35" cy="52" r="2.5" fill="currentColor" opacity="0.7" />
+        <circle cx="185" cy="52" r="2.5" fill="currentColor" opacity="0.7" />
+        <circle cx="58" cy="42" r="1.5" fill="currentColor" opacity="0.5" />
+        <circle cx="162" cy="42" r="1.5" fill="currentColor" opacity="0.5" />
       </svg>
     )
   },
@@ -59,12 +78,31 @@ const DISCIPLINES = [
     guideLabel: 'View Injectables Menu',
     bookServiceId: '4511ad22-af4a-5f94-8b12-fe42de71129d',
     iconSvg: (
-      <svg viewBox="0 0 48 48" className="sf-deck-icon-svg" aria-hidden="true">
-        <path d="M12 36 L36 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        <path d="M30 6 L42 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.25" />
-        <circle cx="36" cy="12" r="3" fill="currentColor" />
-        <path d="M8 40 L12 36" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <svg viewBox="0 0 220 110" className="sf-deck-art-svg sf-art-jeuveau" aria-hidden="true">
+        <defs>
+          <radialGradient id="jeuveauGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--card-accent)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--card-accent)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="110" cy="55" rx="78" ry="42" fill="url(#jeuveauGlow)" />
+        <path d="M25 75 C60 30 110 25 150 45 C175 58 195 52 205 40" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="3 4" opacity="0.4" />
+        <path d="M15 60 C55 20 115 15 165 40 C185 50 198 48 208 35" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.6" />
+        <path d="M35 90 C70 50 120 45 160 65 C185 78 200 70 210 58" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" opacity="0.3" />
+        <g className="sf-target-nodes">
+          <circle cx="75" cy="38" r="3.5" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <circle cx="75" cy="38" r="1.5" fill="currentColor" />
+          <circle cx="115" cy="32" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 2" />
+          <circle cx="115" cy="32" r="2" fill="currentColor" />
+          <circle cx="155" cy="48" r="3.5" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <circle cx="155" cy="48" r="1.5" fill="currentColor" />
+        </g>
+        <g className="sf-art-stylus">
+          <line x1="85" y1="88" x2="135" y2="38" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          <line x1="125" y1="28" x2="145" y2="48" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="135" y1="38" x2="152" y2="21" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <circle cx="156" cy="17" r="3" fill="currentColor" className="sf-micro-bead" />
+        </g>
       </svg>
     )
   },
@@ -88,11 +126,25 @@ const DISCIPLINES = [
     guideLabel: 'Explore Facials Directory',
     bookServiceId: 'ddd47915-309a-52fc-8bd0-0270524937f8',
     iconSvg: (
-      <svg viewBox="0 0 48 48" className="sf-deck-icon-svg" aria-hidden="true">
-        <path d="M24 4 C14 16 8 24 8 32 a16 16 0 0 0 32 0 c0-8-6-16-16-28 Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M16 32 C16 36.5 19.5 40 24 40" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <circle cx="24" cy="20" r="2" fill="currentColor" />
-        <path d="M12 20 Q24 24 36 20" fill="none" stroke="currentColor" strokeWidth="1.2" opacity="0.4" />
+      <svg viewBox="0 0 220 110" className="sf-deck-art-svg sf-art-facials" aria-hidden="true">
+        <defs>
+          <radialGradient id="facialsGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--card-accent)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--card-accent)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="110" cy="55" rx="78" ry="42" fill="url(#facialsGlow)" />
+        <path d="M40 75 C60 95 100 95 125 78 C155 58 150 30 118 25 C88 20 72 45 88 65 C102 80 132 75 142 58 C150 45 142 35 128 35" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.65" className="sf-vortex-stream" />
+        <path d="M25 55 C45 85 85 92 120 85 C165 75 185 45 168 25 C152 8 115 12 102 32 C90 52 112 68 132 64 C148 60 152 48 142 40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 4" opacity="0.4" />
+        <g className="sf-art-botanical-core">
+          <path d="M110 32 C125 45 132 62 128 78 C112 75 98 62 110 32 Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M110 32 L120 76" stroke="currentColor" strokeWidth="1" opacity="0.6" />
+          <path d="M114 45 L124 50" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+          <path d="M116 56 L126 62" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
+          <circle cx="94" cy="52" r="4.5" fill="currentColor" className="sf-dew-spark" />
+          <circle cx="145" cy="62" r="2.5" fill="currentColor" opacity="0.75" />
+          <circle cx="75" cy="42" r="2" fill="currentColor" opacity="0.5" />
+        </g>
       </svg>
     )
   },
@@ -116,12 +168,30 @@ const DISCIPLINES = [
     guideLabel: 'Explore Scar Revision Guide',
     bookServiceId: '2909d933-4de7-560b-810b-cd22d9be475b',
     iconSvg: (
-      <svg viewBox="0 0 48 48" className="sf-deck-icon-svg" aria-hidden="true">
-        <path d="M6 24 C14 16 20 16 24 24 C28 32 34 32 42 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        <path d="M10 28 C16 22 20 22 24 28 C28 34 32 34 38 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 3" opacity="0.6" />
-        <circle cx="24" cy="24" r="3" fill="currentColor" />
-        <circle cx="12" cy="18" r="1.5" fill="currentColor" />
-        <circle cx="36" cy="30" r="1.5" fill="currentColor" />
+      <svg viewBox="0 0 220 110" className="sf-deck-art-svg sf-art-scar" aria-hidden="true">
+        <defs>
+          <radialGradient id="scarGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--card-accent)" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="var(--card-accent)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="110" cy="55" rx="78" ry="42" fill="url(#scarGlow)" />
+        <path d="M25 45 L45 65 M30 68 L50 40 M20 55 L55 52 M38 32 L42 78" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.4" strokeDasharray="2 3" />
+        <g className="sf-stipple-matrix">
+          <circle cx="70" cy="38" r="1.5" fill="currentColor" opacity="0.6" />
+          <circle cx="78" cy="48" r="2" fill="currentColor" opacity="0.8" />
+          <circle cx="72" cy="60" r="1.8" fill="currentColor" opacity="0.7" />
+          <circle cx="85" cy="42" r="2.2" fill="currentColor" opacity="0.9" />
+          <circle cx="82" cy="56" r="2.5" fill="currentColor" />
+          <circle cx="94" cy="50" r="3" fill="currentColor" className="sf-active-peptide-core" />
+          <circle cx="106" cy="52" r="2.5" fill="currentColor" />
+        </g>
+        <path d="M100 52 C125 38 145 68 175 52 C190 44 200 48 210 52" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M96 62 C120 48 142 78 172 62 C188 54 198 58 208 62" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity="0.65" />
+        <path d="M92 42 C118 28 138 58 168 42 C184 34 195 38 205 42" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.45" />
+        <circle cx="140" cy="58" r="2.2" fill="currentColor" opacity="0.85" />
+        <circle cx="165" cy="48" r="2" fill="currentColor" opacity="0.85" />
+        <circle cx="192" cy="54" r="1.8" fill="currentColor" opacity="0.75" />
       </svg>
     )
   }
@@ -200,6 +270,8 @@ export function PinnedDisciplinesDeck({ links }: PinnedDisciplinesDeckProps) {
                   {/* Right Column: Key Specifications & Dynamic Illustration */}
                   <div className="sf-deck-card-aside">
                     <div className="sf-deck-art-box">
+                      <span className="sf-deck-corner-bracket tl" aria-hidden="true" />
+                      <span className="sf-deck-corner-bracket br" aria-hidden="true" />
                       {d.iconSvg}
                     </div>
 
