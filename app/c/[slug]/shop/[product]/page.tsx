@@ -131,7 +131,10 @@ function getPairedServices(category: string, productName: string, allServices: S
   // 3. Acne / Clarifying routines
   if (/acne|clarify|clear repair/i.test(name)) {
     return allServices.filter(s =>
-      /clearing|bacne|hydroboration/i.test(s.name)
+      // "hydro" rather than the full word: the treatment was renamed from
+      // Hydroboration to Hydrodermabrasion, and a regex pinned to the old
+      // spelling silently stops pairing any product with it.
+      /clearing|bacne|hydro/i.test(s.name)
     ).slice(0, 3);
   }
 
@@ -159,7 +162,7 @@ function getPairedServices(category: string, productName: string, allServices: S
   // 7. Cleansers / Toners / Mists
   if (/cleanse|toner/i.test(cat) || /cleansing|mist|soothe|purify/i.test(name)) {
     return allServices.filter(s =>
-      /wellness signature|dermaplan|hydroboration|clearing/i.test(s.name)
+      /wellness signature|dermaplan|hydro|clearing/i.test(s.name)
     ).slice(0, 3);
   }
 
@@ -256,31 +259,40 @@ export default async function ProductPage({ params }: Props) {
               )}
             </div>
 
-            {/* Studio Clean Standards & Guarantee Bar */}
-            <div className="sf-product-perks">
-              <div className="sf-perk-item">
-                <span className="sf-perk-icon">🌿</span>
-                <span>100% Clean Organic Botanicals</span>
-              </div>
-              <div className="sf-perk-item">
-                <span className="sf-perk-icon">🧪</span>
-                <span>Cold-Pressed Active Nutrients</span>
-              </div>
-              <div className="sf-perk-item">
-                <span className="sf-perk-icon">🚫</span>
-                <span>Paraben, Sulfate &amp; Toxin Free</span>
-              </div>
-              <div className="sf-perk-item">
-                <span className="sf-perk-icon">📍</span>
-                <span>Loveland Studio Pickup Available</span>
-              </div>
-            </div>
+            {/*
+              A SPEC ROW, NOT A BADGE BAR.
+              This was four emoji against four claims — "100% Clean Organic
+              Botanicals", "Cold-Pressed Active Nutrients", "Paraben, Sulfate &
+              Toxin Free", "Loveland Studio Pickup Available" — printed
+              identically on all thirty-one products. Two problems in one
+              component.
+
+              It looked cheap: emoji render in each platform's own cartoon set,
+              at a different size and colour from everything around them, and
+              nothing else on this site is a picture of a leaf. The reference
+              this page is modelled on uses no icons anywhere; the restraint is
+              the expensive-looking part.
+
+              And it asserted chemistry nobody checked, on every product at
+              once. Whether a given formula is sulfate-free is a fact about that
+              formula, not a decoration. Same failure as the service copy: a
+              claim on her page is her claim.
+
+              What is left is what the row actually knows.
+            */}
+            <dl className="sf-product-spec">
+              {product.brand && (
+                <div><dt>Brand</dt><dd>{product.brand}</dd></div>
+              )}
+              <div><dt>Type</dt><dd>{titleCase(product.category)}</dd></div>
+              <div><dt>Step</dt><dd>{stepLabel}</dd></div>
+            </dl>
 
             {/* Accordion Panels (Formulation, How to Use, Clean Standard) */}
             <div className="sf-product-accordions">
               <details className="sf-accordion" open>
                 <summary>
-                  <span>✦ The Formulation &amp; Benefits</span>
+                  <span>The Formulation &amp; Benefits</span>
                   <span className="sf-accordion-arrow" aria-hidden="true" />
                 </summary>
                 <div className="sf-accordion-body">
@@ -290,19 +302,23 @@ export default async function ProductPage({ params }: Props) {
 
               <details className="sf-accordion">
                 <summary>
-                  <span>✦ How to Use in Your Daily Ritual</span>
+                  <span>How to Use</span>
                   <span className="sf-accordion-arrow" aria-hidden="true" />
                 </summary>
                 <div className="sf-accordion-body">
                   <p><b>When to apply:</b> {usageGuide.when}</p>
                   <p><b>How to apply:</b> {usageGuide.how}</p>
-                  <p><b>Practitioner Pro-Tip:</b> {usageGuide.proTip}</p>
+                  {/* Was "Practitioner Pro-Tip", which puts general skincare
+                      advice into Jamie's mouth as though she had given it.
+                      These notes are standard for the product type, so they are
+                      labelled as what they are. */}
+                  <p><b>Good to know:</b> {usageGuide.proTip}</p>
                 </div>
               </details>
 
               <details className="sf-accordion">
                 <summary>
-                  <span>✦ Clean Ingredients &amp; Clinical Safety</span>
+                  <span>Ingredients &amp; Safety</span>
                   <span className="sf-accordion-arrow" aria-hidden="true" />
                 </summary>
                 <div className="sf-accordion-body">
@@ -384,7 +400,7 @@ export default async function ProductPage({ params }: Props) {
               const isActive = st.key === activeStepKey;
               return (
                 <div key={st.key} className={`sf-step-pill${isActive ? ' is-active' : ''}`}>
-                  <span className="sf-step-idx">{st.num} {isActive ? '★ This Step' : ''}</span>
+                  <span className="sf-step-idx">{st.num}</span>
                   <span className="sf-step-name">{st.name}</span>
                 </div>
               );
