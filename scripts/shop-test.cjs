@@ -364,10 +364,40 @@ async function cannotRead(label, table) {
   if (unrewritten.length === 0) ok('every nav link has a rewrite on her domain');
   else bad('every nav link has a rewrite on her domain', `missing: ${unrewritten.join(', ')}`);
 
-  // The gate must never stand in front of the webhook.
+  /**
+   * Nothing that authenticates itself may sit behind the gate.
+   *
+   * Neither Stripe nor Vercel Cron can hold a session or type a passcode, so
+   * gating them does not secure anything — it breaks them, silently. The cron
+   * was returning a 307 to /admin, which would have meant reminders never
+   * firing with nothing anywhere explaining why.
+   */
   const middleware = fs.readFileSync(path.join(ROOT, 'middleware.ts'), 'utf8');
-  if (/'\/api\/stripe\/webhook'/.test(middleware)) ok('the Stripe webhook is not behind the passcode gate');
-  else bad('the Stripe webhook is not behind the passcode gate', 'Stripe cannot enter a passcode');
+  for (const [label, needle] of [
+    ['the Stripe webhook', "'/api/stripe/webhook'"],
+    ['the reminder cron', "'/api/cron'"]
+  ]) {
+    if (middleware.includes(needle)) ok(`${label} is not behind the passcode gate`);
+    else bad(`${label} is not behind the passcode gate`, 'it cannot authenticate as a user');
+  }
+
+  /**
+   * vercel.json carries a load-bearing key.
+   *
+   * This project was imported into Vercel before package.json existed, so its
+   * Framework Preset is null. Without "framework": "nextjs" Vercel falls back to
+   * a generic build, emits middleware.js as ESM and loads it as CommonJS, and
+   * EVERY request fails with MIDDLEWARE_INVOCATION_FAILED. It happened in
+   * September, was fixed in the file so the fix would travel with the repo, and
+   * happened again when that file was rewritten to add the cron schedule.
+   */
+  const vercelJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  if (vercelJson.framework === 'nextjs') {
+    ok('vercel.json still declares the framework', 'without it, every request 500s');
+  } else {
+    bad('vercel.json still declares the framework',
+        'middleware will be built as ESM and loaded as CommonJS — the whole site goes down');
+  }
 
   /**
    * EVERY REWRITE MUST PRESERVE ITS PATH.

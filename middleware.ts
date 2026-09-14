@@ -51,6 +51,17 @@ const ALWAYS_OPEN = [
   '/api/stripe/webhook',
 
   /**
+   * Scheduled jobs. Same argument as the webhook above: Vercel Cron cannot hold
+   * a session or type a passcode, so gating this does not secure it — it breaks
+   * it. The route authenticates itself against CRON_SECRET and refuses to run
+   * at all when that is unset.
+   *
+   * Without this the cron got a 307 to /admin and the reminders would simply
+   * never have fired, with nothing anywhere saying why.
+   */
+  '/api/cron',
+
+  /**
    * Public storefronts: /c/<slug>.
    *
    * These sit in front of the gate rather than behind it, because a shop window
