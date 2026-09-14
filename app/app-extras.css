@@ -418,84 +418,194 @@ label.inline {
 .cal-title { display: flex; align-items: baseline; gap: var(--gd-4); margin-bottom: var(--gd-4); }
 .cal-title h2 { margin: 0; font-size: var(--gd-step-1); }
 
-.cal { padding: var(--gd-4); overflow-x: auto; }
+.cal { padding: var(--gd-4); }
+
+/* The week grid is for wide screens; the agenda replaces it on a phone. Chosen
+   in CSS rather than JavaScript so the right one is there on the first paint
+   and neither can flash while hydrating. */
+.cal-week { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cal-agenda { display: none; }
+
 .cal-grid {
   display: grid;
-  grid-template-columns: 3.25rem repeat(7, minmax(6.5rem, 1fr));
+  grid-template-columns: 3.5rem repeat(7, minmax(6.5rem, 1fr));
   gap: 1px;
   min-width: 52rem;
+  background: var(--gd-border);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  overflow: hidden;
 }
 
+/* ------------------------------------------------------------- day heads -- */
 .cal-dayhead {
-  height: 34px;
+  height: 42px;
   display: flex;
-  align-items: baseline;
-  gap: .35rem;
-  padding: 0 .4rem;
-  border-bottom: 1px solid var(--gd-border);
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  padding: 0 .5rem;
+  background: var(--gd-surface-raised);
 }
-.cal-dayhead .dow { font-weight: 700; font-size: .8rem; }
-.cal-dayhead .dat { font-size: .68rem; color: var(--gd-text-dim); }
+.cal-dayhead .dow { font-weight: 700; font-size: .78rem; line-height: 1.2; }
+.cal-dayhead .dat { font-size: .66rem; color: var(--gd-text-dim); line-height: 1.2; }
+.cal-dayhead .shut {
+  font-size: .58rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gd-text-dim);
+  line-height: 1.2;
+}
 
-.cal-col { position: relative; }
-.cal-col.is-today .cal-dayhead { border-bottom-color: var(--gd-accent); }
+.cal-col { position: relative; background: var(--gd-surface); }
+.cal-col.is-today .cal-dayhead { background: color-mix(in srgb, var(--gd-accent) 16%, var(--gd-surface-raised)); }
 .cal-col.is-today .cal-dayhead .dow { color: var(--gd-accent); }
-/* Closed days stay in the grid. Removing them makes a Mon/Wed/Fri week three
-   columns wide and hides the shape of it. */
-.cal-col.is-closed { background: var(--gd-surface-sunken); }
-.cal-col.is-closed .cal-dayhead { opacity: .45; }
 
-.cal-gutter { position: relative; }
+/*
+ * CLOSED DAYS ARE QUIET, NOT LOUD.
+ *
+ * They used to take `--gd-surface-sunken`, a near-black that is DARKER than the
+ * open days beside it. On a Mon/Wed/Fri practice that is four of seven columns
+ * rendering as heavy black voids, so the closed days were the most prominent
+ * thing on the screen and the week read as broken rather than as mostly shut.
+ *
+ * A faint diagonal hatch at low contrast says "nothing happens here" without
+ * competing with the days something does happen on.
+ */
+.cal-col.is-closed {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent, transparent 5px,
+      color-mix(in srgb, var(--gd-border) 55%, transparent) 5px,
+      color-mix(in srgb, var(--gd-border) 55%, transparent) 6px),
+    var(--gd-surface);
+}
+.cal-col.is-closed .cal-dayhead { opacity: .6; }
+
+/* --------------------------------------------------------------- gutter -- */
+.cal-gutter { position: relative; background: var(--gd-surface); }
+.cal-gutter .cal-dayhead { background: var(--gd-surface-raised); }
 .cal-hours { position: relative; }
 .cal-hour {
   position: absolute;
-  right: .4rem;
-  transform: translateY(-.5em);
-  font-size: .62rem;
+  right: .45rem;
+  /* Half a line up so the label straddles its own rule rather than sitting
+     under it. The first hour would clip at the top edge, so the whole gutter
+     is nudged down by the same amount instead. */
+  transform: translateY(-.55em);
+  font-size: .68rem;
   color: var(--gd-text-dim);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
+.cal-hour small { font-size: .78em; opacity: .75; margin-left: .1em; }
 
 .cal-day { position: relative; }
 .cal-line {
   position: absolute;
   left: 0; right: 0;
   border-top: 1px solid var(--gd-border);
-  opacity: .5;
+  opacity: .45;
 }
 
+/* Now. Only drawn on the current day, and only after mount — see the note in
+   WeekGrid.tsx about not guessing the reader's clock on the server. */
+.cal-now {
+  position: absolute;
+  left: 0; right: 0;
+  height: 0;
+  border-top: 2px solid var(--gd-critical);
+  z-index: 3;
+  pointer-events: none;
+}
+.cal-now::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gd-critical);
+}
+
+/* --------------------------------------------------------------- events -- */
 .cal-event {
   position: absolute;
-  left: 2px; right: 2px;
+  left: 3px; right: 3px;
   overflow: hidden;
-  padding: .2rem .35rem;
+  display: flex;
+  flex-direction: column;
+  gap: .05rem;
+  padding: .25rem .4rem;
   border-radius: var(--gd-r-sm);
-  border: 1px solid var(--gd-accent-line);
-  background: var(--gd-accent-dim);
+  border: 1px solid color-mix(in srgb, var(--gd-accent) 45%, var(--gd-border));
+  border-left: 3px solid var(--gd-accent);
+  background: color-mix(in srgb, var(--gd-accent) 14%, var(--gd-surface));
   color: var(--gd-text);
-  font: inherit;
   font-size: .68rem;
   line-height: 1.25;
   text-align: left;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  z-index: 2;
 }
-.cal-event:hover { border-color: var(--gd-accent); z-index: 2; }
-.cal-event-time { font-variant-numeric: tabular-nums; color: var(--gd-text-dim); font-size: .6rem; }
-.cal-event-who { font-weight: 700; display: flex; align-items: center; gap: .25rem; }
-.cal-event-what { color: var(--gd-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-event:hover { border-color: var(--gd-accent); z-index: 4; }
+.cal-event:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 1px; z-index: 4; }
 
-/* Status reads at a glance without a legend being necessary to use the screen. */
-.cal-event.st-complete { opacity: .55; border-style: solid; }
+/* A short slot has room for one line. Putting the time and the name on that one
+   line beats stacking two lines into 16px and clipping both. */
+.cal-event.is-short {
+  flex-direction: row;
+  align-items: baseline;
+  gap: .3rem;
+  padding: .1rem .35rem;
+}
+.cal-event.is-short .cal-event-time { font-size: .62rem; }
+
+.cal-event-time { font-variant-numeric: tabular-nums; color: var(--gd-text-muted); font-size: .62rem; }
+.cal-event-who { font-weight: 700; display: flex; align-items: center; gap: .25rem; min-width: 0; }
+.cal-event-who,
+.cal-event-what { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-event-what { color: var(--gd-text-muted); }
+
+.cal-event.st-complete {
+  border-left-color: var(--gd-text-dim);
+  border-color: var(--gd-border);
+  background: var(--gd-surface-raised);
+  color: var(--gd-text-muted);
+}
+/*
+ * CANCELLED IS LEGIBLE.
+ *
+ * It was opacity .4 on a transparent ground with a line through the text, which
+ * on a dark theme rendered as a grey smudge — the screenshot that prompted this
+ * rebuild showed two of them and they read as a rendering fault rather than as
+ * appointments. A cancelled slot still matters: it is free time the
+ * practitioner can offer to somebody. So it is drawn, dimmed, with a real
+ * border and no strikethrough, and the word "Cancelled" is written on it in the
+ * agenda rather than implied by a text-decoration.
+ */
 .cal-event.st-cancelled,
-.cal-event.st-no_show { opacity: .4; text-decoration: line-through; background: transparent; }
-.cal-event.st-arrived { border-color: var(--gd-ok, #4ea373); background: color-mix(in srgb, var(--gd-ok, #4ea373) 18%, transparent); }
+.cal-event.st-no_show {
+  border-style: dashed;
+  border-left-style: dashed;
+  border-color: var(--gd-border-strong);
+  border-left-color: var(--gd-border-strong);
+  background: transparent;
+  color: var(--gd-text-dim);
+  opacity: 1;
+  text-decoration: none;
+}
+.cal-event.st-arrived {
+  border-left-color: var(--gd-in-range);
+  border-color: color-mix(in srgb, var(--gd-in-range) 45%, var(--gd-border));
+  background: color-mix(in srgb, var(--gd-in-range) 14%, var(--gd-surface));
+}
 
 .cal-block {
   position: absolute;
-  left: 2px; right: 2px;
+  left: 3px; right: 3px;
   border-radius: var(--gd-r-sm);
   background: repeating-linear-gradient(
     45deg, var(--gd-surface-raised), var(--gd-surface-raised) 6px,
@@ -507,26 +617,40 @@ label.inline {
   overflow: hidden;
 }
 
+/*
+ * VISIBLE, NOT HOVER-ONLY.
+ *
+ * This was opacity:0 until .cal-day:hover. A touch screen has no hover, so on a
+ * phone an empty day was a blank rectangle with nothing to press and no hint
+ * that it was bookable — and even on a desktop, a control you can only find by
+ * sweeping the mouse over every column is a control most people never find.
+ */
 .cal-empty {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: .64rem;
-  color: var(--gd-text-dim);
   text-decoration: none;
-  opacity: 0;
-  transition: opacity var(--gd-fast) var(--gd-ease);
+  color: var(--gd-text-dim);
+  font-size: .68rem;
+  opacity: .5;
+  transition: opacity var(--gd-fast) var(--gd-ease), color var(--gd-fast) var(--gd-ease);
 }
-.cal-day:hover .cal-empty { opacity: 1; }
-.cal-empty:hover { color: var(--gd-accent); }
+.cal-empty span {
+  border: 1px dashed var(--gd-border-strong);
+  border-radius: var(--gd-r-full);
+  padding: .2rem .6rem;
+}
+.cal-day:hover .cal-empty,
+.cal-empty:focus-visible { opacity: 1; color: var(--gd-accent); }
 
+/* ----------------------------------------------------------------- key -- */
 .cal-dot { width: .4rem; height: .4rem; border-radius: 50%; flex: none; display: inline-block; }
 .cal-dot.online { background: var(--gd-accent); }
-.cal-dot.intake { background: var(--gd-warn, #d9a441); }
+.cal-dot.intake { background: var(--gd-below); }
 .cal-swatch { width: .7rem; height: .5rem; border-radius: 2px; display: inline-block; border: 1px solid var(--gd-border-strong); }
-.cal-swatch.st-cancelled { opacity: .4; }
-.cal-swatch.st-complete { background: var(--gd-accent-dim); opacity: .55; }
+.cal-swatch.st-cancelled { border-style: dashed; background: transparent; }
+.cal-swatch.st-complete { background: var(--gd-surface-raised); }
 
 .cal-key {
   display: flex;
@@ -538,6 +662,104 @@ label.inline {
   padding: 0 var(--gd-2);
 }
 .cal-key span { display: inline-flex; align-items: center; gap: .3rem; }
+
+/* ========================================================================
+   THE AGENDA — under 880px, where the grid stops being readable
+   ======================================================================== */
+.cal-agenda-day { border-top: 1px solid var(--gd-border); padding: var(--gd-4) 0; }
+.cal-agenda-day:first-child { border-top: 0; padding-top: 0; }
+.cal-agenda-day h3 {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  margin: 0 0 var(--gd-3);
+  font-size: .92rem;
+}
+.cal-agenda-day h3 .dat { font-weight: 400; color: var(--gd-text-dim); font-size: .8rem; }
+.cal-agenda-day h3 .today {
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--brand-accent-ink);
+  background: var(--gd-accent);
+  border-radius: var(--gd-r-full);
+  padding: .1rem .45rem;
+}
+.cal-agenda-day h3 .n { margin-left: auto; font-size: .7rem; color: var(--gd-text-dim); font-weight: 400; }
+.cal-agenda-day.is-today h3 .dow { color: var(--gd-accent); }
+
+.cal-agenda-list { display: flex; flex-direction: column; gap: var(--gd-2); }
+
+/* A row, not a positioned block: on a phone the question is "what is next",
+   and drawing 15 minutes proportionally smaller than 90 buys nothing when
+   they are stacked in order anyway. */
+.cal-row {
+  display: flex;
+  gap: var(--gd-3);
+  width: 100%;
+  text-align: left;
+  padding: var(--gd-3);
+  border: 1px solid var(--gd-border);
+  border-left: 3px solid var(--gd-accent);
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-surface-raised);
+  color: var(--gd-text);
+  font: inherit;
+  cursor: pointer;
+}
+.cal-row:disabled { cursor: default; }
+.cal-row:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+.cal-row-time {
+  flex: none;
+  width: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  font-variant-numeric: tabular-nums;
+}
+.cal-row-time .t { font-weight: 700; font-size: .84rem; }
+.cal-row-time .d { font-size: .68rem; color: var(--gd-text-dim); }
+.cal-row-body { min-width: 0; flex: 1; }
+.cal-row-who { display: flex; align-items: center; gap: .3rem; font-weight: 700; font-size: .88rem; }
+.cal-row-what { display: block; font-size: .76rem; color: var(--gd-text-muted); margin-top: .1rem; }
+.cal-row-flag {
+  display: inline-block;
+  margin-top: .3rem;
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--gd-text-dim);
+  border: 1px dashed var(--gd-border-strong);
+  border-radius: var(--gd-r-full);
+  padding: .05rem .4rem;
+}
+.cal-row.st-complete { border-left-color: var(--gd-text-dim); }
+.cal-row.st-cancelled,
+.cal-row.st-no_show { border-left-style: dashed; border-left-color: var(--gd-border-strong); background: transparent; }
+.cal-row.st-arrived { border-left-color: var(--gd-in-range); }
+
+.cal-agenda-empty {
+  display: block;
+  padding: var(--gd-4);
+  border: 1px dashed var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  text-align: center;
+  font-size: .8rem;
+  color: var(--gd-text-dim);
+  text-decoration: none;
+}
+.cal-agenda-empty:hover { color: var(--gd-accent); border-color: var(--gd-accent); }
+
+.cal-agenda-closed {
+  margin: var(--gd-4) 0 0;
+  font-size: .76rem;
+  color: var(--gd-text-dim);
+}
+
+@media (max-width: 880px) {
+  .cal { padding: var(--gd-3) 0; }
+  .cal-week { display: none; }
+  .cal-agenda { display: block; }
+}
 
 /* ==========================================================================
    SINCE YOU LAST LOOKED
