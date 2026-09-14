@@ -48,7 +48,13 @@ const CATEGORY_LABEL: Record<string, string> = {
   lip_care: 'Lip Care',
   kit: 'Kits',
   masque: 'Masques',
-  toner: 'Mists & Toners'
+  toner: 'Mists & Toners',
+  // Plural, because every one of these labels sits next to a count. "Cleanser
+  // 4" reads as a stutter; "Cleansers 4" reads as a shelf.
+  cleanser: 'Cleansers',
+  exfoliator: 'Exfoliants',
+  serum: 'Serums',
+  moisturizer: 'Moisturizers'
 };
 
 export function categoryLabel(category: string) {
