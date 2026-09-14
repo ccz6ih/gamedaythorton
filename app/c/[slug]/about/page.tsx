@@ -13,6 +13,7 @@ import type { Metadata } from 'next';
 import { getStorefront, getStorefrontProviders, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { initials, phone } from '@/lib/format';
+import { ProviderStoryDeck } from '@/components/ProviderStoryDeck';
 
 export const dynamic = 'force-dynamic';
 
@@ -142,43 +143,55 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
                 </p>
               )}
             </div>
-            <div className="sf-people">
-              {providers.map(p => (
-                <article className="sf-person" key={p.id}>
-                  <div className="sf-portrait">
-                    {p.photo_path?.startsWith('/')
-                      ? <img src={p.photo_path} alt={p.name} width={480} height={600} />
-                      : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
-                  </div>
-                  <div>
-                    <h3>{p.name}{p.credentials ? `, ${p.credentials}` : ''}</h3>
-                    {p.role_label && <p className="role">{p.role_label}</p>}
-                    {p.bio
-                      ? <p className="bio">{p.bio}</p>
-                      : (
-                        <p className="sf-pending">
-                          Biography {p.credentials ? '' : 'and credentials '}
-                          to be supplied by the practice. Nothing here is written
-                          on a practitioner&rsquo;s behalf.
-                        </p>
-                      )}
+            {isSpa && providers[0]?.story ? (
+              <ProviderStoryDeck
+                story={providers[0].story}
+                providerName={providers[0].name}
+                credentials={providers[0].credentials}
+                roleLabel={providers[0].role_label}
+                photoPath={providers[0].photo_path}
+                bookingUrl={links.book}
+                isSpa={isSpa}
+              />
+            ) : (
+              <div className="sf-people">
+                {providers.map(p => (
+                  <article className="sf-person" key={p.id}>
+                    <div className="sf-portrait">
+                      {p.photo_path?.startsWith('/')
+                        ? <img src={p.photo_path} alt={p.name} width={480} height={600} />
+                        : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
+                    </div>
+                    <div>
+                      <h3>{p.name}{p.credentials ? `, ${p.credentials}` : ''}</h3>
+                      {p.role_label && <p className="role">{p.role_label}</p>}
+                      {p.bio
+                        ? <p className="bio">{p.bio}</p>
+                        : (
+                          <p className="sf-pending">
+                            Biography {p.credentials ? '' : 'and credentials '}
+                            to be supplied by the practice. Nothing here is written
+                            on a practitioner&rsquo;s behalf.
+                          </p>
+                        )}
 
-                    {/* The long version, in full, for a reader who has come
-                        this far. It is the thing that actually distinguishes
-                        this practice from the one down the road, so it is not
-                        hidden behind a "read more" that most people never
-                        press — the about page IS the read-more. */}
-                    {p.story && (
-                      <div className="sf-story">
-                        {p.story.split('\n\n').map((para, i) => (
-                          <p key={i}>{para}</p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
+                      {/* The long version, in full, for a reader who has come
+                          this far. It is the thing that actually distinguishes
+                          this practice from the one down the road, so it is not
+                          hidden behind a "read more" that most people never
+                          press — the about page IS the read-more. */}
+                      {p.story && (
+                        <div className="sf-story">
+                          {p.story.split('\n\n').map((para, i) => (
+                            <p key={i}>{para}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
