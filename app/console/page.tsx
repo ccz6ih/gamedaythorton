@@ -13,6 +13,8 @@
 import Link from 'next/link';
 import { getClinic, getScoreboard, getAttention, hasModule } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
+import { getActivity } from '@/lib/db/calendar';
+import { ActivityFeed } from '@/components/ActivityFeed';
 import { money, num } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -57,7 +59,9 @@ export default async function ScoreboardPage() {
     );
   }
 
-  const [board, attention] = await Promise.all([getScoreboard(clinic), getAttention(clinic)]);
+  const [board, attention, activity] = await Promise.all([
+    getScoreboard(clinic), getAttention(clinic), getActivity(72)
+  ]);
   const words = vocab(clinic);
 
   const revenueDelta = board.revenuePrev30Cents
@@ -146,6 +150,13 @@ export default async function ScoreboardPage() {
                   : 'Nothing new since yesterday'
             }
           />
+        </div>
+
+        {/* What arrived while nobody was looking. Above "needs you today"
+            because that list is about appointments already known about, and
+            this is the only place a booking taken at 11pm announces itself. */}
+        <div style={{ marginTop: 'var(--gd-5)' }}>
+          <ActivityFeed items={activity} hours={72} />
         </div>
 
         {attention.length > 0 && (

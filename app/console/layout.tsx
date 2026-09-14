@@ -18,12 +18,23 @@ import { Brand, vocab } from '@/components/Brand';
 import { PilotBanner } from '@/components/PilotBanner';
 import { titleCase } from '@/lib/format';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Console · The Med Bar',
-    template: '%s · The Med Bar'
-  }
-};
+/**
+ * The practice names itself. It was hardcoded to "The Med Bar", which put one
+ * tenant's name in every other tenant's browser tab — a cross-tenant leak in
+ * the one place nobody looks for one, and the screen test caught it as
+ * "Gameday's console mentions The Med Bar".
+ *
+ * A second getClinic() here rather than threading it down from the layout body:
+ * Next resolves metadata separately from rendering, so there is nothing to
+ * thread. The query is RLS-scoped and cheap.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const clinic = await getClinic();
+  const name = clinic?.name ?? 'Console';
+  return {
+    title: { default: `Console · ${name}`, template: `%s · ${name}` }
+  };
+}
 
 async function signOut() {
   'use server';
@@ -54,6 +65,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { group: 'Run the day' },
     { href: '/console', label: words.dashboard, icon: '◯' },
     { href: '/console/today', label: 'Today', icon: '▦' },
+    { href: '/console/calendar', label: 'Calendar', icon: '▤' },
     { href: '/console/book', label: 'Book', icon: '✚' },
     { href: '/console/clients', label: words.people, icon: '☇' },
     { group: 'Clinical', when: hasModule(clinic, 'labs') || hasModule(clinic, 'treatment_records') },

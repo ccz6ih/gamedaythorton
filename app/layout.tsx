@@ -25,8 +25,17 @@ export const metadata: Metadata = {
    * one per practice, and the console has its own template. The root only needs
    * to say something sensible on the handful of pages that are neither.
    */
-  title: 'The Med Bar · Aesthetics & Wellness',
-  description: 'Cash-pay aesthetics in Loveland, CO. Skin, lashes, and regenerative treatments.',
+  /**
+   * Deliberately unnamed. This layout is shared by every tenant, and the only
+   * pages that fall through to it are ones with no practice context at all —
+   * the gate, the pilot explainer, the prototype. Naming one practice here put
+   * it in front of the others.
+   *
+   * The storefront and the console both build their own titles from the clinic
+   * they are rendering, which is where a name belongs.
+   */
+  title: 'Practice console',
+  description: 'Booking, records and payments for an independent practice.',
   icons: {
     /**
      * SVG first. The practice's logo is white on transparent, which disappears

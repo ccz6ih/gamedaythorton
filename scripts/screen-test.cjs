@@ -326,6 +326,68 @@ const CONSOLE_ROUTES = [
       'it exposes the tenant structure to anyone who reaches the page');
   }
 
+  /* ------------------------------------------------ no tenant hardcoded -- */
+  /**
+   * A practice name written into shared code shows up in every OTHER practice.
+   *
+   * It happened in the console layout's page title and reached Gameday's
+   * browser tab as "Console · The Med Bar". The cross-tenant check above caught
+   * it, but only incidentally — it greps the whole rendered page, so it would
+   * have said "Gameday's console mentions The Med Bar" without saying why. This
+   * finds the cause rather than the symptom, and fails before a page is even
+   * rendered.
+   *
+   * app/c/** is exempt: those files ARE the storefront and render one named
+   * practice on purpose. Comments are exempt too — the explanations in this
+   * codebase name her constantly and should.
+   */
+  console.log('\nNO PRACTICE NAME IN SHARED CODE');
+  {
+    const fsx = require('fs');
+    const pathx = require('path');
+    const root = pathx.resolve(__dirname, '..');
+
+    const files = [];
+    const walk = dir => {
+      for (const entry of fsx.readdirSync(dir, { withFileTypes: true })) {
+        if (/^(node_modules|\.next|\.git)$/.test(entry.name)) continue;
+        const full = pathx.join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.tsx?$/.test(entry.name)) files.push(full);
+      }
+    };
+    walk(pathx.join(root, 'app'));
+    walk(pathx.join(root, 'components'));
+
+    const NAMES = /The Med Bar|Gameday|Jamie Salazar/;
+
+    /**
+     * Strips comments before looking.
+     *
+     * The first version tested "does the line start with * or //", which misses
+     * any continuation line inside a /* *​/ block that is not decorated with a
+     * star — and this codebase has many. It flagged Brand.tsx for a sentence in
+     * a comment explaining this very class of bug, which is the kind of false
+     * positive that gets a check deleted rather than fixed.
+     */
+    const stripComments = src => src
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split('\n')
+      .map(line => line.replace(/\/\/.*$/, ''))
+      .join('\n');
+
+    const offenders = files
+      .map(f => pathx.relative(root, f).split(pathx.sep).join('/'))
+      .filter(rel => !rel.startsWith('app/c/'))
+      .filter(rel => NAMES.test(stripComments(fsx.readFileSync(pathx.join(root, rel), 'utf8'))));
+
+    if (offenders.length === 0) {
+      ok('no practice name is hardcoded in shared code');
+    } else {
+      bad('no practice name is hardcoded in shared code', offenders.join(', '));
+    }
+  }
+
   console.log('\n' + '─'.repeat(64));
   if (fail) { console.log(`${fail} of ${pass + fail} screen checks FAILED\n`); process.exit(1); }
   console.log(`All ${pass} authenticated screen checks passed.\n`);

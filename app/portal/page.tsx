@@ -22,7 +22,9 @@ import { PilotBanner } from '@/components/PilotBanner';
 import { dateLabel, timeLabel, money, num, signed, relative, titleCase, daysUntil } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Your Account · The Med Bar' };
+// Deliberately generic. This page resolves the viewer before it knows whose
+// practice it is, and naming one tenant here showed it to all of them.
+export const metadata: Metadata = { title: 'Your account' };
 
 async function signOut() {
   'use server';

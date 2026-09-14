@@ -405,3 +405,186 @@ label.inline {
   .product-row-body { flex-direction: column; }
   .product-row-img { flex-direction: row; align-items: center; gap: var(--gd-3); }
 }
+
+/* ==========================================================================
+   THE WEEK
+   --------------------------------------------------------------------------
+   Time is drawn to scale. A list answers "what is booked"; a practitioner
+   planning her week needs "where are the gaps and how big are they", and that
+   is only answerable if a 90-minute treatment looks three times a 15-minute
+   consult.
+   ========================================================================== */
+
+.cal-title { display: flex; align-items: baseline; gap: var(--gd-4); margin-bottom: var(--gd-4); }
+.cal-title h2 { margin: 0; font-size: var(--gd-step-1); }
+
+.cal { padding: var(--gd-4); overflow-x: auto; }
+.cal-grid {
+  display: grid;
+  grid-template-columns: 3.25rem repeat(7, minmax(6.5rem, 1fr));
+  gap: 1px;
+  min-width: 52rem;
+}
+
+.cal-dayhead {
+  height: 34px;
+  display: flex;
+  align-items: baseline;
+  gap: .35rem;
+  padding: 0 .4rem;
+  border-bottom: 1px solid var(--gd-border);
+}
+.cal-dayhead .dow { font-weight: 700; font-size: .8rem; }
+.cal-dayhead .dat { font-size: .68rem; color: var(--gd-text-dim); }
+
+.cal-col { position: relative; }
+.cal-col.is-today .cal-dayhead { border-bottom-color: var(--gd-accent); }
+.cal-col.is-today .cal-dayhead .dow { color: var(--gd-accent); }
+/* Closed days stay in the grid. Removing them makes a Mon/Wed/Fri week three
+   columns wide and hides the shape of it. */
+.cal-col.is-closed { background: var(--gd-surface-sunken); }
+.cal-col.is-closed .cal-dayhead { opacity: .45; }
+
+.cal-gutter { position: relative; }
+.cal-hours { position: relative; }
+.cal-hour {
+  position: absolute;
+  right: .4rem;
+  transform: translateY(-.5em);
+  font-size: .62rem;
+  color: var(--gd-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-day { position: relative; }
+.cal-line {
+  position: absolute;
+  left: 0; right: 0;
+  border-top: 1px solid var(--gd-border);
+  opacity: .5;
+}
+
+.cal-event {
+  position: absolute;
+  left: 2px; right: 2px;
+  overflow: hidden;
+  padding: .2rem .35rem;
+  border-radius: var(--gd-r-sm);
+  border: 1px solid var(--gd-accent-line);
+  background: var(--gd-accent-dim);
+  color: var(--gd-text);
+  font: inherit;
+  font-size: .68rem;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cal-event:hover { border-color: var(--gd-accent); z-index: 2; }
+.cal-event-time { font-variant-numeric: tabular-nums; color: var(--gd-text-dim); font-size: .6rem; }
+.cal-event-who { font-weight: 700; display: flex; align-items: center; gap: .25rem; }
+.cal-event-what { color: var(--gd-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Status reads at a glance without a legend being necessary to use the screen. */
+.cal-event.st-complete { opacity: .55; border-style: solid; }
+.cal-event.st-cancelled,
+.cal-event.st-no_show { opacity: .4; text-decoration: line-through; background: transparent; }
+.cal-event.st-arrived { border-color: var(--gd-ok, #4ea373); background: color-mix(in srgb, var(--gd-ok, #4ea373) 18%, transparent); }
+
+.cal-block {
+  position: absolute;
+  left: 2px; right: 2px;
+  border-radius: var(--gd-r-sm);
+  background: repeating-linear-gradient(
+    45deg, var(--gd-surface-raised), var(--gd-surface-raised) 6px,
+    transparent 6px, transparent 12px);
+  border: 1px solid var(--gd-border);
+  font-size: .62rem;
+  color: var(--gd-text-dim);
+  padding: .2rem .35rem;
+  overflow: hidden;
+}
+
+.cal-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: .64rem;
+  color: var(--gd-text-dim);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--gd-fast) var(--gd-ease);
+}
+.cal-day:hover .cal-empty { opacity: 1; }
+.cal-empty:hover { color: var(--gd-accent); }
+
+.cal-dot { width: .4rem; height: .4rem; border-radius: 50%; flex: none; display: inline-block; }
+.cal-dot.online { background: var(--gd-accent); }
+.cal-dot.intake { background: var(--gd-warn, #d9a441); }
+.cal-swatch { width: .7rem; height: .5rem; border-radius: 2px; display: inline-block; border: 1px solid var(--gd-border-strong); }
+.cal-swatch.st-cancelled { opacity: .4; }
+.cal-swatch.st-complete { background: var(--gd-accent-dim); opacity: .55; }
+
+.cal-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2) var(--gd-5);
+  font-size: .68rem;
+  color: var(--gd-text-dim);
+  margin: var(--gd-4) 0 0;
+  padding: 0 var(--gd-2);
+}
+.cal-key span { display: inline-flex; align-items: center; gap: .3rem; }
+
+/* ==========================================================================
+   SINCE YOU LAST LOOKED
+   ========================================================================== */
+
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gd-3);
+  padding: var(--gd-3) 0;
+  border-bottom: 1px solid var(--gd-border);
+}
+.feed-item:last-child { border-bottom: 0; }
+
+.feed-ico {
+  width: 1.6rem; height: 1.6rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  font-size: .75rem;
+  background: var(--gd-surface-raised);
+  color: var(--gd-text-dim);
+}
+.feed-item.k-booking .feed-ico { color: var(--gd-accent); }
+.feed-item.k-order .feed-ico { color: var(--gd-accent); }
+.feed-item.k-cancellation .feed-ico { opacity: .6; }
+/* Something to do about, rather than just worth knowing. */
+.feed-item.is-actionable .feed-ico {
+  background: var(--gd-accent-dim);
+  color: var(--gd-accent);
+}
+
+.feed-main { flex: 1; min-width: 0; text-decoration: none; color: inherit; display: block; }
+.feed-main:hover .feed-what { color: var(--gd-accent); }
+.feed-what { display: block; font-weight: 600; font-size: .86rem; }
+.feed-detail {
+  display: block;
+  font-size: .76rem;
+  color: var(--gd-text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feed-when { flex: none; font-size: .7rem; color: var(--gd-text-dim); white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .feed-when { display: none; }
+}

@@ -32,7 +32,16 @@ import { Brand } from '@/components/Brand';
 import { clinicForHost } from '../../storefront-domains.mjs';
 import type { Clinic } from '@/lib/db/queries';
 
-export const metadata: Metadata = { title: 'Staff Sign In · The Med Bar' };
+/**
+ * Named from the DOMAIN, like the colours on this page. Hardcoding one
+ * practice put its name in front of every other one.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const host = (await headers()).get('host');
+  const slug = clinicForHost(host, process.env.PRIMARY_CLINIC_SLUG);
+  const clinic = slug ? await getStorefront(slug) : null;
+  return { title: clinic ? `Staff sign in · ${clinic.name}` : 'Staff sign in' };
+}
 
 async function signIn(formData: FormData) {
   'use server';

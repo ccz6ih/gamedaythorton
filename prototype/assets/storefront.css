@@ -255,74 +255,100 @@
    readable, and it is the first thing a card grid throws away. */
 .sf-item {
   display: grid;
-  grid-template-columns: 3.75rem 1fr auto;
-  gap: var(--gd-3) var(--gd-5);
-  padding: var(--gd-5) var(--gd-5);
-  margin-inline: calc(-1 * var(--gd-3));
-  margin-bottom: var(--gd-3);
-  background: color-mix(in srgb, var(--gd-surface) 65%, rgba(255,255,255,0.4));
-  border: 1px solid var(--gd-border);
-  border-radius: var(--gd-r-md);
+  grid-template-columns: 2.75rem 1fr auto;
+  gap: var(--gd-3) var(--gd-6);
+  padding: var(--gd-6) var(--gd-4);
+  margin-inline: calc(-1 * var(--gd-4));
+  border-bottom: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
   align-items: center;
-  transition: transform var(--gd-fast) var(--gd-ease),
-              box-shadow var(--gd-fast) var(--gd-ease),
-              border-color var(--gd-fast) var(--gd-ease),
-              background var(--gd-fast) var(--gd-ease);
+  transition: background var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover {
-  background: color-mix(in srgb, var(--gd-surface-raised) 75%, transparent);
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--gd-accent) 65%, transparent);
-  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--gd-surface-raised) 45%, transparent);
+  border-color: color-mix(in srgb, var(--gd-accent) 35%, transparent);
 }
-.sf-item:last-child { margin-bottom: 0; }
+.sf-item:last-child { border-bottom: none; }
 
-.sf-item-mark {
-  display: grid;
-  place-items: center;
-  width: 3.75rem;
-  height: 3.75rem;
-  border-radius: var(--gd-r-full);
-  background: radial-gradient(circle at 35% 35%, #233b2c 0%, #101c14 100%);
-  border: 1.5px solid color-mix(in srgb, var(--gd-accent) 70%, transparent);
-  box-shadow: 0 6px 18px -2px rgba(16, 28, 20, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.25);
-  color: #F3CA65;
-  flex: none;
-  transition: transform var(--gd-fast) var(--gd-ease),
-              border-color var(--gd-fast) var(--gd-ease),
-              box-shadow var(--gd-fast) var(--gd-ease),
-              color var(--gd-fast) var(--gd-ease);
+/* Editorial index number */
+.sf-item-num {
+  font-family: var(--brand-display-font);
+  font-size: 1.45rem;
+  font-weight: 400;
+  color: var(--gd-accent);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
 }
-.sf-item:hover .sf-item-mark {
+
+.sf-item-eyebrow {
+  font-family: var(--gd-font);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gd-accent);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.sf-item-title-link {
+  color: var(--gd-text);
+  text-decoration: none;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-item-title-link:hover {
+  color: var(--gd-accent);
+}
+
+.sf-item-reserve {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0.4rem;
+  font-family: var(--gd-font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--gd-text);
+  padding: 0.32rem 0.95rem;
+  border: 1px solid var(--gd-border-strong);
+  border-radius: 999px;
+  background: transparent;
+  transition: all var(--gd-fast) var(--gd-ease);
+}
+.sf-item-reserve:hover {
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink);
   border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 55%, transparent), inset 0 1px 3px rgba(255, 255, 255, 0.4);
-  color: #FFE79E;
+  transform: translateY(-1px);
 }
-.sf-item-mark svg {
-  width: 2rem;
-  height: 2rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+.sf-item-reserve span {
+  transition: transform var(--gd-fast) var(--gd-ease);
+}
+.sf-item-reserve:hover span {
+  transform: translateX(2px);
 }
 
 /* An uploaded image takes the mark's slot exactly, so a menu mixing photographed
    and drawn services still lines up down the left edge. */
 .sf-item-photo {
-  width: 3.75rem;
-  height: 3.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   max-width: 100%;
   border-radius: var(--gd-r-full);
   object-fit: cover;
   display: block;
-  border: 1.5px solid var(--gd-border);
-  box-shadow: 0 4px 14px -2px rgba(0,0,0,0.08);
+  border: 1px solid var(--gd-border);
   flex: none;
-  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease), box-shadow var(--gd-fast) var(--gd-ease);
+  transition: transform var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
 }
 .sf-item:hover .sf-item-photo {
   border-color: var(--gd-accent);
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 8px 24px -2px color-mix(in srgb, var(--gd-accent) 35%, transparent);
+  transform: scale(1.05);
 }
 
 .sf-item-body { min-width: 0; }
