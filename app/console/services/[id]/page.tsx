@@ -426,11 +426,29 @@ export default async function ServiceFormPage({
                 <span className="txt">This is a membership</span>
               </label>
 
+              {/* Two different situations wear the same flag, and telling a
+                  practitioner the wrong one is worse than saying nothing. A row
+                  with no description publishes an apology; a row with a
+                  description we wrote publishes a sentence she has never read
+                  and may not agree with. The second is the more urgent of the
+                  two and used to be invisible here. */}
               {!isNew && service?.needs_copy ? (
                 <div className="note-band warn">
-                  Marked as <b>awaiting copy</b>, so the public page currently says a
-                  description is to be supplied. Writing the short line above clears
-                  that automatically when you save.
+                  {service?.description ? (
+                    <>
+                      The description above was <b>written for you, not by you</b> —
+                      it says only what the treatment generally is, because the
+                      practice has not supplied wording for this one. It is live on
+                      your menu now. Please read it, and replace anything you would
+                      not say to a client. Saving your own words clears this notice.
+                    </>
+                  ) : (
+                    <>
+                      Marked as <b>awaiting copy</b>, so the public page currently says a
+                      description is to be supplied. Writing the short line above clears
+                      that automatically when you save.
+                    </>
+                  )}
                 </div>
               ) : null}
             </div>
