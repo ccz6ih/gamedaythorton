@@ -40,6 +40,8 @@ export default async function sitemap(
     { url: `${base}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${base}/services`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/prf`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${base}/prf/compare`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${base}/prf/aftercare`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/book`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/shop`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/packages`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },

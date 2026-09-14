@@ -37,6 +37,8 @@ export const STOREFRONT_PATHS = [
   // The PRF education/pillar page — public and indexable like every other
   // storefront page, and specifically NOT a booking or checkout step.
   '/prf',
+  '/prf/compare',
+  '/prf/aftercare',
   // Booking. Public by necessity: a person picking a treatment and a time has
   // no account and must never meet a passcode on the way to giving money.
   '/book',

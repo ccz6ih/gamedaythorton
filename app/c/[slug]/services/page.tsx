@@ -112,7 +112,7 @@ export default async function StorefrontServices({ params }: { params: Promise<{
 
               {group.category === 'injectables' && (
                 <p className="sf-cat-note">
-                  New to PRF? <Link href={links.prf}>Read what it is, how it&rsquo;s made and what to expect</Link>.
+                  New to PRF? <Link href={links.prf}>Explore our complete PRF guide</Link> &middot; <Link href={links.prfCompare}>Compare PRF vs PRP vs Fillers</Link> &middot; <Link href={links.prfAftercare}>Recovery timeline &amp; aftercare</Link>.
                 </p>
               )}
 
