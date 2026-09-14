@@ -15,6 +15,7 @@ import { getStorefront, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
+import { Analytics } from '@/components/Analytics';
 import { phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -184,6 +185,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         />
       )}
+      <Analytics measurementId={clinic.ga_measurement_id} />
       <StorefrontNav
         items={nav}
         homeHref={links.home}
