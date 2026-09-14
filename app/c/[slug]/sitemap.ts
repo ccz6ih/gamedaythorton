@@ -45,6 +45,7 @@ export default async function sitemap(
     { url: `${base}/facials`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/led-light-therapy`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/scar-revision`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${base}/injectables`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/book`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/shop`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/packages`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },

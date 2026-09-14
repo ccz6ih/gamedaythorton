@@ -81,6 +81,7 @@ export function storefrontLinks(base: string) {
     ledLightTherapy: `${base}/led-light-therapy`,
     facialsGuide: `${base}/facials`,
     scarRevision: `${base}/scar-revision`,
+    injectablesGuide: `${base}/injectables`,
     /** Stripe returns here. Absolute URL built by the checkout route. */
     thanks: `${base}/shop/thanks`
   };
