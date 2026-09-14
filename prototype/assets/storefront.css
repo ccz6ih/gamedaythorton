@@ -5906,3 +5906,157 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   .sf-target-nodes,
   .sf-stipple-matrix { animation: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   PRODUCT FINDER — "what does your skin need?" on the shop
+   ---------------------------------------------------------------------------
+   One row of concerns, then the products whose own copy answers it. Built from
+   pieces that already exist elsewhere on the site — the pill from the treatment
+   matcher, the hairline card from the guide pages — so it reads as part of the
+   shop rather than as a widget dropped into it.
+   --------------------------------------------------------------------------- */
+
+.sf-finder-head { max-width: var(--sf-measure); }
+.sf-finder-eyebrow {
+  display: block;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-3);
+}
+.sf-finder-head h2 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
+  color: var(--gd-text);
+  text-wrap: balance;
+}
+.sf-finder-head p {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+}
+
+.sf-finder-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin: var(--gd-6) 0 var(--gd-5);
+}
+.sf-finder-pill {
+  padding: .55rem 1rem;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-full);
+  background: transparent;
+  color: var(--gd-text-muted);
+  font: inherit;
+  font-size: var(--gd-step--1);
+  cursor: pointer;
+  transition: color var(--gd-fast) var(--gd-ease),
+              border-color var(--gd-fast) var(--gd-ease),
+              background var(--gd-fast) var(--gd-ease);
+}
+.sf-finder-pill:hover { color: var(--gd-text); border-color: var(--gd-border-strong); }
+.sf-finder-pill:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+.sf-finder-pill.is-active {
+  background: var(--gd-accent);
+  border-color: var(--gd-accent);
+  color: var(--brand-accent-ink);
+}
+
+.sf-finder-idle,
+.sf-finder-blurb {
+  margin: 0;
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  max-width: var(--sf-measure);
+}
+.sf-finder-idle a { color: var(--gd-accent); }
+
+.sf-finder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: var(--gd-5);
+  margin-top: var(--gd-5);
+}
+
+/* The card is a hairline over the top, like the paired-treatment cards on a
+   product page. No border box, no shadow, no lift. */
+.sf-finder-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+  padding-top: var(--gd-4);
+  border-top: 1px solid var(--gd-border);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-finder-card:hover { border-top-color: var(--gd-accent); }
+.sf-finder-card:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 4px; }
+
+.sf-finder-card-img {
+  aspect-ratio: 1;
+  background: #EFE7DA;
+  border-radius: var(--gd-r-sm);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.sf-finder-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10%;
+  display: block;
+}
+.sf-finder-card-img span {
+  font-family: var(--brand-display-font);
+  font-size: 2.5rem;
+  color: var(--gd-text-dim);
+}
+
+.sf-finder-card-body { flex: 1; }
+.sf-finder-card-body h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-0);
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0 0 var(--gd-2);
+  color: var(--gd-text);
+}
+.sf-finder-card-body p {
+  margin: 0;
+  font-size: var(--gd-step--2);
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+  /* Three lines, so cards in a row stay the same height whatever the copy
+     does. The full description is one tap away on the product page. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sf-finder-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--gd-step--1);
+  color: var(--gd-text);
+}
+.sf-finder-card-go {
+  color: var(--gd-accent);
+  transition: transform var(--gd-fast) var(--gd-ease);
+}
+.sf-finder-card:hover .sf-finder-card-go { transform: translateX(3px); }
+
+/* The finder's outer wrapper and its results region. Both are plain containers
+   — declared so the coverage test can see them, and so the results have a
+   settled minimum height that stops the page jumping as concerns are switched. */
+.sf-finder { max-width: 72rem; }
+.sf-finder-results { min-height: 3rem; }

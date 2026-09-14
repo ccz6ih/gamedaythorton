@@ -17,6 +17,10 @@ import { AddToCart } from '@/components/AddToCart';
 import { ProductGallery } from '@/components/ProductGallery';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { money, titleCase, priceLabel } from '@/lib/format';
+// One definition of the routine order and its labels, shared with the shop
+// listing. It lived here as a local map and the shop had its own idea of the
+// order, which is two copies of one sequence waiting to disagree.
+import { STEP_MAP } from '@/lib/shop-taxonomy';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,19 +41,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const STEP_MAP: Record<string, string> = {
-  cleanser: 'Step 01 · Cleanse',
-  exfoliator: 'Step 02 · Exfoliate',
-  toner: 'Step 03 · Tone & Prep',
-  masque: 'Step 04 · Treatment Masque',
-  serum: 'Step 05 · Target Serum',
-  eye_care: 'Step 06 · Eye Care',
-  moisturizer: 'Step 07 · Moisturize & Seal',
-  spf: 'Step 08 · Daily Defense SPF',
-  facial_oil: 'Step 08 · Botanical Facial Oil',
-  lip_care: 'Specialty · Lip Barrier Care',
-  kit: 'Complete Routine Kit'
-};
 
 const ROUTINE_STEPS = [
   { key: 'cleanser', num: '01', name: 'Cleanse' },

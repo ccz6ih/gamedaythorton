@@ -27,7 +27,9 @@ import { getStorefront, getStorefrontProducts } from '@/lib/db/storefront';
 import { shopTaxBps, shopTracksStock, checkoutAvailable } from '@/lib/db/shop';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { AddToCart } from '@/components/AddToCart';
-import { money, titleCase } from '@/lib/format';
+import { ProductFinder, type FinderConcern } from '@/components/ProductFinder';
+import { CONCERNS, matchConcern, sortByRoutine, categoryLabel } from '@/lib/shop-taxonomy';
+import { money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -58,8 +60,48 @@ export default async function Shop({ params }: { params: Promise<{ slug: string 
     groups.get(p.category)!.push(p);
   }
 
+  /**
+   * Routine order, not insertion order.
+   *
+   * The categories used to come out however the rows arrived, which put masques
+   * above cleansers and SPF somewhere in the middle. Ordered by the routine,
+   * the page can be read top to bottom as a sequence somebody could follow
+   * rather than as an inventory. lib/shop-taxonomy.ts holds the order, and the
+   * product pages read their step labels from the same place.
+   */
+  const orderedGroups = sortByRoutine([...groups.entries()]);
+
   const brands = [...new Set(products.map(p => p.brand).filter(Boolean))];
   const sellable = tracksStock ? products.filter(p => p.stock_qty > 0).length : products.length;
+
+  /**
+   * The finder's answers, worked out here rather than in the browser.
+   *
+   * Matching needs every product's description and details; doing it on the
+   * client would mean shipping all of that as JSON on a page already loading
+   * thirty-one photographs, and would put the logic that decides what to
+   * recommend where anyone could edit it. Four per concern — enough to choose
+   * between, few enough to read, and the component says when it has trimmed.
+   */
+  const finderConcerns: FinderConcern[] = CONCERNS.map(c => {
+    const matched = matchConcern(c, products);
+    return {
+      key: c.key,
+      label: c.label,
+      blurb: c.blurb,
+      total: matched.length,
+      products: matched.slice(0, 4).map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        priceCents: p.price_cents,
+        imagePath: p.image_path,
+        description: p.description
+      }))
+    };
+  // A concern nothing answers is not offered. Better to show seven honest
+  // buttons than eight where one leads to an apology.
+  }).filter(c => c.products.length > 0);
 
   return (
     <>
@@ -78,8 +120,36 @@ export default async function Shop({ params }: { params: Promise<{ slug: string 
               ? <span><b>{sellable}</b> in stock today</span>
               : <span>Shipped to you, or collect at the studio</span>}
           </div>
+
+          {/* The same rail the treatment menu uses, for the same reason: a
+              shelf of thirty-one jars with no visible structure is one long
+              scroll, and the categories were the one thing telling you where
+              you were. They were on the page already — as headings a third of
+              the way down, where you only find them by scrolling past them. */}
+          {orderedGroups.length > 1 && (
+            <nav className="sf-jump" aria-label="Jump to a category">
+              {orderedGroups.map(([category, items]) => (
+                <a key={category} href={`#cat-${category}`} className="sf-jump-link">
+                  {categoryLabel(category)}
+                  <span className="n">{items.length}</span>
+                </a>
+              ))}
+            </nav>
+          )}
         </div>
       </header>
+
+      {finderConcerns.length > 0 && (
+        <section className="sf-section sf-bordered">
+          <div className="sf-wrap">
+            <ProductFinder
+              concerns={finderConcerns}
+              shopHref={links.shop}
+              enquireHref={links.enquire}
+            />
+          </div>
+        </section>
+      )}
 
       <section className="sf-section">
         <div className="sf-wrap">
@@ -90,10 +160,10 @@ export default async function Shop({ params }: { params: Promise<{ slug: string 
             </p>
           )}
 
-          {[...groups.entries()].map(([category, items]) => (
-            <div className="sf-menu-group" key={category}>
+          {orderedGroups.map(([category, items]) => (
+            <div className="sf-menu-group" id={`cat-${category}`} key={category}>
               <div className="sf-menu-cat">
-                <h2>{titleCase(category)}</h2>
+                <h2>{categoryLabel(category)}</h2>
                 <span className="rule" aria-hidden="true" />
                 <span className="count">{items.length}</span>
               </div>
