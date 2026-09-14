@@ -270,7 +270,7 @@ export function LedSpectrumDial({ bookUrl }: { bookUrl: string }) {
             <span className="sf-led-price-val">from $40</span>
             <span className="sf-led-price-time">30 Min · Zero Downtime</span>
           </div>
-          <Link href={`${bookUrl}?service=3affd9d8-50ab-5cab-a413-0a9055acbb80`} className="sf-btn sf-btn-primary">
+          <Link href={`${bookUrl}?service=3affd9d8-50ab-5cab-a413-0a9055acbb80`} className="sf-btn primary">
             Reserve LED Therapy &rarr;
           </Link>
         </div>
