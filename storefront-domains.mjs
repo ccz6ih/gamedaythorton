@@ -34,6 +34,9 @@ export const STOREFRONT_DOMAINS = {
  */
 export const STOREFRONT_PATHS = [
   '/', '/services', '/packages', '/about', '/shop', '/enquire',
+  // The PRF education/pillar page — public and indexable like every other
+  // storefront page, and specifically NOT a booking or checkout step.
+  '/prf',
   // Booking. Public by necessity: a person picking a treatment and a time has
   // no account and must never meet a passcode on the way to giving money.
   '/book',
@@ -65,13 +68,19 @@ const NOT_INDEXABLE = new Set(['/cart', '/shop/thanks']);
 export const STOREFRONT_HEADER_SOURCES = [
   ...STOREFRONT_PATHS.map(p => ({ source: p, index: !NOT_INDEXABLE.has(p) })),
   // Product pages, which are exactly the ones worth having in search.
-  { source: '/shop/:path*', index: true }
+  { source: '/shop/:path*', index: true },
+  // One PRF treatment per URL, equally worth having in search.
+  { source: '/prf/:path*', index: true }
 ];
 
 /** True when this path is a storefront page on a root-serving domain. */
 export function isStorefrontPath(pathname) {
   return STOREFRONT_PATHS.includes(pathname)
-    || pathname.startsWith('/shop/');
+    || pathname.startsWith('/shop/')
+    // One PRF treatment per URL — /prf/under-eye, /prf/microneedling,
+    // /prf/hair-restoration. Same reasoning as /shop/: a fixed list here would
+    // drift the moment a fourth PRF treatment or a renamed one shipped.
+    || pathname.startsWith('/prf/');
 }
 
 /**

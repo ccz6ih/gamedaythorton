@@ -31,6 +31,7 @@ import { getStorefront, getStorefrontServices, groupByCategory } from '@/lib/db/
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { priceLabel, titleCase, money } from '@/lib/format';
+import { PRF_TREATMENTS } from '@/lib/prf-content';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Services & Pricing' };
@@ -109,6 +110,12 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                 <p className="sf-cat-note">{CATEGORY_NOTE[group.category]}</p>
               )}
 
+              {group.category === 'injectables' && (
+                <p className="sf-cat-note">
+                  New to PRF? <Link href={links.prf}>Read what it is, how it&rsquo;s made and what to expect</Link>.
+                </p>
+              )}
+
               {group.items.map(s => (
                 <article className="sf-item" key={s.id}>
                   {s.image_path ? (
@@ -149,6 +156,15 @@ export default async function StorefrontServices({ params }: { params: Promise<{
                         <p>{s.details}</p>
                       </details>
                     )}
+
+                    {(() => {
+                      const cluster = PRF_TREATMENTS.find(t => t.match.test(s.name));
+                      return cluster ? (
+                        <p className="sf-item-desc dim">
+                          <Link href={`${links.prf}/${cluster.slug}`}>Full details &amp; FAQ &rarr;</Link>
+                        </p>
+                      ) : null;
+                    })()}
 
                     {s.deposit_cents ? (
                       <p className="sf-item-desc dim">

@@ -160,6 +160,7 @@ export default async function StorefrontLayout({ children, params }: Props) {
   const nav = [
     { href: links.home, label: 'Home' },
     { href: links.services, label: 'Services' },
+    { href: links.prf, label: 'PRF' },
     { href: links.shop, label: 'Shop' },
     { href: links.packages, label: 'Packages' },
     { href: links.about, label: 'About' }
@@ -176,8 +177,57 @@ export default async function StorefrontLayout({ children, params }: Props) {
    */
   const needsCormorant = /Cormorant/i.test(String(brand.displayFont ?? brand.font ?? ''));
 
+  /**
+   * LocalBusiness structured data, present on every storefront page.
+   *
+   * Every field here comes straight off the clinic record — nothing is
+   * invented, so this cannot drift from what the page itself already says.
+   * It is what lets Google's local pack and an AI answer engine build an
+   * entity profile of the practice (name, address, phone, hours) instead of
+   * having to guess at it from prose. Only emitted once the practice's own
+   * site is live — a pilot tenant's storefront is already noindex, and giving
+   * a crawler a business's real address before the practice has said "go
+   * live" would be the same mistake as indexing the page itself.
+   */
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'https://www.medbarco.com';
+  const localBusinessJsonLd = clinic.live ? {
+    '@context': 'https://schema.org',
+    '@type': isSpa ? 'MedicalBusiness' : 'MedicalOrganization',
+    name: clinic.name,
+    url: `${base}${links.home}`,
+    ...(brand.logoUrl ? { logo: brand.logoUrl } : {}),
+    ...(clinic.address_line1 ? {
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: [clinic.address_line1, clinic.address_line2].filter(Boolean).join(', '),
+        addressLocality: clinic.address_city ?? undefined,
+        addressRegion: clinic.address_state ?? undefined,
+        postalCode: clinic.address_zip ?? undefined,
+        addressCountry: 'US'
+      }
+    } : {}),
+    ...(clinic.phone_voice ? { telephone: clinic.phone_voice } : {}),
+    ...(clinic.email ? { email: clinic.email } : {}),
+    ...(hours.length ? {
+      openingHoursSpecification: clinic.hours
+        .filter(h => h.open && h.close)
+        .map(h => ({
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: `https://schema.org/${h.day}`,
+          opens: h.open,
+          closes: h.close
+        }))
+    } : {})
+  } : null;
+
   return (
     <div className="sf" data-surface={surface} style={style}>
+      {localBusinessJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        />
+      )}
       {needsCormorant && (
         <link
           rel="stylesheet"
