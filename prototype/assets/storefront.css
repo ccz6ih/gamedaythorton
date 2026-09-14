@@ -1061,14 +1061,14 @@
 
 .sf-card-img {
   aspect-ratio: 1;
-  background: var(--gd-surface-raised);
+  background: #EFE7DA;
   display: grid;
   place-items: center;
-  border-bottom: 1px solid var(--gd-border);
+  border-bottom: 1px solid color-mix(in srgb, #16201A 12%, transparent);
   position: relative;
   overflow: hidden;
 }
-.sf-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf-card-img img { width: 100%; height: 100%; object-fit: contain; padding: 8%; display: block; }
 .sf-card-img-primary {
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
   will-change: transform, opacity;
@@ -1078,7 +1078,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 8%;
   opacity: 0;
   transform: scale(1.08) rotate(0.6deg);
   filter: blur(2px);
@@ -1086,14 +1087,18 @@
   will-change: opacity, transform, filter;
   pointer-events: none;
 }
-.sf-card:hover .sf-card-img.has-hover-img .sf-card-img-primary {
-  opacity: 0;
-  transform: scale(0.96);
-}
-.sf-card:hover .sf-card-img.has-hover-img .sf-card-img-hover {
-  opacity: 1;
-  transform: scale(1) rotate(0deg);
-  filter: blur(0);
+
+/* Only run hover image transitions on desktop pointers, so touch devices never hide the primary image */
+@media (hover: hover) and (pointer: fine) {
+  .sf-card:hover .sf-card-img.has-hover-img .sf-card-img-primary {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  .sf-card:hover .sf-card-img.has-hover-img .sf-card-img-hover {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0);
+  }
 }
 /* No photograph yet: the initial in the brand face, rather than a grey box or
    a stock image of somebody else's product. */
@@ -1920,108 +1925,375 @@
    ========================================================================== */
 
 .sf-back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--gd-text-muted);
   text-decoration: none;
+  font-family: var(--gd-font);
   font-size: var(--gd-step--1);
+  font-weight: 500;
+  transition: color var(--gd-fast) var(--gd-ease);
 }
 .sf-back:hover { color: var(--gd-accent); }
 
+/* ----------------------------------------------------------- luxury PDP hero -- */
 .sf-product {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 5vw, 4.5rem);
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
   align-items: start;
+}
+
+.sf-product-gallery {
+  position: sticky;
+  top: 5rem;
 }
 
 .sf-product-main {
   aspect-ratio: 1;
-  border-radius: var(--gd-r-md);
+  border-radius: var(--gd-r-lg);
   overflow: hidden;
-  background: var(--gd-surface-raised);
+  background: #EFE7DA;
+  border: 1px solid color-mix(in srgb, #16201A 12%, transparent);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.07);
   display: grid;
   place-items: center;
+  position: relative;
 }
-.sf-product-main img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sf-product-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8%;
+  display: block;
+}
 .sf-product-empty {
   font-family: var(--brand-display-font);
   font-size: 5rem;
-  color: var(--gd-text-dim);
+  color: color-mix(in srgb, #16201A 30%, transparent);
 }
 
 .sf-product-thumbs {
   display: flex;
   gap: var(--gd-3);
-  margin-top: var(--gd-3);
+  margin-top: var(--gd-4);
   flex-wrap: wrap;
 }
 .sf-product-thumb {
-  width: 4.5rem;
+  width: 5rem;
+  height: 5rem;
   aspect-ratio: 1;
   padding: 0;
-  border: 1px solid var(--gd-border);
-  border-radius: var(--gd-r-sm);
-  background: var(--gd-surface-raised);
+  border: 1.5px solid color-mix(in srgb, #16201A 14%, transparent);
+  border-radius: var(--gd-r-md);
+  background: #EFE7DA;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color var(--gd-fast) var(--gd-ease);
+  transition: all var(--gd-fast) var(--gd-ease);
 }
-.sf-product-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.sf-product-thumb:hover { border-color: var(--gd-border-strong); }
-.sf-product-thumb.is-active { border-color: var(--gd-accent); }
+.sf-product-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10%; display: block; }
+.sf-product-thumb:hover { border-color: var(--gd-accent); transform: translateY(-1px); }
+.sf-product-thumb.is-active {
+  border-color: var(--gd-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gd-accent) 40%, transparent);
+}
 
-.sf-product-detail h1 { margin: var(--gd-2) 0 var(--gd-4); }
+.sf-product-detail {
+  display: flex;
+  flex-direction: column;
+}
+.sf-product-routine-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--gd-font);
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gd-accent);
+  font-weight: 700;
+  margin-bottom: var(--gd-2);
+}
+.sf-product-detail h1 {
+  font-family: var(--brand-display-font);
+  font-size: clamp(2rem, 1.7rem + 1.2vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--gd-3);
+}
+
+.sf-product-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gd-4);
+  margin-bottom: var(--gd-4);
+  flex-wrap: wrap;
+}
 .sf-product-price {
+  font-family: var(--brand-display-font);
   font-size: var(--gd-step-2);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  margin-bottom: var(--gd-5);
+  color: var(--gd-text);
 }
+.sf-product-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--gd-step--2);
+  font-weight: 600;
+  color: var(--gd-in-range);
+  background: color-mix(in srgb, var(--gd-in-range) 12%, transparent);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--gd-in-range) 30%, transparent);
+}
+.sf-product-stock-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+
 .sf-product-desc {
-  font-size: var(--gd-step-0);
-  line-height: 1.6;
-  color: var(--gd-text-muted);
-  max-width: 42ch;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.12rem);
+  line-height: 1.65;
+  color: var(--gd-text);
+  margin: 0 0 var(--gd-5);
 }
 .sf-product-desc.dim { color: var(--gd-text-dim); font-style: italic; }
 
-.sf-product-details { margin-top: var(--gd-6); }
-.sf-product-details h2 {
-  font-size: var(--gd-step--1);
-  text-transform: uppercase;
-  letter-spacing: .12em;
-  color: var(--gd-accent);
-  margin: 0 0 var(--gd-2);
+/* Buy Box & Quantity Controls */
+.sf-buybox {
+  margin: var(--gd-4) 0 var(--gd-6);
 }
-.sf-product-details p { margin: 0; color: var(--gd-text-muted); line-height: 1.6; }
-
-.sf-product-buy {
+.sf-qty-row {
   display: flex;
   gap: var(--gd-3);
-  flex-wrap: wrap;
-  margin: var(--gd-6) 0 var(--gd-4);
-  align-items: center;
+  align-items: stretch;
 }
-/* On its own page the add button is the primary action, not a chip in a card. */
-.sf-product-buy .sf-add {
-  padding: var(--gd-3) var(--gd-6);
-  font-size: var(--gd-step-0);
+.sf-qty-picker {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-md);
+  padding: 0.2rem;
+  min-height: 3.25rem;
+}
+.sf-qty-btn {
+  width: 2.25rem;
+  height: 100%;
+  background: none;
+  border: none;
+  color: var(--gd-text);
+  font-size: 1.25rem;
   font-weight: 600;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: var(--gd-r-sm);
+  transition: background var(--gd-fast) var(--gd-ease);
+}
+.sf-qty-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gd-text) 10%, transparent);
+}
+.sf-qty-btn:disabled { opacity: 0.35; cursor: default; }
+.sf-qty-val {
+  min-width: 2rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-add.sf-add-lg {
+  flex: 1;
+  min-height: 3.25rem;
+  padding: var(--gd-3) var(--gd-6);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   border-radius: var(--gd-r-md);
   background: var(--gd-accent);
   color: var(--brand-accent-ink);
+  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--gd-accent) 45%, transparent);
+  transition: all var(--gd-fast) var(--gd-ease);
 }
-.sf-product-buy .sf-add:hover:not(:disabled) { background: var(--gd-accent-hover); }
+.sf-add.sf-add-lg:hover:not(:disabled) {
+  background: var(--gd-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px -2px color-mix(in srgb, var(--gd-accent) 60%, transparent);
+}
+.sf-add.is-added {
+  background: var(--gd-in-range) !important;
+  color: #ffffff !important;
+}
 
-/* A card that is entirely a link still needs to look like a card. */
-a.sf-card { text-decoration: none; color: inherit; }
-a.sf-card:hover { border-color: var(--gd-accent); }
-.sf-card h3 a { color: inherit; text-decoration: none; }
-.sf-card h3 a:hover { color: var(--gd-accent); }
+/* Studio Guarantee & Clean Badges */
+.sf-product-perks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gd-2) var(--gd-4);
+  padding: var(--gd-4);
+  background: color-mix(in srgb, var(--gd-surface-raised) 40%, transparent);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  margin-bottom: var(--gd-6);
+}
+.sf-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--gd-text-muted);
+}
+.sf-perk-icon {
+  color: var(--gd-accent);
+  font-size: 0.95rem;
+  flex: none;
+}
+
+/* Accordion Details */
+.sf-product-accordions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-2);
+  margin-top: var(--gd-2);
+}
+.sf-accordion {
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  background: var(--gd-surface);
+  overflow: hidden;
+  transition: border-color var(--gd-fast) var(--gd-ease);
+}
+.sf-accordion[open] {
+  border-color: color-mix(in srgb, var(--gd-accent) 45%, var(--gd-border));
+}
+.sf-accordion summary {
+  padding: var(--gd-4) var(--gd-5);
+  font-family: var(--brand-display-font);
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  color: var(--gd-text);
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-accordion summary::-webkit-details-marker { display: none; }
+.sf-accordion summary:hover { color: var(--gd-accent); }
+.sf-accordion-arrow {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--gd-fast) var(--gd-ease);
+  margin-right: 0.25rem;
+}
+.sf-accordion[open] .sf-accordion-arrow {
+  transform: rotate(-135deg);
+}
+.sf-accordion-body {
+  padding: 0 var(--gd-5) var(--gd-5);
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: var(--gd-text-muted);
+  border-top: 1px solid color-mix(in srgb, var(--gd-border) 60%, transparent);
+  padding-top: var(--gd-4);
+}
+.sf-accordion-body p { margin: 0 0 var(--gd-3); }
+.sf-accordion-body p:last-child { margin-bottom: 0; }
+
+/* -------------------------------------------------- Hims-Style Benefit Pillars -- */
+.sf-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--gd-5);
+  margin-top: var(--gd-6);
+}
+.sf-pillar-card {
+  padding: var(--gd-6);
+  border-radius: var(--gd-r-lg);
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  display: flex;
+  flex-direction: column;
+}
+.sf-pillar-num {
+  font-family: var(--brand-display-font);
+  font-size: 1.75rem;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-3);
+  opacity: 0.9;
+}
+.sf-pillar-card h3 {
+  font-family: var(--brand-display-font);
+  font-size: 1.25rem;
+  margin: 0 0 var(--gd-2);
+  color: var(--gd-text);
+}
+.sf-pillar-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+
+/* ---------------------------------------------------- Routine Roadmap Step -- */
+.sf-routine-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--gd-5);
+  margin-top: var(--gd-6);
+  position: relative;
+}
+.sf-routine-step-card {
+  padding: var(--gd-5);
+  border-radius: var(--gd-r-md);
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border);
+  position: relative;
+}
+.sf-routine-step-card.is-current {
+  border-color: var(--gd-accent);
+  box-shadow: 0 0 0 1px var(--gd-accent);
+  background: color-mix(in srgb, var(--gd-accent) 8%, var(--gd-surface-raised));
+}
+.sf-routine-tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gd-accent);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+.sf-routine-step-card h4 {
+  font-family: var(--brand-display-font);
+  font-size: 1.15rem;
+  margin: 0 0 0.35rem;
+}
+.sf-routine-step-card p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--gd-text-muted);
+}
 
 @media (max-width: 860px) {
-  .sf-product { grid-template-columns: 1fr; }
-  .sf-product-main { aspect-ratio: 4 / 3; }
+  .sf-product { grid-template-columns: 1fr; gap: var(--gd-6); }
+  .sf-product-gallery { position: static; }
+  .sf-product-main { aspect-ratio: 1; }
+  .sf-product-perks { grid-template-columns: 1fr; }
+  .sf-qty-row { flex-direction: column; }
+  .sf-qty-picker { justify-content: space-between; width: 100%; }
 }
 
 /* The full biography on the about page. Set at a comfortable reading measure
