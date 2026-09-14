@@ -298,14 +298,14 @@ export default async function StorefrontLayout({ children, params }: Props) {
 
             {isSpa && (
               <div>
-                <h4>PRF &amp; Guides</h4>
+                <h4>Guides &amp; Science</h4>
                 <ul className="sf-foot-links" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <li><Link href={links.prf}>PRF Complete Guide</Link></li>
+                  <li><Link href={links.prf}>PRF Regenerative Guide</Link></li>
                   <li><Link href={links.prfCompare}>Compare PRF vs PRP &amp; Fillers</Link></li>
-                  <li><Link href={links.prfAftercare}>Pre-Care &amp; Recovery</Link></li>
-                  <li><Link href={`${links.prf}/under-eye`}>PRF Under-Eye</Link></li>
-                  <li><Link href={`${links.prf}/microneedling`}>PRF Microneedling</Link></li>
-                  <li><Link href={`${links.prf}/hair-restoration`}>Hair Restoration</Link></li>
+                  <li><Link href={links.prfAftercare}>PRF Pre-Care &amp; Recovery</Link></li>
+                  <li><Link href={links.facialsGuide}>Colorado Altitude Facials</Link></li>
+                  <li><Link href={links.ledLightTherapy}>7-Wavelength LED Therapy</Link></li>
+                  <li><Link href={links.scarRevision}>Inkless Scar &amp; Stretch Marks</Link></li>
                 </ul>
               </div>
             )}
