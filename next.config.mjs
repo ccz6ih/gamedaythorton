@@ -1,4 +1,4 @@
-import { STOREFRONT_DOMAINS, STOREFRONT_PATHS } from './storefront-domains.mjs';
+import { STOREFRONT_DOMAINS, STOREFRONT_PATHS, STOREFRONT_HEADER_SOURCES } from './storefront-domains.mjs';
 /**
  * next.config.mjs
  *
@@ -131,9 +131,29 @@ const nextConfig = {
         source: '/c/:path*',
         headers: [...commonHeaders, { key: 'Content-Security-Policy', value: storefrontCsp }]
       },
-      ...['/', '/services', '/packages', '/about', '/shop', '/shop/:path*', '/enquire'].map(source => ({
+      /**
+       * DERIVED FROM STOREFRONT_PATHS, not typed out again.
+       *
+       * This was a third hardcoded list of storefront paths, and it drifted the
+       * moment /book was added: the booking page — the one page on the site
+       * that exists to convert — was served
+       * `X-Robots-Tag: noindex, nofollow` by the catch-all, AND the strict CSP,
+       * so Google was told to ignore it and its typeface never loaded.
+       *
+       * storefront-domains.mjs exists precisely because two lists that must
+       * agree will not. It was already shared by the middleware and the
+       * rewrites; this is the third consumer it should always have had.
+       */
+      ...STOREFRONT_HEADER_SOURCES.map(({ source, index }) => ({
         source,
-        headers: [...commonHeaders, { key: 'Content-Security-Policy', value: storefrontCsp }]
+        headers: [
+          ...commonHeaders,
+          // A basket and a receipt have no business in search results — they
+          // are per-visitor pages that would be indexed empty. They still need
+          // the storefront CSP, because they still need the practice's font.
+          ...(index ? [] : [{ key: 'X-Robots-Tag', value: 'noindex, follow' }]),
+          { key: 'Content-Security-Policy', value: storefrontCsp }
+        ]
       }))
     ];
   },

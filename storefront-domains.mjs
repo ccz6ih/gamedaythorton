@@ -43,6 +43,31 @@ export const STOREFRONT_PATHS = [
   '/cart', '/shop/thanks'
 ];
 
+/**
+ * Which storefront pages belong in search results.
+ *
+ * A basket and a receipt do not: they are per-visitor pages that a crawler
+ * would index empty, and a "your order is confirmed" page turning up in search
+ * results is worse than useless. They still get the storefront CSP — they still
+ * need the practice's typeface — so this is about indexing alone.
+ */
+const NOT_INDEXABLE = new Set(['/cart', '/shop/thanks']);
+
+/**
+ * Header rules for next.config.mjs, derived from the paths above rather than
+ * typed out a third time.
+ *
+ * This existed as a separate hardcoded list and drifted the moment /book was
+ * added: the booking page was served `noindex, nofollow` by the catch-all and
+ * the strict CSP along with it, so Google was told to ignore the one page on
+ * the site whose whole job is converting, and its font never loaded there.
+ */
+export const STOREFRONT_HEADER_SOURCES = [
+  ...STOREFRONT_PATHS.map(p => ({ source: p, index: !NOT_INDEXABLE.has(p) })),
+  // Product pages, which are exactly the ones worth having in search.
+  { source: '/shop/:path*', index: true }
+];
+
 /** True when this path is a storefront page on a root-serving domain. */
 export function isStorefrontPath(pathname) {
   return STOREFRONT_PATHS.includes(pathname)

@@ -430,6 +430,50 @@ async function cannotRead(label, table) {
         broken.map(r => `${r.source} -> ${r.destination}`).join(' · '));
   }
 
+  /**
+   * EVERY STOREFRONT PATH GETS STOREFRONT HEADERS.
+   *
+   * next.config.mjs kept its own hardcoded list of storefront paths, and it
+   * drifted the moment /book was added: the booking page fell through to the
+   * catch-all and was served `X-Robots-Tag: noindex, nofollow` plus the strict
+   * CSP — Google told to ignore the one page whose job is converting, and its
+   * typeface silently not loading. Both failures are invisible from the page.
+   */
+  const { STOREFRONT_HEADER_SOURCES } = await import('../storefront-domains.mjs');
+  const headerRules = await nextConfig.headers();
+
+  const headerSources = new Set(headerRules.map(r => r.source));
+  const uncovered = STOREFRONT_PATHS.filter(p => !headerSources.has(p));
+
+  if (uncovered.length === 0) {
+    ok(`all ${STOREFRONT_PATHS.length} storefront paths get storefront headers`);
+  } else {
+    bad('all storefront paths get storefront headers',
+        `${uncovered.join(', ')} fall through to the strict catch-all`);
+  }
+
+  // And the ones that should be found actually say so.
+  const indexable = STOREFRONT_HEADER_SOURCES.filter(r => r.index).map(r => r.source);
+  const wrong = indexable.filter(source => {
+    const rule = headerRules.find(r => r.source === source);
+    const robots = rule?.headers.filter(h => h.key === 'X-Robots-Tag').pop();
+    return robots?.value !== 'all';
+  });
+
+  if (wrong.length === 0) ok(`${indexable.length} storefront paths are indexable`);
+  else bad('storefront paths are indexable', `${wrong.join(', ')} say noindex`);
+
+  // And the basket is not.
+  const noindexed = STOREFRONT_HEADER_SOURCES.filter(r => !r.index).map(r => r.source);
+  const leaked = noindexed.filter(source => {
+    const rule = headerRules.find(r => r.source === source);
+    const robots = rule?.headers.filter(h => h.key === 'X-Robots-Tag').pop();
+    return robots?.value === 'all';
+  });
+
+  if (leaked.length === 0) ok('the basket and receipt stay out of search', noindexed.join(', '));
+  else bad('the basket and receipt stay out of search', leaked.join(', '));
+
   // And every storefront path a visitor can reach has a rule for her domain.
   const hostRules = beforeFiles.filter(r =>
     r.has?.some(h => h.type === 'host' && h.value === 'medbarco.com'));

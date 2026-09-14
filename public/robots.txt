@@ -17,3 +17,6 @@ Disallow: /portal/
 Disallow: /api/
 Disallow: /prototype/
 Disallow: /gate
+
+# Where the pages are. Generated, so it never goes stale.
+Sitemap: https://www.medbarco.com/sitemap.xml
