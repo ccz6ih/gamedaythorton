@@ -29,6 +29,7 @@ import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { Centrifuge } from '@/components/Centrifuge';
 import { ProcessRail } from '@/components/ProcessRail';
+import { PinnedDisciplinesDeck } from '@/components/PinnedDisciplinesDeck';
 import { priceLabel, initials, money } from '@/lib/format';
 import { PRF_PROCESS } from '@/lib/prf-content';
 
@@ -145,6 +146,9 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
           <ProcessRail steps={PRF_PROCESS} />
         </div>
       </section>
+
+      {/* The 4 Clinical Disciplines Pinned Stacked Card Deck */}
+      <PinnedDisciplinesDeck links={links} />
 
       {signature.length > 0 && (
         <section className="sf-section sf-invert">
