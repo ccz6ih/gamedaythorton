@@ -4379,3 +4379,343 @@
   .sf-scar-price-box { align-items: flex-start; }
 }
 
+/* ==========================================================================
+   PINNED DISCIPLINES STACKED CARDS DECK (HOME PAGE EXPERIENCE)
+   ========================================================================== */
+.sf-deck-section {
+  position: relative;
+  padding-block: clamp(3rem, 7vw, 6rem);
+  border-top: 1px solid var(--gd-border);
+}
+
+.sf-deck-intro {
+  max-width: 54rem;
+  margin: 0 0 clamp(2.5rem, 5vw, 4.5rem);
+}
+.sf-deck-heading {
+  font-family: var(--brand-display-font);
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  color: var(--gd-text);
+  margin: var(--gd-3) 0 var(--gd-4);
+  text-wrap: balance;
+}
+.sf-deck-sub {
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.15rem);
+  color: var(--gd-text-muted);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* Stacked Container & Sticky Card Mechanics */
+.sf-deck-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.sf-deck-card {
+  position: sticky;
+  top: calc(clamp(4.5rem, 8vh, 6.5rem) + (var(--card-index, 0) * 1.35rem));
+  border-radius: var(--gd-r-xl, 20px);
+  margin-bottom: clamp(2.5rem, 5vh, 4rem);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--card-text);
+  box-shadow: 0 16px 48px -8px rgba(0, 0, 0, 0.45);
+  transition: transform var(--gd-fast) var(--gd-ease), box-shadow var(--gd-fast) var(--gd-ease);
+}
+
+/* Color Themes */
+.sf-deck-card.theme-emerald {
+  --card-bg: #0E1711;
+  --card-text: #EFE7DA;
+  --card-muted: rgba(239, 231, 218, 0.72);
+  --card-accent: #D4AF37;
+  --card-accent-ink: #16201A;
+  --card-border: rgba(212, 175, 55, 0.3);
+  --card-sub-bg: rgba(22, 32, 26, 0.85);
+  --card-pill-bg: rgba(212, 175, 55, 0.1);
+}
+
+.sf-deck-card.theme-cream {
+  --card-bg: #EFE7DA;
+  --card-text: #16201A;
+  --card-muted: rgba(22, 32, 26, 0.72);
+  --card-accent: #8C7335;
+  --card-accent-ink: #ffffff;
+  --card-border: rgba(22, 32, 26, 0.16);
+  --card-sub-bg: #E5DBCB;
+  --card-pill-bg: rgba(22, 32, 26, 0.08);
+}
+
+.sf-deck-card.theme-sand {
+  --card-bg: #E5DBCB;
+  --card-text: #16201A;
+  --card-muted: rgba(22, 32, 26, 0.72);
+  --card-accent: #1C3325;
+  --card-accent-ink: #EFE7DA;
+  --card-border: rgba(22, 32, 26, 0.2);
+  --card-sub-bg: #DCD0BD;
+  --card-pill-bg: rgba(28, 51, 37, 0.09);
+}
+
+.sf-deck-card.theme-obsidian {
+  --card-bg: #16201A;
+  --card-text: #EFE7DA;
+  --card-muted: rgba(239, 231, 218, 0.75);
+  --card-accent: #D4AF37;
+  --card-accent-ink: #16201A;
+  --card-border: rgba(212, 175, 55, 0.35);
+  --card-sub-bg: #0E1711;
+  --card-pill-bg: rgba(212, 175, 55, 0.12);
+}
+
+/* Card Internal Layout */
+.sf-deck-card-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  padding: clamp(1.75rem, 4vw, 3.25rem);
+  align-items: center;
+}
+
+.sf-deck-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-3);
+}
+
+.sf-deck-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gd-3);
+  margin-bottom: var(--gd-2);
+}
+.sf-deck-num-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: var(--gd-step--2);
+  letter-spacing: .14em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--card-accent);
+}
+.sf-deck-num-spark {
+  width: .45rem;
+  height: .45rem;
+  border-radius: 50%;
+  background: var(--card-accent);
+  box-shadow: 0 0 8px var(--card-accent);
+}
+.sf-deck-badge {
+  font-size: var(--gd-step--2);
+  font-weight: 600;
+  padding: .25em .65em;
+  border-radius: 999px;
+  background: var(--card-pill-bg);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
+  color: var(--card-text);
+  letter-spacing: .04em;
+}
+
+.sf-deck-kicker {
+  font-size: var(--gd-step--1);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-weight: 600;
+  color: var(--card-accent);
+}
+
+.sf-deck-card-title {
+  font-family: var(--brand-display-font);
+  font-size: clamp(1.75rem, 1.35rem + 1.2vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--card-text);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.sf-deck-card-tagline {
+  font-family: var(--brand-display-font);
+  font-style: italic;
+  font-size: clamp(1.05rem, 0.98rem + 0.2vw, 1.2rem);
+  color: var(--card-text);
+  margin: 0;
+  line-height: 1.4;
+  opacity: .92;
+}
+
+.sf-deck-card-body {
+  font-size: clamp(0.92rem, 0.88rem + 0.1vw, 1rem);
+  color: var(--card-muted);
+  line-height: 1.65;
+  margin: var(--gd-1) 0 var(--gd-2);
+}
+
+.sf-deck-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin-bottom: var(--gd-2);
+}
+.sf-deck-pill {
+  font-size: var(--gd-step--2);
+  padding: .3em .65em;
+  border-radius: var(--gd-r-sm);
+  background: var(--card-pill-bg);
+  color: var(--card-text);
+  border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  font-weight: 500;
+}
+
+.sf-deck-actions {
+  display: flex;
+  gap: var(--gd-3);
+  flex-wrap: wrap;
+  margin-top: var(--gd-2);
+}
+.sf-deck-actions .sf-btn-primary {
+  background: var(--card-accent) !important;
+  color: var(--card-accent-ink) !important;
+  border-color: var(--card-accent) !important;
+}
+.sf-deck-actions .sf-btn-ghost {
+  border-color: color-mix(in srgb, var(--card-text) 30%, transparent) !important;
+  color: var(--card-text) !important;
+}
+.sf-deck-actions .sf-btn-ghost:hover {
+  border-color: var(--card-accent) !important;
+  color: var(--card-accent) !important;
+}
+
+/* Aside: Visual Art Box + Key Specifications */
+.sf-deck-card-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-4);
+}
+
+.sf-deck-art-box {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  background: var(--card-sub-bg);
+  border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  border-radius: var(--gd-r-lg);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.sf-deck-icon-svg {
+  width: 4.5rem;
+  height: 4.5rem;
+  color: var(--card-accent);
+  transition: transform .4s ease;
+}
+.sf-deck-card:hover .sf-deck-icon-svg {
+  transform: scale(1.08);
+}
+
+.sf-deck-specs-card {
+  background: var(--card-sub-bg);
+  border: 1px solid color-mix(in srgb, var(--card-text) 12%, transparent);
+  border-radius: var(--gd-r-lg);
+  padding: var(--gd-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-2);
+}
+.sf-deck-specs-title {
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-weight: 700;
+  color: var(--card-accent);
+  padding-bottom: var(--gd-2);
+  border-bottom: 1px solid color-mix(in srgb, var(--card-text) 10%, transparent);
+}
+.sf-deck-specs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-2);
+}
+.sf-deck-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--gd-2);
+  font-size: var(--gd-step--1);
+}
+.sf-deck-spec-lbl {
+  color: var(--card-muted);
+  font-size: var(--gd-step--2);
+}
+.sf-deck-spec-val {
+  font-weight: 600;
+  color: var(--card-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Deck Outro */
+.sf-deck-outro {
+  background: var(--gd-surface-raised);
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-lg);
+  padding: clamp(2rem, 5vw, 3rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gd-3);
+  margin-top: var(--gd-6);
+}
+.sf-deck-outro h3 {
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  margin: 0;
+  color: var(--gd-text);
+  max-width: 26ch;
+}
+.sf-deck-outro p {
+  margin: 0 0 var(--gd-2);
+  font-size: var(--gd-step-0);
+  color: var(--gd-text-muted);
+  max-width: 48ch;
+  line-height: 1.6;
+}
+
+@media (max-width: 880px) {
+  .sf-deck-card-inner {
+    grid-template-columns: 1fr;
+    gap: var(--gd-5);
+  }
+  .sf-deck-art-box {
+    aspect-ratio: 16 / 6;
+  }
+  .sf-deck-actions {
+    flex-direction: column;
+  }
+  .sf-deck-actions .sf-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-deck-card {
+    position: static !important;
+    transform: none !important;
+    margin-bottom: var(--gd-6) !important;
+  }
+}
+
+
