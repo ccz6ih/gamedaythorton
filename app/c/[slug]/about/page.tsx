@@ -15,7 +15,22 @@ import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { initials, phone } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'About' };
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const clinic = await getStorefront(slug);
+  if (!clinic) return { title: 'Not found' };
+
+  const isSpa = clinic.practice_type === 'med_spa';
+  return {
+    title: isSpa ? 'About The Med Bar | Loveland Med Spa' : 'About',
+    description: isSpa
+      ? 'Meet The Med Bar, a thoughtful med spa in Loveland, Colorado offering PRF, injectables, facials, lashes and paramedical scar revision.'
+      : clinic.intro ?? undefined
+  };
+}
 
 export default async function StorefrontAbout({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -27,22 +42,105 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
   const providers = await getStorefrontProviders(clinic.id);
   const hours = hoursLines(clinic.hours);
   const facts = Object.entries(clinic.visit_facts ?? {});
+  const isSpa = clinic.practice_type === 'med_spa';
 
   return (
     <>
-      <header className="sf-hero">
-        <div className="sf-wrap">
-          <div className="sf-eyebrow">About</div>
-          <h1>{clinic.name}</h1>
-          {clinic.intro && <p className="sf-tagline">{clinic.intro}</p>}
+      <header className="sf-stage sf-about-stage">
+        <div className="sf-wrap sf-stage-grid">
+          <div>
+            <div className="sf-eyebrow">About {clinic.name}</div>
+            {isSpa ? (
+              <>
+                <h1 className="sf-display">
+                  <span className="ln"><span>Beauty, but</span></span>
+                  <span className="ln"><span>make it <i>personal.</i></span></span>
+                </h1>
+                <p className="sf-lede sf-fade" style={{ animationDelay: '.7s' }}>
+                  A thoughtful med spa in Loveland, Colorado for the moments
+                  when you want to look rested, feel considered and leave more
+                  like yourself.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="sf-display">
+                  <span className="ln"><span>Care that</span></span>
+                  <span className="ln"><span>starts with</span></span>
+                  <span className="ln"><span><i>listening.</i></span></span>
+                </h1>
+                {clinic.intro && <p className="sf-lede sf-fade" style={{ animationDelay: '.7s' }}>{clinic.intro}</p>}
+              </>
+            )}
+            <div className="sf-about-orbit" aria-hidden="true">
+              <span className="sf-about-orbit-line sf-about-orbit-line-a" />
+              <span className="sf-about-orbit-line sf-about-orbit-line-b" />
+              <span className="sf-about-orbit-dot sf-about-orbit-dot-a" />
+              <span className="sf-about-orbit-dot sf-about-orbit-dot-b" />
+              <span className="sf-about-orbit-word">made for you</span>
+            </div>
+          </div>
+
+          <div className="sf-about-manifesto sf-fade" style={{ animationDelay: '.95s' }}>
+            <p className="sf-about-manifesto-kicker">The idea</p>
+            <p>
+              The best work does not announce itself. It feels like a version
+              of you that was already there, waiting for a little attention.
+            </p>
+            {isSpa && (
+              <Link href={links.services} className="sf-btn ghost">
+                Explore the treatments <span>&rarr;</span>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
+
+      {isSpa && (
+        <section className="sf-section sf-bordered">
+          <div className="sf-wrap">
+            <div className="sf-section-head">
+              <h2>A studio for your own kind of beautiful.</h2>
+              <p>
+                The Med Bar brings regenerative treatments, injectables,
+                facials, lashes and paramedical scar revision into one
+                considered experience — with time to ask questions and space
+                to make a decision that feels like yours.
+              </p>
+            </div>
+
+            <div className="sf-about-principles">
+              <article>
+                <span className="sf-about-number">01</span>
+                <h3>Start with you</h3>
+                <p>Your goals, your features, your pace. Consultation comes before a plan.</p>
+              </article>
+              <article>
+                <span className="sf-about-number">02</span>
+                <h3>Keep it considered</h3>
+                <p>Thoughtful treatment over a one-size-fits-all menu of promises.</p>
+              </article>
+              <article>
+                <span className="sf-about-number">03</span>
+                <h3>Leave room for real life</h3>
+                <p>Clear pricing, honest expectations and a visit that fits into your day.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+      )}
 
       {providers.length > 0 && (
         <section className="sf-section">
           <div className="sf-wrap">
             <div className="sf-section-head">
-              <h2>The team</h2>
+              <h2>{isSpa ? 'The person behind the practice' : 'The team'}</h2>
+              {isSpa && (
+                <p>
+                  A small practice means your experience is personal from the
+                  first hello. Meet the person making the room what it is.
+                </p>
+              )}
             </div>
             <div className="sf-people">
               {providers.map(p => (
