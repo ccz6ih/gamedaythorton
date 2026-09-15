@@ -46,15 +46,40 @@ export default async function ClientsPage(
    */
   const digits = needle.replace(/\D/g, '');
 
+  /**
+   * SORTED THE WAY IT IS READ.
+   *
+   * getClients() orders by last_name, which is correct for the booking
+   * dropdown — that one renders "Carda, Sarah" and the surname is the first
+   * thing on the line. This table renders "Sarah Carda" in bold, so scanning
+   * the column gave James, Tracy, Sarah, Jennifer, Jonie, Demo, Novia… and
+   * looked like no order at all.
+   *
+   * It was alphabetical the whole time. Just not by anything visible.
+   *
+   * Two clients have no surname at all from the import, which under the old
+   * sort put them at the very top on an empty string — the two rows most
+   * likely to be read as "this list is broken". Sorting by the displayed name
+   * files them under their first name, where somebody would look.
+   */
+  const displayName = (c: { first_name: string; last_name: string | null }) =>
+    `${c.first_name} ${c.last_name ?? ''}`.trim();
+
+  const sorted = [...all].sort((a, b) =>
+    // localeCompare so accented names file where a person would expect, and
+    // sensitivity:'base' so case and accents do not split the alphabet.
+    displayName(a).localeCompare(displayName(b), 'en', { sensitivity: 'base' })
+  );
+
   const clients = needle
-    ? all.filter(c =>
+    ? sorted.filter(c =>
         `${c.first_name} ${c.last_name}`.toLowerCase().includes(needle)
         || (c.email ?? '').toLowerCase().includes(needle)
         // The front desk often has a number on screen from a missed call
         // rather than a name spelled the way it was typed. Three digits is
         // enough to be a deliberate search and short enough to be useful.
         || (digits.length >= 3 && (c.phone ?? '').replace(/\D/g, '').includes(digits)))
-    : all;
+    : sorted;
 
   /**
    * Faces for the roster, signed in ONE call rather than one per row.
