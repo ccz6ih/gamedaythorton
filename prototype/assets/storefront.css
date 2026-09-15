@@ -2387,6 +2387,82 @@
   flex-direction: column;
   transition: border-color var(--gd-fast) var(--gd-ease);
 }
+
+/* ------------------------------------------------ Men's skin-health graphics -- */
+.sf-men-routine-graphic {
+  margin-top: var(--gd-8);
+  padding: var(--gd-5) var(--gd-3);
+  border-top: 1px solid var(--gd-border);
+  border-bottom: 1px solid var(--gd-border);
+  overflow-x: auto;
+}
+.sf-men-routine-graphic svg {
+  display: block;
+  width: min(100%, 58rem);
+  min-width: 42rem;
+  height: auto;
+  margin: 0 auto;
+}
+.sf-men-routine-node { transition: transform var(--gd-fast) var(--gd-ease); }
+.sf-men-routine-node:hover { transform: translateY(-4px); }
+.sf-men-routine-num {
+  font-family: var(--brand-display-font);
+  font-size: 1.15rem;
+  fill: var(--gd-text);
+}
+.sf-men-routine-dot { fill: var(--gd-accent); font-size: .9rem; }
+.sf-men-routine-title {
+  font-family: var(--brand-display-font);
+  font-size: 1.35rem;
+  fill: var(--gd-text);
+}
+.sf-men-routine-sub {
+  font-family: var(--gd-font);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  fill: var(--gd-text-muted);
+}
+
+.sf-men-concern-map {
+  margin-top: var(--gd-8);
+  padding: var(--gd-4);
+  border-radius: var(--gd-r-lg);
+  background: color-mix(in srgb, var(--gd-surface-raised) 38%, transparent);
+  border: 1px solid var(--gd-border);
+  overflow-x: auto;
+}
+.sf-men-concern-map svg {
+  display: block;
+  width: min(100%, 58rem);
+  min-width: 42rem;
+  height: auto;
+  margin: 0 auto;
+}
+.sf-men-map-main {
+  font-family: var(--brand-display-font);
+  font-size: 1.25rem;
+  letter-spacing: .16em;
+  fill: var(--gd-accent);
+}
+.sf-men-map-card rect {
+  fill: var(--gd-surface);
+  stroke: var(--gd-border-strong);
+  transition: stroke var(--gd-fast) var(--gd-ease), fill var(--gd-fast) var(--gd-ease);
+}
+.sf-men-map-card:hover rect {
+  fill: color-mix(in srgb, var(--gd-accent) 10%, var(--gd-surface));
+  stroke: var(--gd-accent);
+}
+.sf-men-map-title {
+  font-family: var(--brand-display-font);
+  font-size: 1.15rem;
+  fill: var(--gd-text);
+}
+.sf-men-map-copy {
+  font-family: var(--gd-font);
+  font-size: .75rem;
+  fill: var(--gd-text-muted);
+}
 .sf-paired-service-card:hover { border-top-color: var(--gd-accent); }
 .sf-paired-head {
   display: flex;

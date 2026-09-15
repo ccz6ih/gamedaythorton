@@ -56,6 +56,75 @@ function faqJsonLd() {
   };
 }
 
+function RoutineDiagram() {
+  return (
+    <div className="sf-men-routine-graphic">
+      <svg viewBox="0 0 900 250" role="img" aria-labelledby="routine-diagram-title routine-diagram-desc">
+        <title id="routine-diagram-title">A four-step men&apos;s skincare routine</title>
+        <desc id="routine-diagram-desc">Cleanse, treat, seal, and protect in that order.</desc>
+        <defs>
+          <linearGradient id="routine-line" x1="0" x2="1">
+            <stop offset="0" stopColor="var(--gd-accent)" stopOpacity=".25" />
+            <stop offset=".5" stopColor="var(--gd-accent)" />
+            <stop offset="1" stopColor="var(--gd-accent)" stopOpacity=".25" />
+          </linearGradient>
+        </defs>
+        <path d="M118 112 H782" stroke="url(#routine-line)" strokeWidth="2" strokeDasharray="5 8" />
+        {[
+          { x: 115, n: '01', title: 'Cleanse', sub: 'Remove the day' },
+          { x: 338, n: '02', title: 'Treat', sub: 'Target the concern' },
+          { x: 562, n: '03', title: 'Seal', sub: 'Support the barrier' },
+          { x: 785, n: '04', title: 'Protect', sub: 'Keep the progress' }
+        ].map(step => (
+          <g key={step.n} className="sf-men-routine-node">
+            <circle cx={step.x} cy="112" r="39" fill="var(--gd-surface)" stroke="var(--gd-accent)" strokeWidth="1.5" />
+            <circle cx={step.x} cy="112" r="28" fill="none" stroke="var(--gd-accent)" strokeOpacity=".25" />
+            <text x={step.x} y="108" textAnchor="middle" className="sf-men-routine-num">{step.n}</text>
+            <text x={step.x} y="119" textAnchor="middle" className="sf-men-routine-dot">•</text>
+            <text x={step.x} y="180" textAnchor="middle" className="sf-men-routine-title">{step.title}</text>
+            <text x={step.x} y="201" textAnchor="middle" className="sf-men-routine-sub">{step.sub}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function ConcernMap() {
+  return (
+    <div className="sf-men-concern-map">
+      <svg viewBox="0 0 800 340" role="img" aria-labelledby="concern-map-title concern-map-desc">
+        <title id="concern-map-title">Men&apos;s skin health concern map</title>
+        <desc id="concern-map-desc">Different concerns connect to different home-care and professional treatment paths.</desc>
+        <path d="M400 170 L155 75 M400 170 L645 75 M400 170 L155 265 M400 170 L645 265" stroke="var(--gd-border-strong)" strokeWidth="1.5" />
+        <circle cx="400" cy="170" r="72" fill="var(--gd-surface)" stroke="var(--gd-accent)" strokeWidth="2" />
+        <text x="400" y="164" textAnchor="middle" className="sf-men-map-main">SKIN</text>
+        <text x="400" y="187" textAnchor="middle" className="sf-men-map-main">HEALTH</text>
+        <g className="sf-men-map-card">
+          <rect x="42" y="35" width="225" height="80" rx="10" />
+          <text x="60" y="65" className="sf-men-map-title">Barrier &amp; dryness</text>
+          <text x="60" y="90" className="sf-men-map-copy">Cleanse · hydrate · protect</text>
+        </g>
+        <g className="sf-men-map-card">
+          <rect x="533" y="35" width="225" height="80" rx="10" />
+          <text x="551" y="65" className="sf-men-map-title">Texture &amp; scars</text>
+          <text x="551" y="90" className="sf-men-map-copy">Facials · microneedling · PRF</text>
+        </g>
+        <g className="sf-men-map-card">
+          <rect x="42" y="225" width="225" height="80" rx="10" />
+          <text x="60" y="255" className="sf-men-map-title">Oil &amp; congestion</text>
+          <text x="60" y="280" className="sf-men-map-copy">Clarify · exfoliate · LED</text>
+        </g>
+        <g className="sf-men-map-card">
+          <rect x="533" y="225" width="225" height="80" rx="10" />
+          <text x="551" y="255" className="sf-men-map-title">Expression lines</text>
+          <text x="551" y="280" className="sf-men-map-copy">Consultation · Jeuveau</text>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 export async function generateMetadata({
   params
 }: {
@@ -153,6 +222,34 @@ export default async function MensSkinCarePage({
               <p>Moisturizer and daily broad-spectrum SPF help support the skin barrier and protect the progress made through professional care.</p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section className="sf-section sf-bordered sf-invert">
+        <div className="sf-wrap">
+          <div className="sf-section-head">
+            <div className="sf-eyebrow">The order matters</div>
+            <h2>Four steps. One routine you can actually keep.</h2>
+            <p>
+              The goal is not a crowded bathroom shelf. It is a sequence that makes sense,
+              protects the barrier, and leaves room for professional care when the concern calls for it.
+            </p>
+          </div>
+          <RoutineDiagram />
+        </div>
+      </section>
+
+      <section className="sf-section sf-bordered">
+        <div className="sf-wrap">
+          <div className="sf-section-head">
+            <div className="sf-eyebrow">Start with the concern</div>
+            <h2>Skin health is not one-size-fits-all.</h2>
+            <p>
+              The same routine does not solve every problem. Use the map as a starting point,
+              then let a consultation decide what belongs in your plan.
+            </p>
+          </div>
+          <ConcernMap />
         </div>
       </section>
 
