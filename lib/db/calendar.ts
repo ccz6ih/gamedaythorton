@@ -24,6 +24,15 @@ export type CalendarEvent = {
   bookedOnline: boolean;
   /** The location's name, ONLY when it is not the practice's usual one. */
   elsewhere?: string | null;
+  /**
+   * The location's id, or null for the usual room.
+   *
+   * Separate from `elsewhere` because that one is deliberately blank for the
+   * default location — it exists to be DISPLAYED, and labelling every row with
+   * the usual address buries the ones that differ. Filtering needs to know the
+   * answer even when there is nothing to show, so it gets its own field.
+   */
+  locationId?: string | null;
 };
 
 export type CalendarWeek = {
@@ -74,6 +83,7 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
         id, starts_at, duration_min, buffer_min, status, intake_complete, booking_channel,
         patient:patient_id ( id, first_name, last_name ),
         service:service_id ( name ),
+        location_id,
         location:location_id ( name, is_default )
       `)
       .gte('starts_at', fromIso)
@@ -90,6 +100,7 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
 
   for (const a of (appts ?? []) as unknown as {
     id: string; starts_at: string; duration_min: number; status: string;
+    location_id: string | null;
     location: { name: string; is_default: boolean } | null;
     intake_complete: boolean; booking_channel: string | null;
     patient: { id: string; first_name: string; last_name: string } | null;
@@ -117,7 +128,8 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
        * every row "The Med Bar" would bury the two that matter under
        * thirty that do not.
        */
-      elsewhere: a.location && !a.location.is_default ? a.location.name : null
+      elsewhere: a.location && !a.location.is_default ? a.location.name : null,
+      locationId: a.location_id ?? null
     });
   }
 

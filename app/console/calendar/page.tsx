@@ -12,6 +12,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getClinic } from '@/lib/db/queries';
 import { getCalendarWeek, weekStart } from '@/lib/db/calendar';
+import { serverClient } from '@/lib/supabase/server';
 import { WeekGrid } from '@/components/WeekGrid';
 import { money } from '@/lib/format';
 
@@ -33,7 +34,7 @@ function shiftDay(date: string, days: number): string {
 export default async function CalendarPage({
   searchParams
 }: {
-  searchParams: Promise<{ week?: string; day?: string }>;
+  searchParams: Promise<{ week?: string; day?: string; at?: string }>;
 }) {
   const params = await searchParams;
   const clinic = await getClinic();
@@ -53,7 +54,45 @@ export default async function CalendarPage({
 
   const week = await getCalendarWeek(clinic, requested);
 
-  const appointments = week.events.filter(e => e.kind === 'appointment');
+  /**
+   * WHERE, as a filter. Everything, by default.
+   *
+   * Seeing the whole week regardless of where each appointment is is the right
+   * default and always was — she is one person and can only be in one place at
+   * a time, so a day with two appointments in two towns is exactly the day she
+   * most needs drawn together rather than split apart.
+   *
+   * The filter is for the other question: "what am I doing at Gameday this
+   * month", when reconciling with them or deciding whether the arrangement is
+   * worth keeping. In the URL like the roster search, so it survives the week
+   * arrows and can be sent to somebody.
+   *
+   * 'base' rather than a uuid for the usual room, because the default location
+   * is recorded as NULL on the appointment — every booking made before
+   * locations existed means "the usual place", and a filter that missed those
+   * would quietly under-report her own studio.
+   */
+  const supabaseForLocations = await serverClient();
+  const { data: locationRows } = await supabaseForLocations
+    .from('location')
+    .select('id, name, is_default')
+    .eq('clinic_id', clinic.id)
+    .eq('active', true)
+    .order('sort_order');
+
+  const locations = (locationRows ?? []) as { id: string; name: string; is_default: boolean }[];
+  const at = params.at ?? '';
+  const defaultLocationId = locations.find(l => l.is_default)?.id ?? null;
+
+  const matchesFilter = (e: { locationId?: string | null }) => {
+    if (!at) return true;
+    const isDefault = !e.locationId || e.locationId === defaultLocationId;
+    return at === 'base' ? isDefault : e.locationId === at;
+  };
+
+  const shown = { ...week, events: week.events.filter(matchesFilter) };
+
+  const appointments = shown.events.filter(e => e.kind === 'appointment');
   const live = appointments.filter(e => e.status !== 'cancelled' && e.status !== 'no_show');
   const online = live.filter(e => e.bookedOnline).length;
   const missingIntake = live.filter(e => !e.intakeComplete).length;
@@ -102,6 +141,36 @@ export default async function CalendarPage({
       </header>
 
       <div className="view wide">
+        {/*
+          Only when there is more than one place to be. A practice with one
+          room does not need a control that always says the same thing.
+
+          Plain links, so the filter lives in the URL: it survives the week
+          arrows, it can be sent to somebody, and the back button works.
+        */}
+        {locations.length > 1 && (
+          <nav className="loc-filter" aria-label="Filter by location">
+            <Link
+              href={`/console/calendar?week=${requested}`}
+              className={`btn sm${at ? '' : ' primary'}`}
+            >
+              Everywhere
+            </Link>
+            {locations.map(l => {
+              const key = l.is_default ? 'base' : l.id;
+              return (
+                <Link
+                  key={l.id}
+                  href={`/console/calendar?week=${requested}&at=${key}`}
+                  className={`btn sm${at === key ? ' primary' : ''}`}
+                >
+                  {l.name}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+
         <div className="cal-title">
           <h2>{validDay ? new Date(validDay + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : label}</h2>
           {validDay ? (

@@ -1235,3 +1235,19 @@ label.inline {
 }
 .cal-row:has(.cal-row-where) { border-left-color: var(--gd-below); }
 .cal-swatch.is-elsewhere { background: var(--gd-below); border-color: var(--gd-below); }
+
+/* ------------------------------------------------------- location filter --
+   Shown only when the practice has more than one place to be. "Everywhere" is
+   the default and stays first, because seeing the whole week together is the
+   normal way to read it — she is one person and cannot be in two towns at
+   once. The filter answers the other question: what am I doing at the partner
+   clinic this month. */
+.loc-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  margin-bottom: var(--gd-4);
+}
+@media (max-width: 640px) {
+  .loc-filter .btn { min-height: 40px; }
+}
