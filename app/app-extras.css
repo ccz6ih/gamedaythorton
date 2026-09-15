@@ -418,7 +418,42 @@ label.inline {
 .cal-title { display: flex; align-items: baseline; gap: var(--gd-4); margin-bottom: var(--gd-4); }
 .cal-title h2 { margin: 0; font-size: var(--gd-step-1); }
 
-.cal { padding: var(--gd-4); }
+/*
+ * .cal IS RESET HERE, NOT JUST RESTYLED — and forgetting that is what made the
+ * phone calendar unreadable.
+ *
+ * app.css still carries the PROTOTYPE's calendar:
+ *
+ *     .cal { display: grid; grid-template-columns: 56px repeat(5, 1fr);
+ *            gap: 1px; min-width: 720px; ... }
+ *
+ * The prototype's staff screens still use it, so it cannot be deleted. But
+ * this file only sets the properties it mentions — so `.cal { padding }` left
+ * `display: grid` and those six columns in force, and the week, the agenda and
+ * the legend were being dropped into them AS GRID ITEMS.
+ *
+ * On a phone that put the agenda in a column a few rem wide: "Consultation |
+ * 15 Minutes" wrapped to one character per line, and the legend sat beside the
+ * appointments instead of under them. It looked like broken CSS because it
+ * was — just not in the rule anybody would have read.
+ *
+ * Every inherited property is therefore cleared explicitly — and the selector
+ * carries `.view` because SOURCE ORDER IS NOT ENOUGH. Next bundles app.css
+ * after app-extras.css, so a bare `.cal` here loses to the prototype's bare
+ * `.cal` no matter which file imports first. Checked in the built bundle, not
+ * assumed.
+ */
+.view .cal {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  min-width: 0;
+  padding: var(--gd-4);
+}
 
 /* The week grid is for wide screens; the agenda replaces it on a phone. Chosen
    in CSS rather than JavaScript so the right one is there on the first paint
@@ -769,7 +804,7 @@ label.inline {
 }
 
 @media (max-width: 880px) {
-  .cal { padding: var(--gd-3) 0; }
+  .view .cal { padding: var(--gd-3) 0; }
   .cal-week { display: none; }
   .cal-agenda { display: block; }
 }
@@ -959,6 +994,35 @@ label.inline {
      1fr, this makes sure nothing in the flow reserves space for it. */
   .shell { grid-template-rows: auto 1fr; }
   .main { min-width: 0; }
+
+  /*
+   * ONE STICKY THING ON A PHONE, AND IT IS THE MENU.
+   *
+   * app.css pins .topbar at `top: 28px` — an offset for the pilot banner —
+   * with z-index 40. The console bar added above it is sticky at top 0 with
+   * z-index 60. So on a phone the page's own header slid UNDER the menu bar
+   * and vanished: on the calendar that is the title and the week arrows, which
+   * is most of what the screen is for.
+   *
+   * Two stacked sticky bars also eat a third of a phone screen before any
+   * content appears. The menu is the one that has to stay; a page title can
+   * scroll away.
+   */
+  .topbar {
+    position: static;
+    top: auto;
+    z-index: auto;
+    /* Four controls and a heading do not fit across 390px in one line. */
+    flex-wrap: wrap;
+    gap: var(--gd-2) var(--gd-3);
+    padding: var(--gd-4);
+  }
+  /* The spacer forces a line break when it is allowed to fill the row, which
+     puts the buttons on their own line under the title rather than squashing
+     both. */
+  .topbar .spacer { flex-basis: 100%; height: 0; }
+  .topbar .row { width: 100%; }
+  .topbar h1 { font-size: var(--gd-step-1); }
 }
 
 /* .sr-only is already defined in app.css and is used here for the toggle's
@@ -1032,3 +1096,34 @@ label.inline {
   font-size: var(--gd-step--1);
 }
 .cal-swatch.st-confirmed { background: var(--gd-accent); border-color: var(--gd-accent); }
+
+/* ---------------------------------------------------------------- search --
+   The roster search. One row on a desktop, full width on a phone — where it
+   matters most, because scrolling thirty-five rows with a thumb to find one
+   person is the thing this replaces. */
+.client-search {
+  display: flex;
+  gap: var(--gd-2);
+  margin: var(--gd-5) 0 var(--gd-3);
+}
+.client-search input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  padding: var(--gd-3) var(--gd-4);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-surface);
+  color: var(--gd-text);
+}
+.client-search input[type="search"]:focus-visible {
+  outline: 2px solid var(--gd-accent);
+  outline-offset: 1px;
+}
+.client-search-result { margin: 0 0 var(--gd-3); font-size: .82rem; }
+
+@media (max-width: 640px) {
+  /* A 44px target and a full-width field: this is used one-handed. */
+  .client-search { flex-wrap: wrap; }
+  .client-search input[type="search"] { flex: 1 1 100%; min-height: 44px; }
+  .client-search .btn { min-height: 44px; }
+}

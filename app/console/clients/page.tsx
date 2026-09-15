@@ -12,11 +12,49 @@ import { signedPhotoUrls } from '@/lib/client-media';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ClientsPage() {
+export default async function ClientsPage(
+  { searchParams }: { searchParams: Promise<{ q?: string }> }
+) {
   const clinic = await getClinic();
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
-  const [clients, bookends] = await Promise.all([getClients(), getVisitBookends()]);
+  const [all, bookends] = await Promise.all([getClients(), getVisitBookends()]);
+
+  /**
+   * Search, in the URL rather than in component state.
+   *
+   * It survives a refresh, it can be sent to somebody, and the back button
+   * behaves — none of which is true of a filter held in the browser. It also
+   * works with JavaScript off, because it is a form that GETs.
+   *
+   * Filtered HERE rather than in the query: thirty-five rows is nothing, the
+   * page already loads all of them for the counts at the top, and a round trip
+   * per keystroke would be slower than the filter it replaces. At a few
+   * thousand this moves into the database.
+   */
+  const q = ((await searchParams).q ?? '').trim();
+  const needle = q.toLowerCase();
+
+  /**
+   * Digits only, and only when there are some.
+   *
+   * The first version compared `phone.replace(/\D/g,'')` against
+   * `needle.replace(/\D/g,'')` unconditionally — so searching "carl" stripped
+   * to an empty string, and `"7208207124".includes("")` is TRUE. Every client
+   * with a phone number matched every text search, which looked exactly like
+   * the filter not running at all.
+   */
+  const digits = needle.replace(/\D/g, '');
+
+  const clients = needle
+    ? all.filter(c =>
+        `${c.first_name} ${c.last_name}`.toLowerCase().includes(needle)
+        || (c.email ?? '').toLowerCase().includes(needle)
+        // The front desk often has a number on screen from a missed call
+        // rather than a name spelled the way it was typed. Three digits is
+        // enough to be a deliberate search and short enough to be useful.
+        || (digits.length >= 3 && (c.phone ?? '').replace(/\D/g, '').includes(digits)))
+    : all;
 
   /**
    * Faces for the roster, signed in ONE call rather than one per row.
@@ -37,7 +75,7 @@ export default async function ClientsPage() {
   // Anyone with no future visit booked. For a practice that lives on rebooking —
   // a lash fill every three weeks, a recheck every seven — this is the single most
   // actionable column on the screen.
-  const noNext = clients.filter(c => !bookends.get(c.id)?.next && c.status === 'active');
+  const noNext = all.filter(c => !bookends.get(c.id)?.next && c.status === 'active');
 
   return (
     <>
@@ -54,7 +92,7 @@ export default async function ClientsPage() {
         <div className="grid g4">
           <div className="stat">
             <div className="lab">Active</div>
-            <div className="stat-val">{clients.filter(c => c.status === 'active').length}</div>
+            <div className="stat-val">{all.filter(c => c.status === 'active').length}</div>
           </div>
           <div className="stat">
             <div className="lab">No next visit</div>
@@ -63,15 +101,46 @@ export default async function ClientsPage() {
           </div>
           <div className="stat">
             <div className="lab">Leads</div>
-            <div className="stat-val">{clients.filter(c => c.status === 'lead').length}</div>
+            <div className="stat-val">{all.filter(c => c.status === 'lead').length}</div>
           </div>
           <div className="stat">
             <div className="lab">Lapsed</div>
             <div className="stat-val">
-              {clients.filter(c => c.status === 'churned' || c.status === 'paused').length}
+              {all.filter(c => c.status === 'churned' || c.status === 'paused').length}
             </div>
           </div>
         </div>
+
+        {/*
+          A plain GET form. No JavaScript, no debounce, no state — type, press
+          enter, the URL changes and the server returns the rows. That makes it
+          refreshable, sendable, and correct with the back button, none of which
+          a filter held in the browser manages.
+
+          type="search" so a phone keyboard offers the right return key and the
+          browser draws its own clear button.
+        */}
+        <form className="client-search" method="GET" role="search">
+          <label className="sr-only" htmlFor="q">Search {words.people.toLowerCase()}</label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={q}
+            placeholder={`Search by name, phone or email`}
+            autoComplete="off"
+          />
+          <button className="btn sm primary" type="submit">Search</button>
+          {q && <Link className="btn sm" href="/console/clients">Clear</Link>}
+        </form>
+
+        {q && (
+          <p className="muted client-search-result">
+            {clients.length === 0
+              ? <>Nothing matches &ldquo;{q}&rdquo;.</>
+              : <>{clients.length} of {all.length} {words.people.toLowerCase()} match &ldquo;{q}&rdquo;.</>}
+          </p>
+        )}
 
         <section className="card flush">
           <div className="table-scroll">
