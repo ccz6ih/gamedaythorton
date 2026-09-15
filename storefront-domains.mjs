@@ -44,6 +44,17 @@ export const STOREFRONT_PATHS = [
   '/facials',
   '/scar-revision',
   '/injectables',
+  /**
+   * Added 15 Sep 2026. It shipped registered in lib/sitemap.ts but NOT here,
+   * so the middleware did not recognise it as a public page and answered
+   * 307 -> /admin. The sitemap was therefore advertising a URL that bounced
+   * every crawler to a sign-in form — caught by npm run test:sitemap, which
+   * fails on a redirect for exactly this reason.
+   *
+   * A new storefront page has to be listed HERE. This file is what the
+   * middleware, the rewrites and the response headers all read.
+   */
+  '/mens-skin-care',
   // Booking. Public by necessity: a person picking a treatment and a time has
   // no account and must never meet a passcode on the way to giving money.
   '/book',
