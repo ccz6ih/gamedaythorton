@@ -188,6 +188,14 @@ export type ActivityItem = {
   href: string;
   /** Wants doing something about, as opposed to just worth knowing. */
   actionable: boolean;
+  /**
+   * The item carries something to READ rather than somewhere to go.
+   *
+   * An enquiry is the only kind where the interesting content is the item
+   * itself; a booking or a cancellation is a pointer to a chart. Expandable
+   * ones open in place instead of navigating away from the feed.
+   */
+  expandable?: boolean;
 };
 
 export async function getActivity(sinceHours = 72): Promise<ActivityItem[]> {
@@ -272,9 +280,21 @@ export async function getActivity(sinceHours = 72): Promise<ActivityItem[]> {
       at: l.created_at,
       kind: 'enquiry',
       what: `${l.name} got in touch`,
-      detail: l.message ? l.message.slice(0, 90) : 'No message',
+      /**
+       * The WHOLE message.
+       *
+       * It was cut at 90 characters, and the link went to the clients LIST —
+       * so the one item in this feed that carries something to read was the
+       * one item you could not read, and clicking it took you somewhere that
+       * did not contain it either. An enquiry is a few sentences from somebody
+       * asking to spend money; there is no version of that worth truncating.
+       */
+      detail: l.message?.trim() || 'No message',
       href: '/console/clients',
-      actionable: true
+      actionable: true,
+      // Marks it as something to READ rather than somewhere to go. The feed
+      // renders these expandable in place instead of as a link.
+      expandable: true
     });
   }
 

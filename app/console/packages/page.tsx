@@ -14,7 +14,12 @@ import { money, dateLabel, daysUntil, titleCase } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PackagesPage() {
+export default async function PackagesPage({
+  searchParams
+}: {
+  searchParams: Promise<{ saved?: string; error?: string }>;
+}) {
+  const params = await searchParams;
   const clinic = await getClinic();
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
@@ -37,9 +42,12 @@ export default async function PackagesPage() {
         </div>
         <div className="spacer" />
         <span className="pill">{open.length} open</span>
+        <Link className="btn primary" href="/console/packages/new">Sell package</Link>
       </header>
 
       <div className="view wide">
+        {params.saved && <div className="note-band" style={{ marginBottom: 'var(--gd-5)' }}>Package sale recorded.</div>}
+        {params.error && <div className="note-band critical" style={{ marginBottom: 'var(--gd-5)' }}>{params.error}</div>}
         <div className="grid g4">
           <div className="stat hero">
             <div className="lab">Outstanding liability</div>

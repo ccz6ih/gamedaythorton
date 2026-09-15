@@ -9,11 +9,13 @@
 import Link from 'next/link';
 import { getClinic, getPayments } from '@/lib/db/queries';
 import { money, dateLabel, titleCase } from '@/lib/format';
+import { stripeMode } from '@/lib/stripe';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PaymentsPage() {
   const clinic = await getClinic();
+  const mode = stripeMode();
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
   const payments = await getPayments();
@@ -38,7 +40,21 @@ export default async function PaymentsPage() {
           <h1>Payments</h1>
         </div>
         <div className="spacer" />
-        <span className="pill" data-tone="warn"><i className="dot" />Stripe test mode</span>
+        {/*
+          Was a hard-coded "Stripe test mode" pill with no condition on it, so
+          it said test mode while the practice was taking real money. On the
+          one screen about money, a badge that is always wrong trains the
+          reader to ignore it — including on the day it is right.
+
+          Live is the normal state and gets no badge. Something to say only
+          when something is off.
+        */}
+        {mode === 'test' && (
+          <span className="pill" data-tone="warn"><i className="dot" />Stripe test mode</span>
+        )}
+        {mode === 'unconfigured' && (
+          <span className="pill" data-tone="critical"><i className="dot" />Stripe not configured</span>
+        )}
       </header>
 
       <div className="view wide">

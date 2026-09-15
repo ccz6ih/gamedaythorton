@@ -182,6 +182,25 @@ export function verifyWebhook(rawBody: string, signature: string): Stripe.Event 
  * turns the whole deployment back into a rehearsal, and it is still the one
  * deliberate act required before any real money moves.
  */
+/**
+ * Which Stripe mode this deployment is actually in.
+ *
+ * The payments screen hard-coded a "Stripe test mode" badge — a literal span
+ * with no condition on it — so it announced test mode while the practice was
+ * taking real money. On the one screen whose entire job is money, a badge that
+ * is always wrong is worse than no badge: it teaches the reader to ignore the
+ * thing that would matter on the day it is right.
+ *
+ * Never returns the key or any part of it.
+ */
+export type StripeMode = 'live' | 'test' | 'unconfigured';
+
+export function stripeMode(): StripeMode {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return 'unconfigured';
+  return key.startsWith('sk_test_') ? 'test' : 'live';
+}
+
 export type MoneyClinic = { slug: string; pilot_mode?: boolean | null };
 
 export type MoneyVerdict =

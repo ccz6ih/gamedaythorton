@@ -71,10 +71,30 @@ export function ActivityFeed({ items, hours }: { items: ActivityItem[]; hours: n
           {items.map(item => (
             <li className={`feed-item k-${item.kind}${item.actionable ? ' is-actionable' : ''}`} key={item.id}>
               <span className="feed-ico" aria-hidden="true">{ICON[item.kind]}</span>
-              <Link href={item.href} className="feed-main">
-                <span className="feed-what">{item.what}</span>
-                {item.detail && <span className="feed-detail">{item.detail}</span>}
-              </Link>
+              {/*
+                An enquiry opens where it is; everything else is a pointer.
+
+                Clicking "Sidney Cobb got in touch" used to navigate to the
+                clients LIST — away from the feed, to a page that did not
+                contain the message, which had been cut at 90 characters
+                anyway. The one item worth reading was the one you could not
+                read. Native <details>, so it works without JavaScript and
+                reads correctly to a screen reader.
+              */}
+              {item.expandable ? (
+                <details className="feed-main feed-expand">
+                  <summary>
+                    <span className="feed-what">{item.what}</span>
+                    {item.detail && <span className="feed-detail">{item.detail}</span>}
+                  </summary>
+                  {item.detail && <p className="feed-full">{item.detail}</p>}
+                </details>
+              ) : (
+                <Link href={item.href} className="feed-main">
+                  <span className="feed-what">{item.what}</span>
+                  {item.detail && <span className="feed-detail">{item.detail}</span>}
+                </Link>
+              )}
               <time className="feed-when" dateTime={item.at}>{ago(item.at)}</time>
             </li>
           ))}

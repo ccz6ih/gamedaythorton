@@ -18,6 +18,7 @@ import { serverClient } from '@/lib/supabase/server';
 import { signedPhotoUrls } from '@/lib/client-media';
 import { ClientNotes, type NoteRow } from '@/components/ClientNotes';
 import { ClientPhoto } from '@/components/ClientPhoto';
+import { redeemPackage } from '@/app/console/packages/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,8 +29,15 @@ type TimelineEvent = {
   detail?: string | null;
 };
 
-export default async function ChartPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ChartPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
+}) {
   const { id } = await params;
+  const feedback = await searchParams;
   const clinic = await getClinic();
   const chart = await getChart(id);
 
@@ -189,6 +197,9 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
       </header>
 
       <div className="view wide">
+        {feedback.saved === 'package' && <div className="note-band" style={{ marginBottom: 'var(--gd-5)' }}>Package sale recorded.</div>}
+        {feedback.saved === 'redemption' && <div className="note-band" style={{ marginBottom: 'var(--gd-5)' }}>Package session redeemed.</div>}
+        {feedback.error && <div className="note-band critical" style={{ marginBottom: 'var(--gd-5)' }}>{feedback.error}</div>}
         <section className={`card${adverse ? ' critical' : ''}`}>
           <div className="row" style={{ gap: '1rem', alignItems: 'flex-start' }}>
             <ClientPhoto patientId={id} name={name} url={faceUrl} />
@@ -263,6 +274,13 @@ export default async function ChartPage({ params }: { params: Promise<{ id: stri
                           <> · expires {dateLabel(String(pk.expires_on), 'md')} ({days} days)</>
                         )}
                       </span>
+                    </span>
+                    <span className="side">
+                      <form action={redeemPackage}>
+                        <input type="hidden" name="patient_id" value={id} />
+                        <input type="hidden" name="purchase_id" value={String(pk.id)} />
+                        <button className="btn sm" type="submit">Redeem 1</button>
+                      </form>
                     </span>
                   </div>
                 );

@@ -24,10 +24,16 @@ function shiftWeek(startDate: string, weeks: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function shiftDay(date: string, days: number): string {
+  const d = new Date(date + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default async function CalendarPage({
   searchParams
 }: {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; day?: string }>;
 }) {
   const params = await searchParams;
   const clinic = await getClinic();
@@ -35,10 +41,13 @@ export default async function CalendarPage({
 
   const tz = clinic.timezone || 'America/Denver';
   const thisWeek = weekStart(new Date(), tz);
+  const validDay = params.day && /^\d{4}-\d{2}-\d{2}$/.test(params.day) ? params.day : null;
 
   // Only accept a date we generated. A hand-typed value would otherwise decide
   // what the query asks for.
-  const requested = params.week && /^\d{4}-\d{2}-\d{2}$/.test(params.week)
+  const requested = validDay
+    ? weekStart(new Date(validDay + 'T12:00:00'), tz)
+    : params.week && /^\d{4}-\d{2}-\d{2}$/.test(params.week)
     ? weekStart(new Date(params.week + 'T12:00:00'), tz)
     : thisWeek;
 
@@ -74,17 +83,30 @@ export default async function CalendarPage({
         </div>
         <div className="spacer" />
         <div className="row tight">
-          <Link className="btn sm" href={`/console/calendar?week=${shiftWeek(requested, -1)}`}>&lsaquo;</Link>
-          <Link className="btn sm" href="/console/calendar">This week</Link>
-          <Link className="btn sm" href={`/console/calendar?week=${shiftWeek(requested, 1)}`}>&rsaquo;</Link>
+          {validDay ? (
+            <>
+              <Link className="btn sm" href={`/console/calendar?day=${shiftDay(validDay, -1)}`}>&lsaquo;</Link>
+              <Link className="btn sm" href={`/console/calendar?day=${shiftDay(validDay, 1)}`}>&rsaquo;</Link>
+              <Link className="btn sm" href={`/console/calendar?week=${requested}`}>Week</Link>
+            </>
+          ) : (
+            <>
+              <Link className="btn sm" href={`/console/calendar?week=${shiftWeek(requested, -1)}`}>&lsaquo;</Link>
+              <Link className="btn sm" href="/console/calendar">This week</Link>
+              <Link className="btn sm" href={`/console/calendar?week=${shiftWeek(requested, 1)}`}>&rsaquo;</Link>
+              <Link className="btn sm" href={`/console/calendar?day=${requested}`}>Day</Link>
+            </>
+          )}
           <Link className="btn sm primary" href="/console/book">Book</Link>
         </div>
       </header>
 
       <div className="view wide">
         <div className="cal-title">
-          <h2>{label}</h2>
-          {requested !== thisWeek && (
+          <h2>{validDay ? new Date(validDay + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : label}</h2>
+          {validDay ? (
+            <Link href={requested === thisWeek ? '/console/calendar' : `/console/calendar?week=${requested}`} className="banner-link">back to week</Link>
+          ) : requested !== thisWeek && (
             <Link href="/console/calendar" className="banner-link">back to this week</Link>
           )}
         </div>
@@ -119,7 +141,7 @@ export default async function CalendarPage({
         </div>
 
         <section className="card flush" style={{ marginTop: 'var(--gd-5)' }}>
-          <WeekGrid week={week} />
+          <WeekGrid week={week} focusDate={validDay} />
         </section>
 
         {live.length === 0 && (

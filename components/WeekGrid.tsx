@@ -75,7 +75,8 @@ const CANCELLED = new Set(['cancelled', 'no_show']);
 type Day = { date: string; label: string; dow: string; isToday: boolean; open: boolean };
 
 export function WeekGrid({
-  week
+  week,
+  focusDate
 }: {
   week: {
     startDate: string;
@@ -84,6 +85,7 @@ export function WeekGrid({
     firstHour: number;
     lastHour: number;
   };
+  focusDate?: string | null;
 }) {
   const router = useRouter();
 
@@ -146,8 +148,11 @@ export function WeekGrid({
     return () => clearInterval(t);
   }, []);
 
-  const openDays = week.days.filter(d => d.open);
-  const closedDays = week.days.filter(d => !d.open);
+  const visibleDays = focusDate
+    ? week.days.filter(d => d.date === focusDate)
+    : week.days;
+  const openDays = visibleDays.filter(d => d.open);
+  const closedDays = visibleDays.filter(d => !d.open);
   const total = week.events.filter(e => !CANCELLED.has(e.status)).length;
 
   function EventButton({ e }: { e: CalendarEvent }) {
@@ -181,7 +186,7 @@ export function WeekGrid({
   }
 
   return (
-    <div className="cal">
+    <div className={`cal${focusDate ? ' cal-day-view' : ''}`}>
       {/* ------------------------------------------------ wide screens -- */}
       <div className="cal-week" aria-hidden={false}>
         <div className="cal-grid" style={{ height: px(height + 42) }}>
