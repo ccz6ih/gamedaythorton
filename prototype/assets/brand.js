@@ -27,6 +27,7 @@
   var GD = window.GD = window.GD || {};
 
   var FONTS = {
+    calSans: { label: 'Cal Sans — clean geometric', stack: '"Cal Sans", "Montserrat", sans-serif' },
     system: { label: 'System (Inter-like)', stack: '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' },
     grotesk: { label: 'Grotesque', stack: '"Helvetica Neue", Helvetica, Arial, sans-serif' },
     serif: { label: 'Serif', stack: 'Georgia, "Times New Roman", serif' },

@@ -41,6 +41,11 @@ const GOOGLE = 'https://fonts.googleapis.com/css2';
  */
 const ALLOWED: { match: RegExp; family: string; axes: string }[] = [
   {
+    match: /cal\s*sans/i,
+    family: 'Cal Sans',
+    axes: 'wght@400;500;600;700'
+  },
+  {
     match: /cormorant\s*garamond/i,
     family: 'Cormorant Garamond',
     // Italic is used by the display headings (<i> inside .sf-display).

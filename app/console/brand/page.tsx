@@ -109,6 +109,7 @@ async function savePortrait(formData: FormData) {
 }
 
 const FONTS = [
+  { value: '"Cal Sans", "Montserrat", sans-serif', label: 'Cal Sans — clean geometric' },
   { value: '"Inter", system-ui, sans-serif', label: 'Inter — plain and modern' },
   { value: '"Cormorant Garamond", Georgia, serif', label: 'Cormorant — elegant serif' },
   { value: 'Georgia, "Times New Roman", serif', label: 'Georgia — classic serif' },

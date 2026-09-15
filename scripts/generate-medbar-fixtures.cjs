@@ -90,8 +90,8 @@ const clinic = {
     accent: '#d9a88c',
     accentInk: '#1a1513',
     radius: 14,
-    font: '"Cormorant Garamond", Georgia, serif',
-    displayFont: '"Cormorant Garamond", Georgia, serif',
+    font: '"Cal Sans", "Montserrat", sans-serif',
+    displayFont: '"Cal Sans", "Montserrat", sans-serif',
     surface: 'dark',
     // A med spa has no reason to inherit a sports metaphor.
     sportsVocabulary: false

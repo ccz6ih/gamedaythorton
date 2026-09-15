@@ -40,6 +40,7 @@ type BrandKit = {
 };
 
 const FONTS: Record<string, string> = {
+  calSans: '"Cal Sans", "Montserrat", sans-serif',
   system: '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   grotesk: '"Helvetica Neue", Helvetica, Arial, sans-serif',
   serif: 'Georgia, "Times New Roman", serif',
