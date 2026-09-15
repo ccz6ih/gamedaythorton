@@ -282,11 +282,10 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
             <div>
               <div className="sf-lash-orbit" aria-label="Classic, Hybrid, and Volume lash extensions">
                 <svg viewBox="0 0 260 112" aria-hidden="true" focusable="false">
-                  <path className="sf-lash-orbit-eye" d="M22 60 C72 16 188 16 238 60 C188 104 72 104 22 60 Z" />
-                  <path className="sf-lash-orbit-lid" d="M22 60 C72 16 188 16 238 60" />
-                  <path className="sf-lash-orbit-lash" d="M73 29 L61 9 M91 22 L84 1 M110 19 L108 0 M129 19 L132 0 M148 22 L155 1 M166 29 L178 9" />
-                  <circle className="sf-lash-orbit-pupil" cx="130" cy="60" r="16" />
-                  <circle className="sf-lash-orbit-light" cx="136" cy="54" r="3" />
+                  <path className="sf-lash-orbit-baseline" d="M46 78 C95 87 165 87 214 78" />
+                  <path className="sf-lash-orbit-fan" d="M130 78 C112 64 88 47 57 42 M130 78 C115 57 99 35 79 20 M130 78 C123 51 116 26 111 7 M130 78 C137 51 144 26 149 7 M130 78 C145 57 161 35 181 20 M130 78 C148 64 172 47 203 42" />
+                  <path className="sf-lash-orbit-detail" d="M130 78 C105 71 79 66 51 66 M130 78 C155 71 181 66 209 66" />
+                  <circle className="sf-lash-orbit-light" cx="130" cy="78" r="2.5" />
                 </svg>
                 <span className="sf-lash-orbit-label" aria-hidden="true">
                   <span>CLASSIC</span><span>HYBRID</span><span>VOLUME</span>
