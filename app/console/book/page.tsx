@@ -22,6 +22,7 @@ import { getClinic, getServices, getClients } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { requireStaff, pilotFields, text, requiredText, int, formMessage } from '@/lib/actions';
 import { dateLabel, timeLabel, priceLabel } from '@/lib/format';
+import { localToInstant, DEFAULT_TZ } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,13 +60,35 @@ async function book(formData: FormData) {
       .maybeSingle();
     if (!service) throw new Error('That service no longer exists.');
 
+    // The practice's own zone. The clinic row carries it; America/Denver is the
+    // fallback and is what every other time in this codebase already assumes.
+    const { data: tzRow } = await supabase
+      .from('clinic')
+      .select('timezone')
+      .eq('id', staff.clinicId)
+      .maybeSingle();
+    const timeZone = tzRow?.timezone || DEFAULT_TZ;
+
     const { error } = await supabase.from('appointment').insert({
       clinic_id: staff.clinicId,
       patient_id: patientId,
       service_id: serviceId,
       provider_id: text(formData, 'provider_id'),
-      // Naive local time. The practice's timezone is what a wall clock means here.
-      starts_at: `${date}T${time}:00`,
+      /**
+       * The practice's wall clock, converted to a real instant.
+       *
+       * This was `${date}T${time}:00` — a naive string into a timestamptz
+       * column, which Postgres reads in the SERVER's zone. On Supabase that is
+       * UTC, so a receptionist typing 9:00 stored 09:00 UTC and the calendar
+       * showed 3:00 in the morning. It was found on a live booking: a client's
+       * second hair-restoration session, sitting at 3am.
+       *
+       * The public booking path never had this bug — app.book_appointment does
+       * `at time zone` in SQL — so appointments clients made themselves were
+       * right and appointments the practice made were six hours out. The worst
+       * way round, because the staff ones are the ones staff trust.
+       */
+      starts_at: localToInstant(date, time, timeZone),
       duration_min: service.duration_min,
       buffer_min: service.buffer_after_min,
       status: 'booked',
