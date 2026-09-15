@@ -1,39 +1,38 @@
 /**
- * app/c/[slug]/sitemap.ts — every page worth finding.
+ * lib/sitemap.ts — every page worth finding, for one practice.
  *
  * GENERATED, because the product pages are rows in a table. A hand-written XML
  * file would have listed eighteen products on the day it was written and none
- * of the ones added since, which is worse than not having one — a stale sitemap
+ * of the ones added since, which is worse than not having one: a stale sitemap
  * actively tells a crawler that pages it can see do not exist.
  *
- * Only the indexable paths appear. The basket and the receipt are deliberately
- * absent for the same reason they carry noindex: they are per-visitor pages a
+ * Only indexable paths appear. The basket and the receipt are deliberately
+ * absent for the same reason they carry noindex — they are per-visitor pages a
  * crawler would fetch empty.
+ *
+ * The URL-building lives here rather than in the route so that the route is
+ * only responsible for deciding WHICH practice it is serving.
  */
 
 import type { MetadataRoute } from 'next';
 import { getStorefront, getStorefrontProducts, getStorefrontServices } from '@/lib/db/storefront';
 import { PRF_TREATMENTS } from '@/lib/prf-content';
 
-export const dynamic = 'force-dynamic';
-
-export async function generateSitemaps() {
-  // One sitemap per practice. Next requires this even for a single entry when
-  // the route is inside a dynamic segment.
-  return [{ id: 0 }];
-}
-
-export default async function sitemap(
-  { params }: { params: Promise<{ slug: string }> }
-): Promise<MetadataRoute.Sitemap> {
-  const { slug } = await params;
+/**
+ * The practice's sitemap, or an empty one.
+ *
+ * Empty rather than a 404 when the practice is not live: a sitemap that
+ * responds and lists nothing is a true statement, and it keeps the URL in
+ * robots.txt honest. A 404 there tells Search Console the site is misconfigured.
+ */
+export async function sitemapFor(slug: string, origin: string): Promise<MetadataRoute.Sitemap> {
   const clinic = await getStorefront(slug);
 
   // A practice that has not said its site is live does not get listed. Same
   // rule as the robots meta tag, from the same column.
   if (!clinic || !clinic.live) return [];
 
-  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.medbarco.com').replace(/\/$/, '');
+  const base = origin.replace(/\/$/, '');
   const now = new Date();
 
   const pages: MetadataRoute.Sitemap = [
