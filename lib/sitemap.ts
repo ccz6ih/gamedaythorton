@@ -42,6 +42,7 @@ export async function sitemapFor(slug: string, origin: string): Promise<Metadata
     { url: `${base}/prf/compare`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/prf/aftercare`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/facials`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${base}/mens-skin-care`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/led-light-therapy`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/scar-revision`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/injectables`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
