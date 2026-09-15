@@ -190,6 +190,9 @@ export default async function ChartPage({
               Record treatment
             </Link>
           )}
+          {hasModule(clinic, 'treatment_records') && (
+            <Link className="btn sm" href={`/console/clients/${id}/photos`}>Progress photos</Link>
+          )}
           {hasModule(clinic, 'labs') && (
             <Link className="btn sm primary" href={`/console/labs?patient=${id}`}>Enter labs</Link>
           )}

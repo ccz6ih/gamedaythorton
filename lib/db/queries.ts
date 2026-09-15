@@ -175,6 +175,13 @@ export type TodayRow = {
   patient: { id: string; first_name: string; last_name: string } | null;
   service: { name: string; category: string } | null;
   provider: { name: string } | null;
+  /**
+   * Where, when it is not the usual room.
+   *
+   * This is the screen she opens in the morning to see what the day holds, so
+   * it is the one that most needs to say "the two o'clock is in Northglenn".
+   */
+  location: { name: string; is_default: boolean } | null;
 };
 
 export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow[]> {
@@ -188,7 +195,8 @@ export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow
       id, starts_at, duration_min, status, room, intake_complete,
       patient:patient_id ( id, first_name, last_name ),
       service:service_id ( name, category ),
-      provider:provider_id ( name )
+      provider:provider_id ( name ),
+      location:location_id ( name, is_default )
     `)
     .gte('starts_at', day + 'T00:00:00')
     .lte('starts_at', day + 'T23:59:59')

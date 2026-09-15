@@ -177,6 +177,9 @@ export function WeekGrid({
             {!e.intakeComplete && <i className="cal-dot intake" title="Intake incomplete" />}
           </span>
           {e.subtitle && <span className="cal-row-what">{e.subtitle}</span>}
+          {/* Where, when it is not the usual room. The one thing on this row
+              that changes what time she has to leave the house. */}
+          {e.elsewhere && <span className="cal-row-where">{e.elsewhere}</span>}
           {/* Spelled out rather than conveyed by a strikethrough nobody can
               read at 40% opacity. */}
           {cancelled && <span className="cal-row-flag">{e.status === 'no_show' ? 'No show' : 'Cancelled'}</span>}
@@ -261,6 +264,12 @@ export function WeekGrid({
                         {mins >= 40 && e.subtitle && (
                           <span className="cal-event-what">{e.subtitle}</span>
                         )}
+                        {/* Shown at ANY height, unlike the treatment name.
+                            A fifteen-minute slot somewhere else is exactly the
+                            one you cannot afford to miss. */}
+                        {e.elsewhere && (
+                          <span className="cal-event-where">{e.elsewhere}</span>
+                        )}
                       </button>
                     );
                   })}
@@ -322,6 +331,7 @@ export function WeekGrid({
       </div>
 
       <p className="cal-key">
+        <span><i className="cal-swatch is-elsewhere" /> somewhere other than the studio</span>
         <span><i className="cal-swatch st-confirmed" /> confirmed by the client</span>
         <span><i className="cal-dot online" /> booked online</span>
         <span><i className="cal-dot intake" /> intake incomplete</span>

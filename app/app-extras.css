@@ -805,6 +805,33 @@ label.inline {
   color: var(--gd-text-dim);
 }
 
+/* Progress-photo and inventory surfaces are deliberately card-based: on a
+   phone the staff member is usually holding the device in the treatment room,
+   so the next action must remain visible without horizontal scrolling. */
+.photo-series-list { display: grid; gap: var(--gd-4); }
+.photo-series-card { display: grid; grid-template-columns: 7rem 1fr; gap: var(--gd-4); align-items: start; }
+.photo-series-image,
+.photo-comparison-image { background: var(--gd-surface-sunken); border: 1px solid var(--gd-border); border-radius: var(--gd-r-sm); overflow: hidden; }
+.photo-series-image { aspect-ratio: 3 / 4; display: grid; place-items: center; color: var(--gd-text-dim); font-size: .72rem; }
+.photo-series-image img,
+.photo-comparison-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gd-4); }
+.photo-comparison figure { margin: 0; min-width: 0; }
+.photo-comparison-image { aspect-ratio: 3 / 4; display: grid; place-items: center; color: var(--gd-text-dim); font-size: .75rem; text-align: center; }
+.photo-comparison figcaption { margin-top: var(--gd-2); font-size: .76rem; line-height: 1.45; color: var(--gd-text-muted); }
+.photo-comparison figcaption b { color: var(--gd-text); }
+
+@media (max-width: 520px) {
+  .photo-series-card { grid-template-columns: 5.25rem 1fr; gap: var(--gd-3); }
+  .photo-comparison { grid-template-columns: 1fr; }
+  .photo-comparison figure { display: grid; grid-template-columns: 7rem 1fr; gap: var(--gd-3); align-items: end; }
+  .photo-comparison figcaption { margin-top: 0; }
+  .table-scroll form { display: grid !important; grid-template-columns: 1fr 1fr; }
+  .table-scroll form input { width: 100% !important; }
+  .table-scroll form select,
+  .table-scroll form button { width: 100%; }
+}
+
 @media (max-width: 880px) {
   .view .cal { padding: var(--gd-3) 0; }
   .cal-week { display: none; }
@@ -1130,6 +1157,30 @@ label.inline {
   .client-search .btn { min-height: 44px; }
 }
 
+/* The console is used one-handed at the front desk. At 400px, preserving the
+   desktop card padding steals the width needed by the actual controls. Keep
+   the hierarchy, give the content the room, and let action groups stack. */
+@media (max-width: 520px) {
+  .view { padding: var(--gd-3); }
+  .card { padding: var(--gd-4); border-radius: var(--gd-r-md); }
+  .card.flush > .card-head { padding: var(--gd-4) var(--gd-4) 0; }
+  .card.flush > .note-band,
+  .card.flush > p { margin-left: var(--gd-4); margin-right: var(--gd-4); }
+  .topbar { padding-left: var(--gd-3); padding-right: var(--gd-3); }
+  .topbar .row { gap: var(--gd-2); }
+  .topbar .row .btn { flex: 1 1 auto; }
+  .actions,
+  .sf-actions { width: 100%; }
+  .actions .btn,
+  .actions > button,
+  .actions > a { width: 100%; }
+  .card-head { gap: var(--gd-2); }
+  .card-head p { line-height: 1.45; }
+  .note-band { overflow-wrap: anywhere; }
+  .table-scroll { margin-left: calc(-1 * var(--gd-4)); margin-right: calc(-1 * var(--gd-4)); }
+  .card.flush .table-scroll { margin-left: 0; margin-right: 0; }
+}
+
 /* ------------------------------------------------------- feed: enquiries --
    An enquiry is the one feed item whose content IS the point, so it opens in
    place rather than navigating to a chart that does not contain it. Closed, it
@@ -1151,3 +1202,36 @@ label.inline {
   color: var(--gd-text-muted);
   white-space: pre-wrap;
 }
+
+/* ------------------------------------------------------- away from base --
+   Jamie splits her week between her own studio and a partner clinic, and which
+   is unpredictable. The client's confirmation carries the address; this is the
+   other half — her own calendar saying which afternoon she is somewhere else.
+
+   Only drawn when it is NOT the usual room. Labelling every row "The Med Bar"
+   would bury the two that matter under thirty that do not. */
+.cal-event-where,
+.cal-row-where {
+  display: inline-block;
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--brand-accent-ink);
+  background: var(--gd-below);
+  border-radius: var(--gd-r-full);
+  padding: .05rem .4rem;
+  margin-top: .15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.cal-row-where { font-size: .64rem; }
+/* The whole block is tinted too, so it reads as different before anything is
+   read. A pill alone is easy to skim past on a busy week. */
+.cal-event:has(.cal-event-where) {
+  border-left-color: var(--gd-below);
+  border-color: color-mix(in srgb, var(--gd-below) 45%, var(--gd-border));
+}
+.cal-row:has(.cal-row-where) { border-left-color: var(--gd-below); }
+.cal-swatch.is-elsewhere { background: var(--gd-below); border-color: var(--gd-below); }

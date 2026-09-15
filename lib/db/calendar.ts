@@ -22,6 +22,8 @@ export type CalendarEvent = {
   patientId: string | null;
   intakeComplete: boolean;
   bookedOnline: boolean;
+  /** The location's name, ONLY when it is not the practice's usual one. */
+  elsewhere?: string | null;
 };
 
 export type CalendarWeek = {
@@ -71,7 +73,8 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
       .select(`
         id, starts_at, duration_min, buffer_min, status, intake_complete, booking_channel,
         patient:patient_id ( id, first_name, last_name ),
-        service:service_id ( name )
+        service:service_id ( name ),
+        location:location_id ( name, is_default )
       `)
       .gte('starts_at', fromIso)
       .lt('starts_at', toIso)
@@ -87,6 +90,7 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
 
   for (const a of (appts ?? []) as unknown as {
     id: string; starts_at: string; duration_min: number; status: string;
+    location: { name: string; is_default: boolean } | null;
     intake_complete: boolean; booking_channel: string | null;
     patient: { id: string; first_name: string; last_name: string } | null;
     service: { name: string } | null;
@@ -103,7 +107,17 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
       subtitle: a.service?.name ?? null,
       patientId: a.patient?.id ?? null,
       intakeComplete: a.intake_complete === true,
-      bookedOnline: a.booking_channel === 'online'
+      bookedOnline: a.booking_channel === 'online',
+      /**
+       * Only when it is NOT the usual room.
+       *
+       * The client's confirmation already carries the address; this is the
+       * other half, and the half that was missing — Jamie looking at her own
+       * week needs to know which afternoon she is somewhere else. Labelling
+       * every row "The Med Bar" would bury the two that matter under
+       * thirty that do not.
+       */
+      elsewhere: a.location && !a.location.is_default ? a.location.name : null
     });
   }
 

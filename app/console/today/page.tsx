@@ -114,6 +114,21 @@ export default async function TodayPage({
                       {row.status === 'complete' && (
                         <span className="pill" data-tone="ok"><i className="dot" />done</span>
                       )}
+                      {/*
+                        Next to the name, not buried in the sub-line with the
+                        duration and the room number.
+
+                        This is the screen she opens in the morning, and the
+                        only fact on it that changes what time she has to leave
+                        the house. It is drawn only when the appointment is NOT
+                        at the usual place — marking every row "The Med Bar"
+                        would bury the one that matters.
+                      */}
+                      {row.location && !row.location.is_default && (
+                        <span className="pill" data-tone="warn">
+                          <i className="dot" />{row.location.name}
+                        </span>
+                      )}
                     </span>
                     <span className="sub">
                       {row.service?.name ?? titleCase(row.status)}

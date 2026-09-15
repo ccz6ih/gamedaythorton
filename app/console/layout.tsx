@@ -73,6 +73,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { href: '/console/labs', label: 'Lab entry', icon: '⚗', when: hasModule(clinic, 'labs') },
     { href: '/console/safety', label: 'Safety queue', icon: '⚠', when: hasModule(clinic, 'safety_queue') },
     { href: '/console/treatments', label: 'Treatment records', icon: '✎', when: hasModule(clinic, 'treatment_records') },
+    { href: '/console/inventory', label: 'Inventory & lots', icon: '▥', when: hasModule(clinic, 'treatment_records') },
     { group: 'Money' },
     { href: '/console/charge', label: 'Take a payment', icon: '＄' },
     { href: '/console/packages', label: 'Packages', icon: '◱', when: hasModule(clinic, 'packages') },
