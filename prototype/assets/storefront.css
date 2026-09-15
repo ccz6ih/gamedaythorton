@@ -4895,7 +4895,7 @@
 /* Homepage lash feature: a quiet eye-line with the three available looks in orbit. */
 .sf-lash-orbit {
   position: relative;
-  width: min(260px, 72vw);
+  width: min(220px, 62vw);
   margin-bottom: var(--gd-5);
   color: var(--gd-accent);
 }
@@ -4913,8 +4913,8 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.sf-lash-orbit-baseline { stroke-width: 1; opacity: .32; }
-.sf-lash-orbit-fan { stroke-width: 1.7; opacity: .82; }
+.sf-lash-orbit-baseline { stroke-width: 1; opacity: .3; }
+.sf-lash-orbit-fan { stroke-width: 1.7; opacity: .84; }
 .sf-lash-orbit-detail { stroke-width: 1; opacity: .45; }
 .sf-lash-orbit-light {
   fill: currentColor;
@@ -4923,7 +4923,7 @@
 .sf-lash-orbit-label {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 67%;
   display: grid;
   width: 7rem;
   transform: translate(-50%, -50%);
