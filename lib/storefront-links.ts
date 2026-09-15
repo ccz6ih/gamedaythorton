@@ -51,6 +51,31 @@ export async function storefrontBase(slug: string): Promise<string> {
 }
 
 /**
+ * The absolute origin to publish URLs under.
+ *
+ * Structured data and sitemaps list absolute URLs, and three different places
+ * had each invented their own way of deciding what that origin was. Two of
+ * them read NEXT_PUBLIC_APP_URL, which is localhost in development — so the
+ * JSON-LD on every product page was advertising http://localhost:3000 images
+ * to anything that read it locally, and would advertise whatever that variable
+ * happened to say in production.
+ *
+ * One rule, matching the sitemap's: if the hostname that asked is a practice's
+ * own domain, that is the answer and it stays right for every tenant without
+ * anybody configuring anything. Otherwise fall back to the configured address,
+ * which is what preview deployments and local development get.
+ */
+export async function siteOrigin(): Promise<string> {
+  const host = (await headers()).get('host');
+  const bare = (host ?? '').split(':')[0]?.toLowerCase() ?? '';
+
+  if (bare && bare in (STOREFRONT_DOMAINS as Record<string, string>)) {
+    return `https://${bare}`;
+  }
+  return (process.env.NEXT_PUBLIC_APP_URL || 'https://www.medbarco.com').replace(/\/$/, '');
+}
+
+/**
  * Links for a storefront, built once per page.
  *
  * Returned as an object rather than assembled inline at each call site because

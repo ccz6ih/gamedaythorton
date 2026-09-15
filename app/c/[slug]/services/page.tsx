@@ -28,10 +28,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, getStorefrontServices, groupByCategory } from '@/lib/db/storefront';
-import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { ServiceIcon } from '@/components/ServiceIcon';
 import { priceLabel, titleCase, money } from '@/lib/format';
 import { PRF_TREATMENTS } from '@/lib/prf-content';
+import { serviceJsonLd, ldScript } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -69,8 +70,40 @@ export default async function StorefrontServices({ params }: { params: Promise<{
   const anyQuoted = services.some(s => s.price_mode === 'quoted' || s.price_mode === 'from');
   const anyDeposit = services.some(s => s.deposit_cents);
 
+  /**
+   * The treatment menu, as data.
+   *
+   * This is the page an answer engine reads to say what a practice charges, so
+   * every price here comes from the service row through the same rules the
+   * rendered menu uses: a flat price is a price, a from-price is a lower bound,
+   * and a quoted service gets no offer at all rather than a number it does not
+   * stand behind.
+   *
+   * One ItemList rather than thirty loose Service blocks, so the relationship
+   * between them — that this is a menu, in this order — survives.
+   */
+  const base = await siteOrigin();
+  const menuLd = clinic.live ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Treatments and pricing at ${clinic.name}`,
+    itemListElement: services.map((s, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: serviceJsonLd(s, {
+        url: `${base}${links.services}`,
+        providerName: clinic.name,
+        area: clinic.address_city ?? undefined
+      })
+    }))
+  } : null;
+
   return (
     <>
+      {menuLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={ldScript(menuLd)} />
+      )}
+
       <header className="sf-hero">
         <div className="sf-wrap">
           <div className="sf-eyebrow">{clinic.name}</div>

@@ -11,9 +11,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, getStorefrontProviders, hoursLines } from '@/lib/db/storefront';
-import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { initials, phone } from '@/lib/format';
 import { ProviderStoryDeck } from '@/components/ProviderStoryDeck';
+import { providerJsonLd, ldScript } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,8 +46,28 @@ export default async function StorefrontAbout({ params }: { params: Promise<{ sl
   const facts = Object.entries(clinic.visit_facts ?? {});
   const isSpa = clinic.practice_type === 'med_spa';
 
+  /**
+   * The practitioner, as an entity rather than a name in a paragraph.
+   *
+   * Without this, "Jamie Salazar" is a string on a page and her credentials are
+   * four letters after it. With it, an answer engine can connect the person to
+   * the practice and repeat what she is qualified as without parsing prose.
+   */
+  const aboutBase = await siteOrigin();
+  const peopleLd = clinic.live
+    ? providers.map(p => providerJsonLd(p, {
+        url: `${aboutBase}${links.about}`,
+        practiceName: clinic.name,
+        imageUrl: p.photo_path
+      }))
+    : [];
+
   return (
     <>
+      {peopleLd.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={ldScript(peopleLd)} />
+      )}
+
       <header className="sf-stage sf-about-stage">
         <div className="sf-wrap sf-stage-grid">
           <div>

@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, hoursLines } from '@/lib/db/storefront';
-import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
 import { Analytics } from '@/components/Analytics';
@@ -211,7 +211,9 @@ export default async function StorefrontLayout({ children, params }: Props) {
    * a crawler a business's real address before the practice has said "go
    * live" would be the same mistake as indexing the page itself.
    */
-  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'https://www.medbarco.com';
+  // Same resolver the sitemap and the product schema use, so the address in
+  // the structured data cannot disagree with the address in the sitemap.
+  const base = await siteOrigin();
   const localBusinessJsonLd = clinic.live ? {
     '@context': 'https://schema.org',
     '@type': isSpa ? 'MedicalBusiness' : 'MedicalOrganization',

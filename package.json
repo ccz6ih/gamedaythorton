@@ -39,7 +39,8 @@
     "test:css": "node scripts/css-test.cjs",
     "test:claims": "node scripts/claims-test.cjs",
     "test:fonts": "node scripts/font-test.cjs",
-    "test:sitemap": "node scripts/sitemap-test.cjs"
+    "test:sitemap": "node scripts/sitemap-test.cjs",
+    "test:schema": "node scripts/schema-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

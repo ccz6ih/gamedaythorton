@@ -55,11 +55,27 @@ export async function sitemapFor(slug: string, origin: string): Promise<Metadata
   const products = await getStorefrontProducts(clinic.id);
   for (const p of products) {
     if (!p.slug) continue;
+    /**
+     * The product photograph goes in the entry.
+     *
+     * A modest win and a cheap one — the row is already loaded. Google finds
+     * images through the pages they sit on regardless, but declaring them
+     * associates each photograph with the product page rather than leaving
+     * that to be inferred, which is what gets a jar of moisturiser into image
+     * results under its own name.
+     *
+     * Absolute, because a sitemap has no base to resolve against.
+     */
+    const images = [p.image_path, p.secondary_image_path]
+      .filter((u): u is string => Boolean(u))
+      .map(u => (u.startsWith('http') ? u : `${base}${u}`));
+
     pages.push({
       url: `${base}/shop/${p.slug}`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.7
+      priority: 0.7,
+      ...(images.length ? { images } : {})
     });
   }
 

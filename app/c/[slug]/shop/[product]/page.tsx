@@ -11,8 +11,8 @@ import type { Metadata } from 'next';
 import {
   getStorefront, getStorefrontProduct, getRelatedProducts, getStorefrontServices, type StorefrontService
 } from '@/lib/db/storefront';
-import { shopTaxBps, checkoutAvailable } from '@/lib/db/shop';
-import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { shopTaxBps, shopTracksStock, checkoutAvailable } from '@/lib/db/shop';
+import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { AddToCart } from '@/components/AddToCart';
 import { ProductGallery } from '@/components/ProductGallery';
 import { ServiceIcon } from '@/components/ServiceIcon';
@@ -21,6 +21,7 @@ import { money, titleCase, priceLabel } from '@/lib/format';
 // listing. It lived here as a local map and the shop had its own idea of the
 // order, which is two copies of one sequence waiting to disagree.
 import { STEP_MAP } from '@/lib/shop-taxonomy';
+import { productJsonLd, ldScript } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -171,8 +172,9 @@ export default async function ProductPage({ params }: Props) {
   const product = await getStorefrontProduct(clinic.id, productSlug);
   if (!product) notFound();
 
-  const [taxBps, related, services] = await Promise.all([
+  const [taxBps, tracksStock, related, services] = await Promise.all([
     shopTaxBps(clinic.id),
+    shopTracksStock(clinic.id),
     getRelatedProducts(clinic.id, product.category, product.id),
     getStorefrontServices(clinic.id)
   ]);
@@ -195,8 +197,30 @@ export default async function ProductPage({ params }: Props) {
   // Active step matching for the 8-step stepper
   const activeStepKey = product.category === 'facial_oil' ? 'spf' : product.category;
 
+  /**
+   * The product, as data.
+   *
+   * Everything in it is read from this product's own row — price, brand,
+   * images, description. Nothing is defaulted to a plausible value; an
+   * invented `availability` or a guessed identifier becomes a confident
+   * answer in somebody else's interface. Only emitted for a live practice,
+   * same rule as the sitemap and the robots meta tag.
+   */
+  const origin = await siteOrigin();
+  const absolute = (u: string) => (u.startsWith('http') ? u : `${origin}${u}`);
+
+  const productLd = clinic.live ? productJsonLd(product, {
+    url: absolute(`${links.shop}/${product.slug ?? ''}`),
+    images: product.images.filter(Boolean).map(absolute),
+    tracksStock
+  }) : null;
+
   return (
     <>
+      {productLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={ldScript(productLd)} />
+      )}
+
       <div className="sf-wrap" style={{ paddingTop: 'var(--gd-6)' }}>
         <nav className="sf-back" aria-label="Breadcrumbs">
           <Link href={links.shop} className="sf-back">&larr; Back to Shop</Link>
