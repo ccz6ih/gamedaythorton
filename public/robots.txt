@@ -20,3 +20,10 @@ Disallow: /gate
 
 # Where the pages are. Generated, so it never goes stale.
 Sitemap: https://www.medbarco.com/sitemap.xml
+
+# llms.txt — a curated, machine-readable index of this site for language
+# models, at https://www.medbarco.com/llms.txt
+#
+# There is no standard robots.txt directive for it, so this is a comment
+# rather than a rule. It is here so that anybody reading robots.txt to work
+# out what this site publishes finds it.

@@ -4859,6 +4859,41 @@
   gap: var(--gd-3);
   margin-top: var(--gd-6);
 }
+.sf-deck-constellation {
+  width: min(180px, 48vw);
+  height: auto;
+  overflow: visible;
+  color: var(--gd-accent);
+  margin-bottom: var(--gd-2);
+}
+.sf-deck-constellation path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 2 5;
+  opacity: .48;
+}
+.sf-deck-constellation circle {
+  fill: var(--gd-surface-raised);
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sf-deck-node-pulse 4.5s ease-in-out infinite;
+}
+.sf-deck-constellation circle:nth-of-type(2) { animation-delay: .7s; }
+.sf-deck-constellation circle:nth-of-type(3) { animation-delay: 1.4s; }
+.sf-deck-constellation circle:nth-of-type(4) { animation-delay: 2.1s; }
+.sf-deck-constellation .is-core {
+  fill: currentColor;
+  stroke: none;
+  animation-delay: 2.8s;
+}
+@keyframes sf-deck-node-pulse {
+  0%, 100% { opacity: .68; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.16); }
+}
 .sf-deck-outro h3 {
   font-family: var(--brand-display-font);
   font-size: var(--gd-step-2);
@@ -4872,6 +4907,78 @@
   color: var(--gd-text-muted);
   max-width: 48ch;
   line-height: 1.6;
+}
+
+/* Homepage lash feature: a quiet eye-line with the three available looks in orbit. */
+.sf-lash-orbit {
+  position: relative;
+  width: min(260px, 72vw);
+  margin-bottom: var(--gd-5);
+  color: var(--gd-accent);
+}
+.sf-lash-orbit svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.sf-lash-orbit-eye,
+.sf-lash-orbit-lid,
+.sf-lash-orbit-lash {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sf-lash-orbit-eye { stroke-width: 1; opacity: .34; }
+.sf-lash-orbit-lid { stroke-width: 1.8; opacity: .9; }
+.sf-lash-orbit-lash { stroke-width: 1.4; opacity: .64; }
+.sf-lash-orbit-pupil {
+  fill: color-mix(in srgb, var(--gd-accent) 13%, transparent);
+  stroke: currentColor;
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sf-lash-pupil-breathe 5s ease-in-out infinite;
+}
+.sf-lash-orbit-light {
+  fill: currentColor;
+  animation: sf-lash-light 3.8s ease-in-out infinite;
+}
+.sf-lash-orbit-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  width: 7rem;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  color: var(--gd-text);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  line-height: 1;
+  text-align: center;
+}
+.sf-lash-orbit-label span {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: sf-lash-label-cycle 9s ease-in-out infinite;
+}
+.sf-lash-orbit-label span:nth-child(2) { animation-delay: 3s; }
+.sf-lash-orbit-label span:nth-child(3) { animation-delay: 6s; }
+@keyframes sf-lash-label-cycle {
+  0%, 24% { opacity: 0; transform: translateY(.5rem); }
+  30%, 57% { opacity: 1; transform: translateY(0); }
+  63%, 100% { opacity: 0; transform: translateY(-.5rem); }
+}
+@keyframes sf-lash-pupil-breathe {
+  0%, 100% { transform: scale(.92); }
+  50% { transform: scale(1.08); }
+}
+@keyframes sf-lash-light {
+  0%, 100% { opacity: .35; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(2px, -2px); }
 }
 
 @media (max-width: 880px) {
@@ -4892,6 +4999,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sf-lash-orbit-pupil,
+  .sf-lash-orbit-light,
+  .sf-lash-orbit-label span { animation: none; }
+  .sf-lash-orbit-label span:first-child { opacity: 1; transform: none; }
+  .sf-deck-constellation circle { animation: none; }
   .sf-deck-card {
     position: static !important;
     transform: none !important;

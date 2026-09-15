@@ -295,7 +295,21 @@ export function PinnedDisciplinesDeck({ links }: PinnedDisciplinesDeckProps) {
 
         {/* Deck Outro CTA */}
         <div className="sf-deck-outro">
-          <span className="sf-story-outro-ornament">✦ ✦ ✦</span>
+          <svg
+            className="sf-deck-constellation"
+            viewBox="0 0 180 54"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M18 27 C49 27 54 10 90 10 S131 27 162 27" />
+            <path d="M18 27 C49 27 54 44 90 44 S131 27 162 27" />
+            <path d="M90 10 V44" />
+            <circle cx="18" cy="27" r="4" />
+            <circle cx="90" cy="10" r="5" />
+            <circle cx="90" cy="44" r="5" />
+            <circle cx="162" cy="27" r="4" />
+            <circle cx="90" cy="27" r="2" className="is-core" />
+          </svg>
           <h3>Not sure which discipline your skin needs?</h3>
           <p>
             Start with our interactive concern finder or book a complimentary 15-minute consultation to design

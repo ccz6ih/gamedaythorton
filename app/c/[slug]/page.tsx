@@ -280,6 +280,18 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
         <section className="sf-section sf-bordered">
           <div className="sf-wrap sf-split">
             <div>
+              <div className="sf-lash-orbit" aria-label="Classic, Hybrid, and Volume lash extensions">
+                <svg viewBox="0 0 260 112" aria-hidden="true" focusable="false">
+                  <path className="sf-lash-orbit-eye" d="M22 60 C72 16 188 16 238 60 C188 104 72 104 22 60 Z" />
+                  <path className="sf-lash-orbit-lid" d="M22 60 C72 16 188 16 238 60" />
+                  <path className="sf-lash-orbit-lash" d="M73 29 L61 9 M91 22 L84 1 M110 19 L108 0 M129 19 L132 0 M148 22 L155 1 M166 29 L178 9" />
+                  <circle className="sf-lash-orbit-pupil" cx="130" cy="60" r="16" />
+                  <circle className="sf-lash-orbit-light" cx="136" cy="54" r="3" />
+                </svg>
+                <span className="sf-lash-orbit-label" aria-hidden="true">
+                  <span>CLASSIC</span><span>HYBRID</span><span>VOLUME</span>
+                </span>
+              </div>
               <h2 className="sf-display-sm">UV-cured lashes, no adhesive cure time</h2>
               <p className="sf-lede sm">
                 Every set is mapped to your natural lashes and eye shape. Fills stay

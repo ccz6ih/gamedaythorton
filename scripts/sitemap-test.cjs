@@ -104,7 +104,54 @@ async function main() {
   check(broken.length === 0, `all ${locs.length} listed pages return 200`,
     broken.slice(0, 6).join('\n          '));
 
+  await checkLlms(host);
   report();
+}
+
+/**
+ * The same promise, to a different reader.
+ *
+ * llms.txt is a proposed convention rather than a standard, and this site
+ * publishes one as a cheap bet on being early. That makes it MORE worth
+ * checking, not less: a file whose entire purpose is to be quoted by a machine,
+ * listing a URL that redirects to a sign-in page, is the exact failure the
+ * sitemap already had once — and nobody would notice, because no human reads
+ * this file.
+ */
+async function checkLlms(host) {
+  console.log('');
+  const res = await fetch(`${BASE}/llms.txt`);
+  check(res.status === 200, 'llms.txt answers 200', `got ${res.status}`);
+  if (res.status !== 200) return;
+
+  const txt = await res.text();
+  check(/^#\s+\S/m.test(txt), 'it opens with a heading',
+    'the convention expects an H1 naming the site');
+  check(/^>\s+\S/m.test(txt), 'it carries the summary blockquote',
+    'the one-sentence answer to "what is this" is the part that matters most');
+
+  // Both forms the file uses: markdown links, and "Label: https://…" lines.
+  const md = [...txt.matchAll(/\]\((https?:[^)]+)\)/g)].map(m => m[1]);
+  const bare = [...txt.matchAll(/:\s+(https?:\/\/\S+)/g)].map(m => m[1]);
+  const all = [...new Set([...md, ...bare])];
+
+  check(all.length > 0, 'it links to pages', 'no urls found');
+
+  const offsite = all.filter(l => {
+    try { return new URL(l).host !== host; } catch { return true; }
+  });
+  check(offsite.length === 0, 'every url is on this domain', offsite.slice(0, 3).join(', '));
+
+  console.log(`\n  fetching all ${all.length} pages llms.txt points at…\n`);
+  const dead = [];
+  for (const l of all) {
+    let r;
+    try { r = await fetch(l, { redirect: 'manual' }); }
+    catch (e) { dead.push(`${l} — ${e.message}`); continue; }
+    if (r.status !== 200) dead.push(`${r.status} ${l}`);
+  }
+  check(dead.length === 0, `all ${all.length} llms.txt links return 200`,
+    dead.slice(0, 6).join('\n          '));
 }
 
 function report() {
