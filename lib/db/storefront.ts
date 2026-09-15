@@ -127,7 +127,7 @@ export type StorefrontPackage = {
  * public marketing page is how a cache ends up serving one visitor's response
  * to the next.
  */
-function anonClient() {
+export function anonClient() {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

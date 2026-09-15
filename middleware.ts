@@ -62,6 +62,21 @@ const ALWAYS_OPEN = [
   '/api/cron',
 
   /**
+   * The appointment confirmation link.
+   *
+   * Same argument as the webhook and the cron: the person opening it is a
+   * client with no account and no passcode, holding a single-purpose token
+   * that IS the authorisation. Gating it does not make it safer, it makes the
+   * link in every reminder email land on a staff sign-in form.
+   *
+   * app.confirm_appointment is what enforces anything: it takes a token,
+   * marks that one appointment confirmed, and returns the time, the treatment
+   * and the practice name. No client name, no contact details, no history — a
+   * link in an email reaches more places than the person it was sent to.
+   */
+  '/confirm',
+
+  /**
    * Public storefronts: /c/<slug>.
    *
    * These sit in front of the gate rather than behind it, because a shop window

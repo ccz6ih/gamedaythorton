@@ -317,6 +317,7 @@ export function WeekGrid({
       </div>
 
       <p className="cal-key">
+        <span><i className="cal-swatch st-confirmed" /> confirmed by the client</span>
         <span><i className="cal-dot online" /> booked online</span>
         <span><i className="cal-dot intake" /> intake incomplete</span>
         <span><i className="cal-swatch st-complete" /> complete</span>

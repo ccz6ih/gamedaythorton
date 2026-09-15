@@ -333,6 +333,21 @@ export type ReminderEmail = {
   clientEmail: string;
   serviceName: string;
   whenText: string;
+  /**
+   * WHERE, when it is not the usual room.
+   *
+   * The practitioner splits her week between her own studio and a partner
+   * clinic, and which one is decided appointment by appointment. A reminder
+   * that always names the main address sends somebody to the wrong town.
+   *
+   * Null means the usual place, and the reminder stays quiet about it — a
+   * client who has been six times does not need the address they already know
+   * repeated at them.
+   */
+  locationName?: string | null;
+  locationAddress?: string | null;
+  /** Absolute URL that marks this appointment confirmed in one tap. */
+  confirmUrl?: string | null;
 };
 
 /**

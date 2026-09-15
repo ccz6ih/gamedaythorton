@@ -79,10 +79,11 @@ export async function GET(request: Request) {
   const { data: due, error } = await supabase
     .from('appointment')
     .select(`
-      id, starts_at, duration_min, clinic_id,
+      id, starts_at, duration_min, clinic_id, confirm_token,
       patient:patient_id ( first_name, last_name, email ),
       service:service_id ( name ),
-      clinic:clinic_id ( name, phone_voice, pilot_mode )
+      clinic:clinic_id ( name, phone_voice, pilot_mode ),
+      location:location_id ( name, address, is_default )
     `)
     .gte('starts_at', from)
     .lte('starts_at', to)
@@ -96,9 +97,11 @@ export async function GET(request: Request) {
 
   const appointments = (due ?? []) as unknown as {
     id: string; starts_at: string; clinic_id: string;
+    confirm_token: string | null;
     patient: { first_name: string; last_name: string; email: string | null } | null;
     service: { name: string } | null;
     clinic: { name: string; phone_voice: string | null; pilot_mode: boolean } | null;
+    location: { name: string; address: string | null; is_default: boolean } | null;
   }[];
 
   // Which of these already have a reminder logged.
@@ -114,6 +117,13 @@ export async function GET(request: Request) {
 
     for (const row of logged ?? []) alreadySent.add(String(row.payload_ref));
   }
+
+  /**
+   * The confirmation links are absolute and go in an email, so they cannot use
+   * a request host — a cron has no browser and no Host worth trusting. This is
+   * the practice's configured address.
+   */
+  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.medbarco.com').replace(/\/$/, '');
 
   let sent = 0, skipped = 0, failed = 0;
 
@@ -134,7 +144,17 @@ export async function GET(request: Request) {
       serviceName: appt.service?.name ?? 'your appointment',
       whenText: new Date(appt.starts_at).toLocaleString('en-US', {
         timeZone: 'America/Denver', dateStyle: 'full', timeStyle: 'short'
-      })
+      }),
+      /**
+       * Only passed when it is NOT the usual room.
+       *
+       * A null location_id means the clinic default, which is also what every
+       * appointment booked before locations existed means — so the reminder
+       * says nothing about the address unless there is something to say.
+       */
+      locationName: appt.location && !appt.location.is_default ? appt.location.name : null,
+      locationAddress: appt.location && !appt.location.is_default ? appt.location.address : null,
+      confirmUrl: appt.confirm_token ? `${base}/confirm/${appt.confirm_token}` : null
     });
 
     if (result.delivered) sent++; else failed++;

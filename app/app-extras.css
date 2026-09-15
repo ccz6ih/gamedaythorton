@@ -597,6 +597,18 @@ label.inline {
   opacity: 1;
   text-decoration: none;
 }
+/*
+ * CONFIRMED — the client said yes.
+ *
+ * A solid left edge in the accent, against the lighter one a merely-booked
+ * appointment gets. It is the difference between "we think they are coming"
+ * and "they told us they are", which is the whole reason the confirm link
+ * exists; a calendar that renders both identically throws that away.
+ */
+.cal-event.st-confirmed {
+  border-left-width: 5px;
+  border-color: color-mix(in srgb, var(--gd-accent) 60%, var(--gd-border));
+}
 .cal-event.st-arrived {
   border-left-color: var(--gd-in-range);
   border-color: color-mix(in srgb, var(--gd-in-range) 45%, var(--gd-border));
@@ -735,6 +747,7 @@ label.inline {
 .cal-row.st-complete { border-left-color: var(--gd-text-dim); }
 .cal-row.st-cancelled,
 .cal-row.st-no_show { border-left-style: dashed; border-left-color: var(--gd-border-strong); background: transparent; }
+.cal-row.st-confirmed { border-left-width: 5px; }
 .cal-row.st-arrived { border-left-color: var(--gd-in-range); }
 
 .cal-agenda-empty {
@@ -955,3 +968,67 @@ label.inline {
 @media (prefers-reduced-motion: reduce) {
   .rail, .rail-scrim { transition: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   THE CONFIRMATION PAGE
+   ---------------------------------------------------------------------------
+   Opened from a link in a reminder email, on a phone, by somebody who is not
+   logged in and will never come back. It has one job: say clearly that the
+   practice now expects them.
+
+   Deliberately outside the storefront shell. It has no navigation, no cart, no
+   footer of guides — every one of those is an invitation to wander off from a
+   page whose entire content is one sentence of reassurance.
+   --------------------------------------------------------------------------- */
+.confirm-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--gd-5);
+  background: var(--gd-bg);
+}
+.confirm-card {
+  width: 100%;
+  max-width: 26rem;
+  text-align: center;
+  background: var(--gd-surface);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-lg);
+  padding: clamp(1.75rem, 6vw, 2.75rem);
+}
+.confirm-tick {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto var(--gd-4);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--brand-accent-ink);
+  background: var(--gd-accent);
+}
+.confirm-card h1 {
+  font-size: var(--gd-step-2);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 var(--gd-3);
+  text-wrap: balance;
+}
+.confirm-when {
+  font-size: var(--gd-step-1);
+  font-weight: 700;
+  margin: 0 0 .25rem;
+}
+.confirm-what { color: var(--gd-text-muted); margin: 0 0 var(--gd-4); }
+.confirm-note {
+  font-size: var(--gd-step--1);
+  line-height: 1.7;
+  color: var(--gd-text-muted);
+  margin: var(--gd-4) 0 0;
+}
+.confirm-link {
+  display: inline-block;
+  margin-top: var(--gd-5);
+  color: var(--gd-accent);
+  font-size: var(--gd-step--1);
+}
+.cal-swatch.st-confirmed { background: var(--gd-accent); border-color: var(--gd-accent); }

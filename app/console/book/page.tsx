@@ -50,7 +50,29 @@ async function book(formData: FormData) {
     const serviceId = requiredText(formData, 'service_id');
     const patientId = requiredText(formData, 'patient_id');
     const date = requiredText(formData, 'date');
-    const time = requiredText(formData, 'time');
+
+    /**
+     * A typed time wins over the slot buttons.
+     *
+     * The buttons come from the practice's opening hours minus what is booked,
+     * which is right for the common case and wrong for a front desk. Jamie hit
+     * this within a week: a client wanted 2pm, the treatment ran past closing,
+     * and there was no way to say "I will stay late for this one".
+     *
+     * Worse, the rest of this form used to be hidden entirely whenever the day
+     * was closed or nothing fit — so a closed Tuesday could not be booked at
+     * all, even though a practice opening specially for somebody is an
+     * completely ordinary thing to do.
+     *
+     * Overlapping is still impossible: appointment_no_double_book is a GIST
+     * exclusion constraint on the provider and the time range, so the database
+     * refuses a clash whatever this form sends. What is being relaxed is the
+     * OPENING HOURS, which are a preference, not the double-booking rule,
+     * which is a fact.
+     */
+    const custom = text(formData, 'custom_time');
+    const time = custom || text(formData, 'time');
+    if (!time) throw new Error('Pick a time, or type one.');
 
     const supabase = await serverClient();
     const { data: service } = await supabase
@@ -93,6 +115,18 @@ async function book(formData: FormData) {
       buffer_min: service.buffer_after_min,
       status: 'booked',
       booking_channel: 'staff',
+      /**
+       * Where, not just when.
+       *
+       * Jamie splits her week between her own room in Loveland and Gameday's
+       * in Northglenn, and which one is unpredictable. Null means the clinic
+       * default, which is what every appointment booked before this existed
+       * means — so nothing already on the books changes meaning.
+       *
+       * This reaches the client: the confirmation and the reminder render this
+       * location's address. A client who sees Loveland drives to Loveland.
+       */
+      location_id: text(formData, 'location_id'),
       room: text(formData, 'room'),
       notes: text(formData, 'notes'),
       intake_complete: false,
@@ -121,6 +155,18 @@ export default async function BookPage({
 
   const words = vocab(clinic);
   const [services, clients] = await Promise.all([getServices(), getClients()]);
+
+  /**
+   * Where she might be. Read here rather than hardcoded, so adding a third
+   * place is a row rather than a deploy.
+   */
+  const supabaseForLocations = await serverClient();
+  const { data: locations } = await supabaseForLocations
+    .from('location')
+    .select('id, name, address, is_default')
+    .eq('clinic_id', clinic?.id ?? '')
+    .eq('active', true)
+    .order('sort_order');
   const bookable = services.filter(s => s.active);
 
   const selectedService = params.service
@@ -247,25 +293,30 @@ export default async function BookPage({
                 </div>
               </div>
 
-              {dayClosed ? (
+              {dayClosed && (
                 <div className="note-band">
                   {clinic.name} is closed on {DOW[new Date(date + 'T12:00:00Z').getUTCDay()]}.
-                  Open days are {openDays.join(', ')}.
+                  Open days are {openDays.join(', ')}. You can still book by typing
+                  a time below.
                 </div>
-              ) : slots.length === 0 ? (
+              )}
+
+              {!dayClosed && slots.length === 0 && (
                 <div className="note-band warn">
                   Nothing long enough is free. A {selectedService.duration_min}-minute
                   treatment needs an unbroken run, and the turnaround after each
-                  appointment counts.
+                  appointment counts. Type a time below to book anyway.
                 </div>
-              ) : (
+              )}
+
+              {slots.length > 0 && (
                 <div className="field">
                   <label>Time</label>
                   <div className="opts">
                     {slots.map((s, i) => (
                       <label className="opt" key={s} style={{ cursor: 'pointer' }}>
                         <input
-                          type="radio" name="time" value={s} required defaultChecked={i === 0}
+                          type="radio" name="time" value={s} defaultChecked={i === 0}
                           style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                         />
                         {timeLabel(`2020-01-01T${s}:00`)}
@@ -275,10 +326,75 @@ export default async function BookPage({
                   <div className="hint">First one is pre-selected. Confirming beats deciding.</div>
                 </div>
               )}
+
+              {/*
+                ALWAYS OFFERED, including on a closed day and a full one.
+
+                The buttons above are the practice's hours minus what is booked.
+                That is right for most bookings and wrong for a front desk: a
+                client wants 2pm, the treatment runs ten minutes past closing,
+                and somebody has to be able to say "I'll stay late for this one".
+
+                Nothing unsafe is being allowed. The database has a GIST
+                exclusion constraint on provider and time range, so a genuine
+                clash is refused whatever is typed here. What this relaxes is
+                the opening hours — a preference — not double-booking, which is
+                a fact.
+              */}
+              <div className="field">
+                <label htmlFor="custom_time">
+                  {slots.length > 0 ? 'Or type a time' : 'Time'}
+                </label>
+                <input
+                  id="custom_time"
+                  name="custom_time"
+                  type="time"
+                  step={300}
+                  style={{ maxWidth: '10rem' }}
+                />
+                <div className="hint">
+                  {slots.length > 0
+                    ? 'Overrides the buttons above. Use it for outside opening hours.'
+                    : 'Outside the usual hours. The practice will not be double-booked — that is refused by the database — but nothing else is checked.'}
+                </div>
+              </div>
             </section>
 
-            {!dayClosed && slots.length > 0 && (
-              <>
+            {/* The rest of the form is no longer conditional. A closed day and a
+                full day both used to hide the Who, the notes and the submit
+                button, which made "book them anyway" impossible rather than
+                merely discouraged. */}
+                {(locations?.length ?? 0) > 1 && (
+                  <section className="card">
+                    <div className="card-head"><div><h2>Where</h2></div></div>
+                    {/*
+                      Only shown when there is a choice. A practice with one
+                      room does not need a field that always says the same
+                      thing.
+
+                      This is not a tenancy switch. Seeing her own client in
+                      Gameday's room for an afternoon keeps the appointment on
+                      HER books at HER prices; filing it under Gameday would put
+                      her client in their patient list and her money in their
+                      takings.
+                    */}
+                    <div className="field">
+                      <label htmlFor="location_id">Location</label>
+                      <select id="location_id" name="location_id" defaultValue="">
+                        {locations!.map(l => (
+                          <option key={l.id} value={l.is_default ? '' : l.id}>
+                            {l.name}{l.is_default ? ' (usual)' : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="hint">
+                        The address for whichever is chosen is what goes in the
+                        client&rsquo;s confirmation and reminder.
+                      </div>
+                    </div>
+                  </section>
+                )}
+
                 <section className="card">
                   <div className="card-head"><div><h2>Who</h2></div></div>
                   <div className="grid g2">
@@ -320,8 +436,6 @@ export default async function BookPage({
                   <button className="btn primary big" type="submit">Book it</button>
                   <Link className="btn ghost" href="/console/book">Start again</Link>
                 </div>
-              </>
-            )}
           </form>
         )}
 
