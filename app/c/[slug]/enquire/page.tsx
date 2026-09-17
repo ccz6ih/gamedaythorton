@@ -82,23 +82,35 @@ async function submit(formData: FormData) {
     { cookies: { getAll: () => [], setAll: () => {} } }
   );
 
-  const { error } = await supabase.from('lead').insert({
-    clinic_id: clinic.id,
-    name,
-    phone: phoneNo || null,
-    email: email || null,
-    source: 'website',
-    message: [interest && `Interested in: ${interest}`, message].filter(Boolean).join('\n') || null,
-    consent_transactional_sms: smsOk,
-    consent_email: !!email,
-    consent_captured_at: smsOk || email ? new Date().toISOString() : null,
-    consent_ip: ip,
-    consent_user_agent: h.get('user-agent'),
-    consent_text_version: smsOk ? CONSENT_V : null,
-    // The pilot guard. While the clinic is in pilot mode the database refuses
-    // any row not marked synthetic — including one arriving from a public form,
-    // which is exactly the path a real enquiry would come in on.
-    synthetic: true
+  /**
+   * Through a security-definer function rather than a direct insert, for the
+   * one reason set out in 0037: the practice's notification address cannot be
+   * read from here.
+   *
+   * `lead_email` is not granted to anon and must not be. The old code selected
+   * it anyway, got nothing back — a column-level denial looks exactly like an
+   * empty row at the call site — and passed `to: null` to the mailer, which
+   * dutifully logged "No destination address set for this practice" while the
+   * address sat correctly filled in. Every enquiry since has been silent.
+   *
+   * The function reads it and hands it back to this action, which runs on our
+   * own server. It is never passed to the browser.
+   *
+   * It also decides `synthetic` from the clinic's own pilot flag instead of the
+   * hardcoded `true` that used to be here, which had been quietly labelling
+   * every real enquiry as test data since the practice went live.
+   */
+  const { data: result, error } = await supabase.rpc('submit_enquiry', {
+    p_clinic_slug: slug,
+    p_name: name,
+    p_phone: phoneNo || null,
+    p_email: email || null,
+    p_interest: interest || null,
+    p_message: message || null,
+    p_sms_consent: smsOk,
+    p_consent_ver: smsOk ? CONSENT_V : null,
+    p_ip: ip,
+    p_user_agent: h.get('user-agent')
   });
 
   if (error) {
@@ -113,21 +125,25 @@ async function submit(formData: FormData) {
   // visitor whose request was saved must not see an error because a mail
   // provider was slow.
   try {
-    const { data: routing } = await supabase
-      .from('clinic')
-      .select('lead_email')
-      .eq('id', clinic.id)
-      .maybeSingle();
+    const routed = (result ?? {}) as {
+      clinic_id?: string;
+      practice_name?: string;
+      notify_email?: string | null;
+      synthetic?: boolean;
+    };
 
     await sendEnquiryEmail({
-      clinicId: clinic.id,
-      to: (routing?.lead_email as string | null) ?? null,
-      clinicName: clinic.name,
+      clinicId: routed.clinic_id ?? clinic.id,
+      // Resolved server-side inside submit_enquiry, because it cannot be read
+      // from here. Falls back to lead_email's partner, clinic.email, in the
+      // function itself.
+      to: routed.notify_email ?? null,
+      clinicName: routed.practice_name ?? clinic.name,
       name,
       contact: [phoneNo, email].filter(Boolean).join(' · '),
       interest: interest || null,
       message: message || null,
-      synthetic: true
+      synthetic: routed.synthetic ?? true
     });
   } catch {
     // Swallowed on purpose. The enquiry is already saved and visible in the

@@ -26,6 +26,7 @@
 
 import { notificationPreview } from '@/lib/phi';
 import { serverClient } from '@/lib/supabase/server';
+import { emailBrand, emailOrigin, renderEmail } from '@/lib/email-theme';
 
 export type NotifyResult = {
   logged: boolean;
@@ -130,7 +131,18 @@ export async function sendEnquiryEmail(e: EnquiryEmail): Promise<NotifyResult> {
         from: process.env.NOTIFY_EMAIL_FROM ?? 'notifications@example.invalid',
         to: [e.to],
         subject,
-        text: body
+        text: body,
+        html: renderEmail(await emailBrand(e.clinicId, e.clinicName), {
+          preheader: `Somebody enquired through your ${e.clinicName} booking page.`,
+          lines: [`${e.name} sent a request through your booking page.`],
+          panel: [
+            { label: 'Contact', value: e.contact },
+            ...(e.interest ? [{ label: 'Interested in', value: e.interest }] : []),
+            ...(e.message ? [{ label: 'What they said', value: e.message }] : [])
+          ],
+          cta: { label: 'Open the console', url: `${emailOrigin()}/console/clients` },
+          footerLines: ['The full request is on your clients list in the console.']
+        })
       })
     });
 
@@ -168,8 +180,16 @@ export async function sendEnquiryEmail(e: EnquiryEmail): Promise<NotifyResult> {
 
 type Sent = { ok: boolean; reason: string };
 
-/** The one place a message actually leaves. */
-async function deliver(to: string, subject: string, text: string): Promise<Sent> {
+/**
+ * The one place a message actually leaves.
+ *
+ * BOTH PARTS, ALWAYS. `text` is not a legacy courtesy — it is what a screen
+ * reader reads, what a watch shows, what a client with images switched off
+ * sees, and what lands if the HTML is mangled in transit. An email with only
+ * an HTML part is an email that is invisible to some of the people it is for,
+ * and it scores worse with spam filters for the same reason.
+ */
+async function deliver(to: string, subject: string, text: string, html?: string): Promise<Sent> {
   if (!emailEnabled()) return { ok: false, reason: emailStatus() };
 
   try {
@@ -183,7 +203,8 @@ async function deliver(to: string, subject: string, text: string): Promise<Sent>
         from: process.env.NOTIFY_EMAIL_FROM ?? 'notifications@example.invalid',
         to: [to],
         subject,
-        text
+        text,
+        ...(html ? { html } : {})
       })
     });
 
@@ -270,7 +291,27 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     `— ${b.clinicName}`
   ].filter(v => v !== null).join('\n');
 
-  const sent = await deliver(b.clientEmail, `Your appointment at ${b.clinicName}`, body);
+  const brand = await emailBrand(b.clinicId, b.clinicName);
+  const html = renderEmail(brand, {
+    // Neutral. The treatment is named in the body, never in the line that shows
+    // in an inbox list next to the subject.
+    preheader: `Your appointment at ${b.clinicName} is confirmed.`,
+    greeting: `Hi ${b.clientName.split(' ')[0]},`,
+    lines: [`You're booked in at ${b.clinicName}.`],
+    panel: [
+      { label: 'Treatment', value: b.serviceName },
+      { label: 'When', value: b.whenText }
+    ],
+    note: b.requiresConsent
+      ? 'This treatment needs a short assessment and a consent form before we start, so please allow a few extra minutes.'
+      : null,
+    footerLines: [
+      'Need to change or cancel? Reply to this email'
+        + (b.practicePhone ? ` or call ${b.practicePhone}.` : '.')
+    ]
+  });
+
+  const sent = await deliver(b.clientEmail, `Your appointment at ${b.clinicName}`, body, html);
 
   await logRun({
     clinicId: b.clinicId,
@@ -309,7 +350,21 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
     'It is on your calendar in the console.'
   ].filter(v => v !== null).join('\n');
 
-  const sent = await deliver(b.practiceInbox, `New booking for ${b.clinicName}`, body);
+  const brand = await emailBrand(b.clinicId, b.clinicName);
+  const html = renderEmail(brand, {
+    preheader: `A new booking came in for ${b.clinicName}.`,
+    lines: [`${b.clientName} booked online.`],
+    panel: [
+      { label: 'Treatment', value: b.serviceName },
+      { label: 'When', value: b.whenText },
+      { label: 'Contact', value: `${b.clientEmail}${b.clientPhone ? `\n${b.clientPhone}` : ''}` },
+      ...(b.note ? [{ label: 'They said', value: b.note }] : [])
+    ],
+    cta: { label: 'Open the calendar', url: `${brand.origin}/console/calendar` },
+    footerLines: ['It is already on your calendar in the console.']
+  });
+
+  const sent = await deliver(b.practiceInbox, `New booking for ${b.clinicName}`, body, html);
 
   await logRun({
     clinicId: b.clinicId,
@@ -383,6 +438,20 @@ export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyR
     return { logged: false, delivered: false, reason: 'already claimed' };
   }
 
+  /**
+   * WHERE, and the one-tap confirm.
+   *
+   * Both of these were on ReminderEmail and passed by the cron, and neither was
+   * ever read here — so the confirm link the /confirm route exists to serve has
+   * never reached a client, and a reminder for an appointment at the partner
+   * clinic has been sending people to the usual address. Optional fields do not
+   * fail a typecheck when nothing reads them, which is exactly how this
+   * survived: every layer was correct except the last one.
+   */
+  const elsewhere = r.locationName
+    ? `${r.locationName}${r.locationAddress ? `\n${r.locationAddress}` : ''}`
+    : null;
+
   const body = [
     `Hi ${r.clientName.split(' ')[0]},`,
     '',
@@ -390,6 +459,11 @@ export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyR
     '',
     `  ${r.serviceName}`,
     `  ${r.whenText}`,
+    // Only when it is NOT the usual room. Repeating the address somebody has
+    // driven to six times is noise; omitting it the one time it changed sends
+    // them to the wrong town.
+    ...(elsewhere ? ['', '  Where:', ...elsewhere.split('\n').map(l => `  ${l}`)] : []),
+    ...(r.confirmUrl ? ['', 'Please confirm you are coming:', r.confirmUrl] : []),
     '',
     'If anything has changed, reply to this email'
       + (r.practicePhone ? ` or call ${r.practicePhone}.` : '.'),
@@ -397,7 +471,25 @@ export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyR
     `— ${r.clinicName}`
   ].join('\n');
 
-  const sent = await deliver(r.clientEmail, `Tomorrow at ${r.clinicName}`, body);
+  const brand = await emailBrand(r.clinicId, r.clinicName);
+  const html = renderEmail(brand, {
+    preheader: `A reminder about your appointment at ${r.clinicName}.`,
+    greeting: `Hi ${r.clientName.split(' ')[0]},`,
+    lines: [`A reminder about your appointment at ${r.clinicName}.`],
+    panel: [
+      { label: 'Treatment', value: r.serviceName },
+      { label: 'When', value: r.whenText },
+      ...(elsewhere ? [{ label: 'Where', value: elsewhere }] : [])
+    ],
+    cta: r.confirmUrl ? { label: "Yes, I'll be there", url: r.confirmUrl } : null,
+    note: r.confirmUrl ? 'One tap confirms — there is nothing to fill in.' : null,
+    footerLines: [
+      'If anything has changed, reply to this email'
+        + (r.practicePhone ? ` or call ${r.practicePhone}.` : '.')
+    ]
+  });
+
+  const sent = await deliver(r.clientEmail, `Tomorrow at ${r.clinicName}`, body, html);
 
   // Update the claim with what actually happened.
   await supabase
