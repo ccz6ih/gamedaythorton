@@ -134,6 +134,29 @@ export async function startCheckout(
     lines: { name: string; brand: string | null; unit_price_cents: number; qty: number }[];
   };
 
+  /**
+   * The stable Stripe Product per line, so Stripe's reporting groups repeat
+   * sales of one item instead of recording each as a brand-new product.
+   *
+   * Best-effort on purpose. If the catalogue has never been synced, or this
+   * call fails, the map is empty and checkout builds the ad-hoc lines it always
+   * did. Losing a reporting nicety must never be the reason a customer cannot
+   * pay, so nothing here is allowed to throw.
+   */
+  const stripeProducts = new Map<string, string>();
+  try {
+    const { data: mapped } = await supabase.rpc('shop_order_stripe_products', {
+      p_order: order.order_id
+    });
+    for (const row of (mapped ?? []) as { name_snapshot: string; stripe_product_id: string }[]) {
+      if (row?.name_snapshot && row?.stripe_product_id) {
+        stripeProducts.set(row.name_snapshot, row.stripe_product_id);
+      }
+    }
+  } catch {
+    // Deliberately silent: the fallback below is correct, not a failure state.
+  }
+
   // ------------------------------------------------------------- 2. Stripe --
   let session;
   try {
@@ -146,7 +169,10 @@ export async function startCheckout(
         name: l.name,
         brand: l.brand,
         unitPriceCents: l.unit_price_cents,
-        qty: l.qty
+        qty: l.qty,
+        // Keyed on the stored name snapshot, which is the same string the RPC
+        // built this line from — both come from the product row it read.
+        stripeProductId: stripeProducts.get(l.name) ?? null
       })),
       taxCents: order.tax_cents,
       email: contact.email,

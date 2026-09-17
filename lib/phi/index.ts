@@ -116,6 +116,33 @@ export function stripeMetadata(input: AllowedStripeMetadata): Record<string, str
   return out;
 }
 
+/**
+ * The label a checkout line may carry.
+ *
+ * A line item name is not private data the way metadata is — it is printed on
+ * the Stripe receipt, which lands in an inbox, and it is stored on Stripe's
+ * side forever. "Botox — 20 units" in either place is the same disclosure
+ * `paymentDescriptor` exists to prevent, one field over.
+ *
+ * NEUTRALISED RATHER THAN REJECTED, deliberately. A custom charge line is free
+ * text the practitioner types with a client in front of her; throwing means the
+ * payment link will not send and she cannot take the money. So the clinical
+ * wording is replaced and the charge goes through. The full description is
+ * still on the order in our own database, which is where it belongs and where
+ * the receipt she sends from here reads it.
+ *
+ * Retail product names do not trip this — nothing in BANNED_TERMS is a
+ * cleanser — so the shop is unaffected and its receipts stay itemised.
+ */
+export function checkoutLineLabel(name: string): string {
+  const cleaned = (name ?? '').replace(/\s+/g, ' ').trim();
+  if (!cleaned) return 'Professional services';
+  if (phiTermsIn(cleaned).length === 0) return cleaned.slice(0, 250);
+  // Matches the wording on the card statement, so a client comparing the two
+  // sees the same thing twice rather than two mysteries.
+  return 'Professional services';
+}
+
 /* -------------------------------------------------------- notifications ---- */
 
 /**

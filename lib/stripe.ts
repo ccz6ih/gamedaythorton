@@ -15,7 +15,7 @@
  */
 
 import Stripe from 'stripe';
-import { paymentDescriptor, stripeMetadata, type AllowedStripeMetadata } from '@/lib/phi';
+import { paymentDescriptor, checkoutLineLabel, stripeMetadata, type AllowedStripeMetadata } from '@/lib/phi';
 
 export function isPilotMode(): boolean {
   return process.env.PILOT_MODE !== 'false';
@@ -241,6 +241,13 @@ export type ShopLine = {
   brand: string | null;
   unitPriceCents: number;
   qty: number;
+  /**
+   * The stable Stripe Product this item reports against, when the catalogue
+   * has been synced. Absent is fine and is the state before a first sync —
+   * checkout falls back to an ad-hoc line, which charges identically and only
+   * costs the grouping in Stripe's reporting.
+   */
+  stripeProductId?: string | null;
 };
 
 export type ShopCheckoutInput = {
@@ -278,14 +285,29 @@ export type ShopCheckoutInput = {
  * agree forever.
  */
 export async function createShopCheckoutSession(input: ShopCheckoutInput) {
+  /**
+   * The amount is ALWAYS inline, read from our own database a moment ago.
+   * Only the product identity comes from Stripe, and only so its reporting can
+   * group repeat sales of the same item instead of seeing a new product every
+   * time. `product_data` mints a throwaway Product per line; `product` points
+   * at the one stable object the sync created.
+   *
+   * The fallback is not a degraded path — it is exactly what shipped before,
+   * and it charges the same number. An unsynced catalogue costs the grouping,
+   * nothing else.
+   */
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = input.lines.map(l => ({
     quantity: l.qty,
     price_data: {
       currency: 'usd',
       unit_amount: l.unitPriceCents,
-      product_data: {
-        name: l.brand ? `${l.brand} — ${l.name}` : l.name
-      }
+      ...(l.stripeProductId
+        ? { product: l.stripeProductId }
+        : {
+            product_data: {
+              name: checkoutLineLabel(l.brand ? `${l.brand} — ${l.name}` : l.name)
+            }
+          })
     }
   }));
 
@@ -385,7 +407,12 @@ export async function createCustomChargeSession(input: CustomChargeInput) {
     price_data: {
       currency: 'usd',
       unit_amount: l.lineTotalCents,
-      product_data: { name: l.qty > 1 ? `${l.name} (${l.qty})` : l.name }
+      // Through the PHI filter: this name is free text the practitioner typed,
+      // it is printed on a Stripe receipt, and Stripe keeps it. A clinical term
+      // here is the disclosure paymentDescriptor prevents on the statement.
+      product_data: {
+        name: checkoutLineLabel(l.qty > 1 ? `${l.name} (${l.qty})` : l.name)
+      }
     }
   }));
 
