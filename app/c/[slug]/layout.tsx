@@ -15,6 +15,7 @@ import { getStorefront, hoursLines } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
+import ServiceWorker from '@/components/ServiceWorker';
 import { Analytics } from '@/components/Analytics';
 import { phone } from '@/lib/format';
 import { googleFontsHref } from '@/lib/webfonts';
@@ -72,8 +73,19 @@ export async function generateMetadata(
         { url: '/brand/medbar-favicon.svg', type: 'image/svg+xml' },
         { url: logo }
       ],
-      apple: logo
+      // A purpose-made square on the practice's paper colour. The bare logo is
+      // 640px of mostly whitespace, which iOS scales down to a speck on a home
+      // screen. See scripts/make-pwa-icons.cjs.
+      apple: '/icons/apple-touch-icon.png'
     },
+    /**
+     * The client-facing manifest, resolved per hostname in app/manifest.ts so
+     * each practice's own domain installs as that practice. `start_url` is the
+     * storefront root — somebody installing from medbarco.com wants to book,
+     * not to open a staff console.
+     */
+    manifest: '/manifest.webmanifest',
+    appleWebApp: { capable: true, title: name, statusBarStyle: 'default' },
     // Social cards. Without these a shared link renders as a bare URL with no
     // picture, which on a business whose whole proposition is how things look
     // is worse than not being shared at all.
@@ -253,6 +265,11 @@ export default async function StorefrontLayout({ children, params }: Props) {
         />
       )}
       {webFontLink && <link rel="stylesheet" href={webFontLink} />}
+      {/* Makes the storefront installable. Chrome will not offer "Add to home
+          screen" for a manifest alone — it needs a registered worker with a
+          fetch handler in scope. The worker caches only content-hashed static
+          assets and brand images; see public/sw.js. */}
+      <ServiceWorker />
       <Analytics measurementId={clinic.ga_measurement_id} />
       <StorefrontNav
         items={nav}

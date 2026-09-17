@@ -52,3 +52,6 @@ scoping/feedback-*.raw.md
 private/*
 !private/.gitignore
 !private/README.md
+
+.env*.local
+.email-preview/

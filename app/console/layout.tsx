@@ -17,6 +17,7 @@ import { getClinic, hasModule } from '@/lib/db/queries';
 import { Brand, vocab } from '@/components/Brand';
 import { PilotBanner } from '@/components/PilotBanner';
 import { ConsoleShell } from '@/components/ConsoleShell';
+import ServiceWorker from '@/components/ServiceWorker';
 import { titleCase } from '@/lib/format';
 
 /**
@@ -33,7 +34,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const clinic = await getClinic();
   const name = clinic?.name ?? 'Console';
   return {
-    title: { default: `Console · ${name}`, template: `%s · ${name}` }
+    title: { default: `Console · ${name}`, template: `%s · ${name}` },
+    /**
+     * The console's OWN manifest, not the storefront's. Installing from here
+     * gives an app that opens on today's column and stays inside /console;
+     * installing from the shop gives the client-facing one. See the header of
+     * app/console/manifest.webmanifest/route.ts.
+     */
+    manifest: '/console/manifest.webmanifest',
+    appleWebApp: {
+      capable: true,
+      title: 'Console',
+      // 'default' keeps the status bar legible on the cream ground. 'black-
+      // translucent' would slide the content under the clock.
+      statusBarStyle: 'default'
+    },
+    icons: { apple: '/icons/apple-touch-icon.png' }
   };
 }
 
@@ -108,6 +124,10 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
         needs no policy change and hands nobody the IP of a staff member
         opening the appointment book.
       */}
+      {/* Registers /sw.js so the console can be installed to a home screen.
+          The worker caches static assets only and never a console page — the
+          reasoning is at the top of public/sw.js. */}
+      <ServiceWorker />
       <PilotBanner pilotMode={process.env.PILOT_MODE !== 'false'} dbPilotMode={flags?.pilot_mode} />
       <ConsoleShell
         clinicName={clinic?.location_name ?? clinic?.name ?? 'Clinic'}

@@ -89,6 +89,24 @@ setting was forgotten.
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_test_…` |
 | `STRIPE_WEBHOOK_SECRET` | Without it the webhook returns 503 rather than trusting an unsigned request |
 
+### Stripe retail catalogue sync
+
+The shop database remains the source of truth for retail names, prices and stock. Stripe
+holds a matching Product and Price so the practice can use either the website Checkout
+or a Stripe Dashboard Payment Link. Clinical services and treatment packages are not
+synced as named Stripe products; those payments use neutral Checkout line items.
+
+```bash
+npm run stripe:catalog -- medbar-loveland              # dry run
+npm run stripe:catalog -- medbar-loveland --write      # test mode write
+npm run stripe:catalog -- medbar-loveland --write --confirm-live
+```
+
+The script matches by opaque database id metadata, stores the resulting `price_id` in
+`product.stripe_price_id`, and creates a new Price rather than mutating an old one when
+the database price changes. Live writes require both `PILOT_MODE=false` and the explicit
+`--confirm-live` flag.
+
 Payments are optional. With no Stripe keys the app runs; checkout is simply not
 available.
 

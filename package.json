@@ -38,10 +38,15 @@
     "test:images:live": "node scripts/image-sweep.cjs",
     "test:css": "node scripts/css-test.cjs",
     "test:claims": "node scripts/claims-test.cjs",
+    "stripe:catalog": "node scripts/stripe-catalog-sync.cjs",
     "test:fonts": "node scripts/font-test.cjs",
     "test:sitemap": "node scripts/sitemap-test.cjs",
     "test:schema": "node scripts/schema-test.cjs",
-    "test:time": "node scripts/time-test.cjs"
+    "test:time": "node scripts/time-test.cjs",
+    "test:pwa": "node scripts/pwa-test.cjs",
+    "test:labels": "node scripts/checkout-label-test.cjs",
+    "email:preview": "node scripts/email-preview.cjs",
+    "icons": "node scripts/make-pwa-icons.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

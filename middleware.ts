@@ -51,6 +51,26 @@ const ALWAYS_OPEN = [
   '/api/stripe/webhook',
 
   /**
+   * Installable-app plumbing.
+   *
+   * A browser fetches a manifest, a service worker and their icons on its own
+   * schedule, sometimes without credentials attached. Gated, they come back as
+   * a 307 to the sign-in page: the install prompt never appears, and the
+   * service worker registration fails with a content-type error that says
+   * nothing about the real cause.
+   *
+   * None of these are worth gating anyway. They say the practice's name and
+   * which screen to open — the name is already on the front of the building.
+   * The console PAGES stay gated exactly as before; this is the wrapper, not
+   * what is inside it.
+   */
+  '/manifest.webmanifest',
+  '/console/manifest.webmanifest',
+  '/sw.js',
+  '/offline',
+  '/icons',
+
+  /**
    * Scheduled jobs. Same argument as the webhook above: Vercel Cron cannot hold
    * a session or type a passcode, so gating this does not secure it — it breaks
    * it. The route authenticates itself against CRON_SECRET and refuses to run
