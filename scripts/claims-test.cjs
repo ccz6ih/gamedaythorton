@@ -58,7 +58,18 @@ const SCAN_EXT = /\.(tsx|ts)$/;
 /** Files that are not customer-facing copy. */
 const SKIP = [
   'lib/db/', 'lib/supabase/', 'lib/phi/', 'lib/stripe',
-  'components/Brand.tsx'
+  'components/Brand.tsx',
+  /**
+   * The file that DEFINES these rules. It necessarily contains the words it
+   * forbids — the patterns themselves, and the sentences explaining to a
+   * practitioner that "zero" and "painless" are the wrong choice. Scanning it
+   * flags the rule for stating the rule.
+   *
+   * It is the one file where quoting a banned phrase is the correct thing to
+   * do, which is exactly why it is named here rather than reworded into
+   * something vaguer and less useful.
+   */
+  'lib/claims.ts'
 ];
 
 const PATTERNS = [

@@ -99,6 +99,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     { href: '/console/orders', label: 'Shop orders', icon: '⬓', when: hasModule(clinic, 'retail') },
     { group: 'Setup' },
     { href: '/console/services', label: 'Services & pricing', icon: '☰' },
+    { href: '/console/packages/manage', label: 'Package pricing', icon: '◱', when: hasModule(clinic, 'packages') },
     { href: '/console/products', label: 'Shop products', icon: '▤', when: hasModule(clinic, 'retail') },
     { href: '/console/storefront', label: 'Your public page', icon: '◈' },
     { href: '/console/brand', label: 'Logo & colours', icon: '◐' },
