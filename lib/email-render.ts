@@ -43,8 +43,22 @@ export function defaultBrand(clinicName: string, origin: string): EmailBrand {
     inkMuted: '#5C6560',
     border: '#E1D8C8',
     radius: '10px',
-    displayFont: 'Georgia, "Times New Roman", serif',
-    bodyFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+    /**
+     * SINGLE QUOTES INSIDE THE FONT STACK, AND IT IS NOT COSMETIC.
+     *
+     * These strings are interpolated into `style="..."` attributes. A double
+     * quote in the value closes the attribute early, so everything after it —
+     * including `color` — is dropped and the browser parses the remainder as
+     * stray attributes. The visible symptom was a Pay button whose white label
+     * vanished: the anchor lost its colour and inherited the stylesheet's dark
+     * `a { color }`, giving dark text on a dark button.
+     *
+     * Single quotes are valid CSS for a family name with a space and survive
+     * inside a double-quoted attribute. cssSafe() below defends the same thing
+     * for a font name the practice sets in its brand kit.
+     */
+    displayFont: "Georgia, 'Times New Roman', serif",
+    bodyFont: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
     logoUrl: null,
     addressText: null,
     phone: null,
@@ -62,6 +76,18 @@ export type EmailContent = {
   lines?: (string | null)[];
   /** The highlighted block: what, when, where. */
   panel?: { label: string; value: string }[] | null;
+  /**
+   * How the panel reads.
+   *
+   * 'stack' (the default) puts a small-caps label above a bold value, which
+   * suits "Treatment / Microneedling with PRF".
+   *
+   * 'ledger' puts them on one line with the value hard right, which is the
+   * only way a list of money reads as a list of money — stacked, an invoice
+   * becomes six lines of alternating words and numbers and the total stops
+   * looking like a total.
+   */
+  panelLayout?: 'stack' | 'ledger';
   /** A single action. More than one button in an email is none. */
   cta?: { label: string; url: string } | null;
   /** A quieter aside under the action, e.g. a consent notice. */
@@ -89,10 +115,30 @@ function escMultiline(value: unknown): string {
   return esc(value).replace(/\r?\n/g, '<br />');
 }
 
+/**
+ * A value safe to drop inside style="…".
+ *
+ * Every brand value here comes from the practice's own kit in the database —
+ * a font name, a hex colour, a radius — and all of them are interpolated into
+ * a double-quoted HTML attribute. One double quote in any of them silently
+ * truncates the whole declaration list. Quotes become apostrophes rather than
+ * being stripped, because a font family with a space genuinely needs them.
+ */
+function cssSafe(value: string): string {
+  return String(value ?? '').replace(/"/g, "'").replace(/[<>]/g, '');
+}
+
 export function renderEmail(brand: EmailBrand, content: EmailContent): string {
-  const {
-    accent, accentInk, paper, card, ink, inkMuted, border, radius, displayFont, bodyFont
-  } = brand;
+  const accent = cssSafe(brand.accent);
+  const accentInk = cssSafe(brand.accentInk);
+  const paper = cssSafe(brand.paper);
+  const card = cssSafe(brand.card);
+  const ink = cssSafe(brand.ink);
+  const inkMuted = cssSafe(brand.inkMuted);
+  const border = cssSafe(brand.border);
+  const radius = cssSafe(brand.radius);
+  const displayFont = cssSafe(brand.displayFont);
+  const bodyFont = cssSafe(brand.bodyFont);
 
   const header = brand.logoUrl
     ? `<img src="${esc(brand.logoUrl)}" alt="${esc(brand.clinicName)}" width="150"
@@ -106,7 +152,28 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
               style="margin:24px 0;border-collapse:separate;">
          <tr>
            <td style="background:${paper};border:1px solid ${border};border-radius:${radius};padding:20px 22px;">
-             ${content.panel.map(row => `
+             ${content.panel.map((row, i, all) => {
+               if (content.panelLayout === 'ledger') {
+                 // The last row is the total: ruled off and heavier, so the eye
+                 // lands on the number that matters without reading the rest.
+                 const isTotal = i === all.length - 1 && all.length > 1;
+                 return `
+               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                 <tr>
+                   <td style="font-family:${bodyFont};font-size:15px;line-height:1.5;color:${ink};
+                              padding:${isTotal ? '10px 0 0' : '0 0 8px'};
+                              ${isTotal ? `border-top:1px solid ${border};font-weight:700;` : ''}">
+                     ${escMultiline(row.label)}
+                   </td>
+                   <td align="right" style="font-family:${bodyFont};font-size:15px;line-height:1.5;
+                              color:${ink};white-space:nowrap;padding:${isTotal ? '10px 0 0 12px' : '0 0 8px 12px'};
+                              ${isTotal ? `border-top:1px solid ${border};font-weight:700;` : ''}">
+                     ${esc(row.value)}
+                   </td>
+                 </tr>
+               </table>`;
+               }
+               return `
                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                  <tr>
                    <td style="font-family:${bodyFont};font-size:12px;line-height:1.4;color:${inkMuted};
@@ -120,7 +187,8 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
                      ${escMultiline(row.value)}
                    </td>
                  </tr>
-               </table>`).join('')}
+               </table>`;
+             }).join('')}
            </td>
          </tr>
        </table>`

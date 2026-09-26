@@ -19,6 +19,7 @@
 import { revalidatePath } from 'next/cache';
 import { serverClient, currentViewer } from '@/lib/supabase/server';
 import { canTakeMoney, createCustomChargeSession, stripeConfigured } from '@/lib/stripe';
+import { sendPaymentLink } from '@/lib/notify';
 
 export type ChargeLine = {
   name: string;
@@ -46,7 +47,7 @@ export type ChargeInput = {
 };
 
 export type ChargeResult =
-  | { ok: true; orderNo: string; url?: string; paid?: boolean }
+  | { ok: true; orderNo: string; url?: string; paid?: boolean; emailed?: boolean; sentTo?: string }
   | { ok: false; error: string };
 
 export async function raiseCharge(input: ChargeInput): Promise<ChargeResult> {
@@ -116,7 +117,7 @@ export async function raiseCharge(input: ChargeInput): Promise<ChargeResult> {
   // The real slug and guard flag, so a refusal names the practice rather than a
   // uuid and the per-clinic pilot check has something to check.
   const { data: clinicRow } = await supabase
-    .from('clinic').select('slug, pilot_mode').eq('id', viewer.clinicId).maybeSingle();
+    .from('clinic').select('slug, pilot_mode, phone_voice').eq('id', viewer.clinicId).maybeSingle();
 
   const verdict = canTakeMoney({
     slug: clinicRow?.slug ?? viewer.clinicId,
@@ -164,8 +165,40 @@ export async function raiseCharge(input: ChargeInput): Promise<ChargeResult> {
       return { ok: false, error: 'Could not link the charge to its payment page. Try again.' };
     }
 
+    /**
+     * Send it, rather than leaving her to copy a stripe.com URL into her own
+     * email. Best-effort on purpose: the charge exists, the link works, and the
+     * Copy button is still on screen — so a mail provider having a bad minute
+     * must not read as "the payment failed".
+     *
+     * `emailed` is returned so the screen can say what actually happened
+     * instead of claiming a send it did not make.
+     */
+    let emailed = false;
+    try {
+      const result = await sendPaymentLink({
+        clinicId: viewer.clinicId,
+        clinicName: order.practice_name,
+        practicePhone: clinicRow?.phone_voice ?? null,
+        toName: input.name,
+        toEmail: input.email,
+        orderNo: order.order_no,
+        payUrl: session.url,
+        lines: order.lines.map(l => ({
+          name: l.name,
+          qty: l.qty,
+          lineTotalCents: l.unit_price_cents * l.qty - l.discount_cents
+        })),
+        totalCents: order.total_cents,
+        synthetic: false
+      });
+      emailed = result.delivered;
+    } catch {
+      // Swallowed deliberately — see above.
+    }
+
     revalidatePath('/console/orders');
-    return { ok: true, orderNo: order.order_no, url: session.url };
+    return { ok: true, orderNo: order.order_no, url: session.url, emailed, sentTo: input.email };
   } catch (err) {
     return {
       ok: false,

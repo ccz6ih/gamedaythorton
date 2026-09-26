@@ -161,7 +161,20 @@ export function ChargeBuilder({
 
           {result.url && (
             <>
-              <p>Send this to them, or open it on your own device to take the card:</p>
+              {/* Says what actually happened. The send is best-effort, so
+                  claiming "emailed" unconditionally would eventually have her
+                  waiting on a payment from somebody who never got an invoice. */}
+              {result.emailed ? (
+                <p className="okc">
+                  Invoice emailed to {result.sentTo}. The link below is the same one,
+                  if you would rather text it too:
+                </p>
+              ) : (
+                <p>
+                  The invoice could not be emailed just now &mdash; send this link
+                  instead, or open it on your own device to take the card:
+                </p>
+              )}
               <div className="charge-link">
                 <input readOnly value={result.url} onFocus={e => e.currentTarget.select()} />
                 <button type="button" className="btn sm"
@@ -334,7 +347,7 @@ export function ChargeBuilder({
             <input type="radio" name="settle" checked={settle === 'link'}
                    disabled={!stripeReady}
                    onChange={() => setSettle('link')} />
-            {' '}Send a payment link
+            {' '}Email an invoice with a payment link
             {!stripeReady && <span className="dim"> — card payment is not configured yet</span>}
           </label>
 

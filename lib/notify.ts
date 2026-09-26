@@ -24,7 +24,7 @@
  * then actually travels.
  */
 
-import { notificationPreview } from '@/lib/phi';
+import { notificationPreview, checkoutLineLabel } from '@/lib/phi';
 import { serverClient } from '@/lib/supabase/server';
 import { emailBrand, emailOrigin, renderEmail } from '@/lib/email-theme';
 
@@ -371,6 +371,101 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
     ruleKey: 'booking_notice',
     clinicName: b.clinicName,
     synthetic: b.synthetic,
+    sent
+  });
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}
+
+/* ------------------------------------------------------------ invoices -- */
+
+export type PaymentLinkEmail = {
+  clinicId: string;
+  clinicName: string;
+  practicePhone: string | null;
+  toName: string;
+  toEmail: string;
+  orderNo: string;
+  /** The Stripe Checkout page. Expires; the copy below says so. */
+  payUrl: string;
+  lines: { name: string; qty: number; lineTotalCents: number }[];
+  totalCents: number;
+  synthetic: boolean;
+};
+
+/**
+ * The invoice — a branded email whose button is the Stripe checkout.
+ *
+ * WHY THIS WAS MISSING AND MATTERED. The charge screen has always built a
+ * payment link and shown it with a Copy button, under a radio labelled "Send a
+ * payment link". Nothing sent it. The practice copied the URL into their own
+ * email or a text, which works, and means the one message a client receives
+ * about money arrives with no letterhead, from a personal address, containing
+ * a bare stripe.com link — which is indistinguishable from a phishing attempt
+ * and gets treated as one.
+ *
+ * EVERY LINE NAME GOES THROUGH checkoutLineLabel. These are the same free-text
+ * descriptions the practitioner typed into the charge builder, so the same
+ * rule applies as when they reach Stripe: an emailed invoice sits in an inbox
+ * and gets forwarded, and "Botox — 20 units" in a subject-adjacent body is the
+ * disclosure lib/phi exists to prevent.
+ */
+export async function sendPaymentLink(p: PaymentLinkEmail): Promise<NotifyResult> {
+  const safe = p.lines.map(l => ({
+    label: checkoutLineLabel(l.qty > 1 ? `${l.name} (${l.qty})` : l.name),
+    amount: l.lineTotalCents
+  }));
+
+  const dollars = (c: number) => `$${(c / 100).toFixed(2)}`;
+
+  const body = [
+    `Hi ${p.toName.split(' ')[0]},`,
+    '',
+    `Here is your invoice from ${p.clinicName}.`,
+    '',
+    ...safe.map(l => `  ${l.label} — ${dollars(l.amount)}`),
+    '',
+    `  Total: ${dollars(p.totalCents)}`,
+    '',
+    'Pay securely here:',
+    p.payUrl,
+    '',
+    'The link is good for seven days. Nothing is charged until you complete it.',
+    '',
+    p.practicePhone ? `Questions? Call ${p.practicePhone} or reply to this email.` : 'Questions? Reply to this email.',
+    '',
+    `— ${p.clinicName}`
+  ].join('\n');
+
+  const brand = await emailBrand(p.clinicId, p.clinicName);
+  const html = renderEmail(brand, {
+    // Neutral: an invoice preview that names the treatment is the same leak as
+    // a confirmation that does.
+    preheader: `Your invoice from ${p.clinicName} — ${dollars(p.totalCents)}.`,
+    greeting: `Hi ${p.toName.split(' ')[0]},`,
+    lines: [`Here is your invoice from ${p.clinicName}.`],
+    panel: [
+      ...safe.map(l => ({ label: l.label, value: dollars(l.amount) })),
+      { label: 'Total', value: dollars(p.totalCents) }
+    ],
+    panelLayout: 'ledger',
+    cta: { label: `Pay ${dollars(p.totalCents)}`, url: p.payUrl },
+    note: 'The link is good for seven days, and nothing is charged until you complete it.',
+    footerLines: [
+      p.practicePhone
+        ? `Questions? Call ${p.practicePhone} or reply to this email.`
+        : 'Questions? Just reply to this email.',
+      `Reference ${p.orderNo}.`
+    ]
+  });
+
+  const sent = await deliver(p.toEmail, `Your invoice from ${p.clinicName}`, body, html);
+
+  await logRun({
+    clinicId: p.clinicId,
+    ruleKey: 'payment_link',
+    clinicName: p.clinicName,
+    synthetic: p.synthetic,
     sent
   });
 

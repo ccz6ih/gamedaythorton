@@ -114,6 +114,24 @@ const samples = {
     }
   },
 
+  'payment-link': {
+    subject: 'Your invoice from The Med Bar',
+    content: {
+      preheader: 'Your invoice from The Med Bar — $275.00.',
+      greeting: 'Hi Amanda,',
+      lines: ['Here is your invoice from The Med Bar.'],
+      panel: [
+        { label: 'Professional services', value: '$250.00' },
+        { label: 'Sales tax', value: '$25.00' },
+        { label: 'Total', value: '$275.00' }
+      ],
+      cta: { label: 'Pay $275.00', url: 'https://checkout.stripe.com/c/pay/cs_test_example' },
+      panelLayout: 'ledger',
+      note: 'The link is good for seven days, and nothing is charged until you complete it.',
+      footerLines: ['Questions? Call (970) 460-9270 or reply to this email.', 'Reference MB-1042.']
+    }
+  },
+
   'enquiry': {
     subject: 'New enquiry for The Med Bar',
     content: {
