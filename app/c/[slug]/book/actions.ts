@@ -10,7 +10,7 @@
  */
 
 import { createServerClient } from '@supabase/ssr';
-import { sendBookingConfirmation, sendBookingNotice } from '@/lib/notify';
+import { sendBookingConfirmation, sendBookingNotice, intakeLinkFor } from '@/lib/notify';
 
 function anonClient() {
   return createServerClient(
@@ -99,6 +99,8 @@ export async function book(input: {
     clinic_id: string; service_name: string; practice_name: string;
     practice_phone: string | null; notify_email: string | null;
     starts_at: string; requires_consent: boolean; synthetic: boolean;
+    /** Added by 0040, so the confirmation can carry the client's own form. */
+    intake_token: string | null;
   };
 
   const whenText = new Date(result.starts_at).toLocaleString('en-US', {
@@ -128,6 +130,16 @@ export async function book(input: {
     whenText,
     note: input.note ?? null,
     requiresConsent: result.requires_consent === true,
+    /**
+     * Only when the practice actually has a form live.
+     *
+     * The template is seeded INACTIVE pending Jamie's sign-off, so until she
+     * approves it intake_for_token answers "no_form" — and emailing a link to
+     * a form that refuses to open is worse than sending no link. Asking the
+     * same function the client's browser will ask means the email cannot
+     * promise something the page will not deliver.
+     */
+    intakeUrl: await intakeLinkFor(result.intake_token as string | null),
     synthetic: result.synthetic === true
   };
 

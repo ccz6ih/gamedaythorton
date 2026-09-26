@@ -139,6 +139,35 @@ export default async function ChartPage({
       .eq('active', true).order('name')
   ]);
 
+  /**
+   * What they told us, and what they agreed to.
+   *
+   * Read separately from the notes because it is a different kind of record:
+   * a note is what the practitioner observed, this is what the CLIENT said,
+   * and conflating the two is how an allergy the client reported ends up
+   * attributed to a clinician who never wrote it.
+   *
+   * Newest first and capped — a regular client accumulates one of these per
+   * visit, and the current one is what matters before a treatment.
+   */
+  const [{ data: intakeRows }, { data: consentRows }] = await Promise.all([
+    supabase.from('intake_submission')
+      .select('id, created_at, signed_at, template_version, answers, appointment_id')
+      .eq('patient_id', id).order('created_at', { ascending: false }).limit(5),
+    supabase.from('consent_record')
+      .select('id, type, granted, captured_at, text_snapshot, revoked_at')
+      .eq('patient_id', id).order('captured_at', { ascending: false }).limit(30)
+  ]);
+
+  const intakes = (intakeRows ?? []) as {
+    id: string; created_at: string; signed_at: string | null;
+    template_version: string; answers: Record<string, unknown>; appointment_id: string | null;
+  }[];
+  const consents = (consentRows ?? []) as {
+    id: string; type: string; granted: boolean; captured_at: string;
+    text_snapshot: string | null; revoked_at: string | null;
+  }[];
+
   // One round trip for every image on the page, including the face.
   const urls = await signedPhotoUrls([
     p.photo_path ?? null,
@@ -462,6 +491,69 @@ export default async function ChartPage({
                 );
               })}
             </div>
+          </section>
+        )}
+
+        {(intakes.length > 0 || consents.length > 0) && (
+          <section className="card">
+            <div className="card-head">
+              <div>
+                <div className="eyebrow">In their own words</div>
+                <h2>Intake &amp; consent</h2>
+              </div>
+            </div>
+
+            {intakes.map(sub => {
+              const entries = Object.entries(sub.answers ?? {});
+              return (
+                <details className="intake-record" key={sub.id} open={sub === intakes[0]}>
+                  <summary>
+                    {sub.signed_at ? dateLabel(sub.signed_at, 'long') : 'Not submitted'}
+                    <span className="dim"> · {sub.template_version}</span>
+                    <span className="dim"> · {entries.length} answers</span>
+                  </summary>
+                  {entries.length === 0
+                    ? <p className="muted">Nothing filled in.</p>
+                    : (
+                      <dl className="intake-answers">
+                        {entries.map(([k, v]) => (
+                          <div key={k}>
+                            {/* The template's key, tidied. Rendering the question
+                                text would mean joining to the template version
+                                they saw, which is the right long-term answer and
+                                more than this screen needs today. */}
+                            <dt>{k.replace(/_/g, ' ')}</dt>
+                            <dd>{Array.isArray(v) ? v.join(', ') : String(v)}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                </details>
+              );
+            })}
+
+            {consents.length > 0 && (
+              <div className="consent-list">
+                <h3>Consents</h3>
+                {consents.map(c => (
+                  <div className="consent-row" key={c.id}>
+                    <span className="pill" data-tone={c.granted && !c.revoked_at ? 'ok' : undefined}>
+                      {c.granted && !c.revoked_at ? <i className="dot" /> : null}
+                      {c.revoked_at ? 'withdrawn' : c.granted ? 'agreed' : 'declined'}
+                    </span>
+                    <div>
+                      {/* The wording they were shown, not the enum. A record
+                          saying "photo: true" is not evidence of anything. */}
+                      <div className="consent-text">{c.text_snapshot ?? c.type}</div>
+                      <div className="dim" style={{ fontSize: '.72rem' }}>
+                        {dateLabel(c.captured_at, 'long')}
+                        {c.revoked_at && ` · withdrawn ${dateLabel(c.revoked_at, 'md')}`}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
 

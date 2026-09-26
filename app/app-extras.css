@@ -1485,11 +1485,30 @@ a.cal-row:hover { border-color: var(--gd-accent); }
    an appointment.
    ========================================================================== */
 
+/**
+ * LITERAL COLOURS, NOT INHERITED ONES.
+ *
+ * app/layout.tsx sets `data-surface="dark"` on <html>, because the console is
+ * dark by default. This page is standalone — no console chrome, no storefront
+ * wrapper — so it would inherit that and a client opening their consent form
+ * from an email would get the staff app's near-black.
+ *
+ * The client-facing surfaces are cream: the storefront, the emails, and this.
+ * Written as literals for the same reason `.sf-invert` does it — a var that
+ * refers to a token being redefined in the same block resolves to the final
+ * value and silently comes out one colour.
+ */
 .intake {
   min-height: 100dvh;
-  background: var(--gd-bg, #EFE7DA);
-  color: var(--gd-text, #16201A);
+  background: #EFE7DA;
+  color: #16201A;
   padding: var(--gd-5) var(--gd-4) var(--gd-10);
+  --gd-bg: #EFE7DA;
+  --gd-surface: #FFFFFF;
+  --gd-border: #E1D8C8;
+  --gd-border-strong: #CFC3AE;
+  --gd-text-muted: #5C6560;
+  --gd-text-dim: #7A837D;
 }
 .intake-wrap { max-width: 34rem; margin: 0 auto; }
 .intake h1 {
@@ -1580,3 +1599,38 @@ a.cal-row:hover { border-color: var(--gd-accent); }
   margin-top: var(--gd-2);
 }
 .intake-submit:focus-visible { outline: 2px solid var(--gd-text); outline-offset: 2px; }
+
+/* ---------------------------------------------- intake on the chart ------ */
+
+.intake-record { border-top: 1px solid var(--gd-border); padding: var(--gd-3) 0; }
+.intake-record:first-of-type { border-top: 0; }
+.intake-record summary { cursor: pointer; font-size: .88rem; font-weight: 600; }
+.intake-answers { margin: var(--gd-3) 0 0; display: grid; gap: var(--gd-2); }
+.intake-answers > div {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: var(--gd-3);
+  align-items: baseline;
+}
+.intake-answers dt {
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gd-text-dim);
+}
+.intake-answers dd { margin: 0; font-size: .88rem; line-height: 1.5; }
+
+.consent-list { margin-top: var(--gd-5); border-top: 1px solid var(--gd-border); padding-top: var(--gd-4); }
+.consent-list h3 { margin: 0 0 var(--gd-3); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gd-text-dim); }
+.consent-row { display: flex; gap: var(--gd-3); align-items: flex-start; padding: var(--gd-2) 0; }
+.consent-row .pill { flex: none; }
+.consent-text { font-size: .84rem; line-height: 1.5; }
+
+/* The intake pill on Today is a link now, so it needs to look pressable
+   without looking like a button in a row of status pills. */
+a.pill-action { text-decoration: none; }
+a.pill-action:hover { filter: brightness(1.12); }
+
+@media (max-width: 640px) {
+  .intake-answers > div { grid-template-columns: 1fr; gap: 0; }
+}

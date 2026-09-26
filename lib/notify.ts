@@ -248,6 +248,29 @@ async function logRun(row: {
   }
 }
 
+/**
+ * The client's intake link, but only if there is a form to open.
+ *
+ * ASKS THE SAME FUNCTION THE CLIENT'S BROWSER WILL ASK. The template is seeded
+ * inactive pending sign-off, so intake_for_token answers "no_form" until the
+ * practice approves it — and a confirmation email carrying a link to a page
+ * that says "this form is not available" is worse than one carrying no link.
+ *
+ * Never throws. A confirmation email must go out whether or not this resolves.
+ */
+export async function intakeLinkFor(token: string | null | undefined): Promise<string | null> {
+  if (!token) return null;
+  try {
+    const supabase = await serverClient();
+    const { data } = await supabase.rpc('intake_for_token', { p_token: token });
+    const status = (data as { status?: string } | null)?.status;
+    if (status !== 'open') return null;
+    return `${emailOrigin()}/intake/${token}`;
+  } catch {
+    return null;
+  }
+}
+
 export type BookingEmail = {
   clinicId: string;
   clinicName: string;
@@ -262,6 +285,14 @@ export type BookingEmail = {
   whenText: string;
   note: string | null;
   requiresConsent: boolean;
+  /**
+   * The client's own intake form, when the practice has one switched on.
+   *
+   * Sent with the confirmation rather than the reminder because the day before
+   * is too late to be useful: a form filled the night before still means the
+   * practitioner reads it for the first time with the client in the chair.
+   */
+  intakeUrl?: string | null;
   synthetic: boolean;
 };
 
@@ -281,10 +312,17 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     `  ${b.serviceName}`,
     `  ${b.whenText}`,
     '',
-    b.requiresConsent
+    // Same three states as the HTML half, kept in step deliberately: the text
+    // part is what a screen reader and a watch get, and it saying "a form is
+    // needed" with no link while the HTML carries a button is the sort of
+    // mismatch nobody notices until a client complains they never got one.
+    b.intakeUrl ? 'Please fill in your form before you come in — it takes about three minutes:' : null,
+    b.intakeUrl ?? null,
+    b.intakeUrl ? '' : null,
+    !b.intakeUrl && b.requiresConsent
       ? 'This treatment needs a short assessment and a consent form before we start, so please allow a few extra minutes.'
       : null,
-    b.requiresConsent ? '' : null,
+    !b.intakeUrl && b.requiresConsent ? '' : null,
     'If you need to change or cancel, reply to this email'
       + (b.practicePhone ? ` or call ${b.practicePhone}.` : '.'),
     '',
@@ -302,9 +340,19 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
       { label: 'Treatment', value: b.serviceName },
       { label: 'When', value: b.whenText }
     ],
-    note: b.requiresConsent
-      ? 'This treatment needs a short assessment and a consent form before we start, so please allow a few extra minutes.'
-      : null,
+    /**
+     * The form becomes the action when there is one.
+     *
+     * Until now this email said a consent form was needed and gave no way to
+     * do it, which is how the whole thing ended up on paper in the treatment
+     * room. One button, and the visit starts with it already read.
+     */
+    cta: b.intakeUrl ? { label: 'Fill in your form', url: b.intakeUrl } : null,
+    note: b.intakeUrl
+      ? 'It takes about three minutes and saves time when you arrive. Only your practitioner sees it.'
+      : b.requiresConsent
+        ? 'This treatment needs a short assessment and a consent form before we start, so please allow a few extra minutes.'
+        : null,
     footerLines: [
       'Need to change or cancel? Reply to this email'
         + (b.practicePhone ? ` or call ${b.practicePhone}.` : '.')

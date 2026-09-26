@@ -214,6 +214,8 @@ export type TodayRow = {
    * it is the one that most needs to say "the two o'clock is in Northglenn".
    */
   location: { name: string; is_default: boolean } | null;
+  /** So the console can open the client's own form, or see it is still blank. */
+  intake_token: string | null;
 };
 
 export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow[]> {
@@ -224,7 +226,7 @@ export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow
   const { data } = await supabase
     .from('appointment')
     .select(`
-      id, starts_at, duration_min, status, room, intake_complete,
+      id, starts_at, duration_min, status, room, intake_complete, intake_token,
       patient:patient_id ( id, first_name, last_name ),
       service:service_id ( name, category ),
       provider:provider_id ( name ),

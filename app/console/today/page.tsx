@@ -154,8 +154,33 @@ export default async function TodayPage({
                       {row.patient
                         ? `${row.patient.first_name} ${row.patient.last_name}`
                         : 'Unnamed'}
+                      {/*
+                        An ACTION now, not just a complaint.
+
+                        This pill has been on every appointment ever made,
+                        because nothing could set intake_complete — so it
+                        reported a problem with no way to fix it, which is how
+                        a warning gets learned as wallpaper. It opens the
+                        client's own form: hand her the iPad, or fill it in
+                        together while they are sitting down.
+                      */}
                       {!row.intake_complete && (
-                        <span className="pill" data-tone="warn"><i className="dot" />intake incomplete</span>
+                        row.intake_token ? (
+                          <Link
+                            className="pill pill-action"
+                            data-tone="warn"
+                            href={`/intake/${row.intake_token}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <i className="dot" />intake incomplete — open form
+                          </Link>
+                        ) : (
+                          <span className="pill" data-tone="warn"><i className="dot" />intake incomplete</span>
+                        )
+                      )}
+                      {row.intake_complete && (
+                        <span className="pill" data-tone="ok"><i className="dot" />intake done</span>
                       )}
                       {row.status === 'no_show' && (
                         <span className="pill" data-tone="critical"><i className="dot" />no-show</span>
