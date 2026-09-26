@@ -1444,3 +1444,34 @@ a.cal-row:hover { border-color: var(--gd-accent); }
   .cal-month-dow span { font-size: .75rem; text-align: left; padding-left: .5rem; }
   .cal-month-head h2 { text-align: left; }
 }
+
+/* ---------------------------------------------------------------- tasks -- */
+/* The dashboard counted these for months and this is the first screen that
+   shows them. Deliberately plain: a task is a line of text and a way to say it
+   is finished. */
+
+.task-list { list-style: none; margin: 0; padding: 0; }
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gd-4);
+  padding: var(--gd-3) var(--gd-5);
+  border-top: 1px solid var(--gd-border);
+}
+.task-row:first-child { border-top: 0; }
+.task-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: .15rem; }
+.task-title { font-size: .9rem; display: flex; align-items: center; gap: .4rem; }
+.task-title a { color: inherit; }
+.task-meta { font-size: .74rem; }
+.task-flag {
+  flex: none;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gd-critical);
+}
+.task-row form { flex: none; }
+
+@media (max-width: 640px) {
+  .task-row { padding: var(--gd-3) var(--gd-4); }
+  .task-row .btn { min-height: 40px; }
+}

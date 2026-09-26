@@ -28,6 +28,23 @@ async function setStatus(formData: FormData) {
   revalidatePath('/console/today');
 }
 
+/**
+ * Tick a task off.
+ *
+ * RLS scopes the update to the caller's own practice, same as setStatus above.
+ * `done_at` is stamped rather than the row deleted: an adverse-event follow-up
+ * that was closed is part of the record of how it was handled, and a task that
+ * vanishes cannot be shown to have been done.
+ */
+async function completeTask(formData: FormData) {
+  'use server';
+  const id = String(formData.get('id'));
+  const supabase = await serverClient();
+  await supabase.from('task').update({ done: true, done_at: new Date().toISOString() }).eq('id', id);
+  revalidatePath('/console/today');
+  revalidatePath('/console');
+}
+
 export default async function TodayPage({
   searchParams
 }: {
@@ -41,6 +58,38 @@ export default async function TodayPage({
 
   const rows = await getToday(clinic, offset);
   const words = vocab(clinic);
+
+  /**
+   * THE TASKS NOBODY COULD SEE.
+   *
+   * The dashboard has always counted open tasks and linked here, and this page
+   * never rendered them — so recording an adverse event created a high-priority
+   * follow-up that was invisible from the moment it was made. Two screens write
+   * tasks (lab entry, treatment records) and until now none read them.
+   *
+   * Synthetic rows are excluded once a practice is live, for the same reason
+   * they are excluded from the dashboard: seed data naming clients who do not
+   * exist is worse than an empty list.
+   */
+  const supabaseForTasks = await serverClient();
+  const { data: flags } = await supabaseForTasks
+    .from('clinic').select('pilot_mode').eq('id', clinic.id).maybeSingle();
+  const liveClinic = flags?.pilot_mode === false;
+
+  const { data: taskRows } = await supabaseForTasks
+    .from('task')
+    .select('id, title, priority, due_on, patient_id, source')
+    .eq('done', false)
+    .match(liveClinic ? { synthetic: false } : {})
+    .order('due_on', { ascending: true, nullsFirst: false })
+    .limit(50);
+
+  const tasks = (taskRows ?? []) as {
+    id: string; title: string; priority: string | null;
+    due_on: string | null; patient_id: string | null; source: string | null;
+  }[];
+
+  const todayKey = new Date().toISOString().slice(0, 10);
   const dayIso = new Date(Date.now() + offset * 864e5).toISOString();
 
   const arrived = rows.filter(r => r.status === 'arrived').length;
@@ -159,6 +208,49 @@ export default async function TodayPage({
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {tasks.length > 0 && (
+          <section className="card flush" style={{ marginTop: 'var(--gd-5)' }}>
+            <div className="card-head">
+              <div>
+                <div className="eyebrow">Open tasks</div>
+                <h2>{tasks.length} to do</h2>
+              </div>
+            </div>
+            <ul className="task-list">
+              {tasks.map(t => {
+                const overdue = t.due_on !== null && t.due_on < todayKey;
+                return (
+                  <li key={t.id} className="task-row">
+                    <div className="task-body">
+                      <span className="task-title">
+                        {t.priority === 'high' && <i className="task-flag" aria-label="High priority" />}
+                        {/* Linked to the chart when the task is about somebody,
+                            because "follow up on bruising" is not actionable
+                            without the person it concerns. */}
+                        {t.patient_id
+                          ? <Link href={`/console/clients/${t.patient_id}`}>{t.title}</Link>
+                          : t.title}
+                      </span>
+                      <span className="task-meta">
+                        {t.due_on
+                          ? <span className={overdue ? 'warnc' : 'dim'}>
+                              {overdue ? 'overdue — ' : 'due '}{dateLabel(t.due_on, 'md')}
+                            </span>
+                          : <span className="dim">no date</span>}
+                        {t.source && <span className="dim"> · {titleCase(t.source.replace(/_/g, ' '))}</span>}
+                      </span>
+                    </div>
+                    <form action={completeTask}>
+                      <input type="hidden" name="id" value={t.id} />
+                      <button className="btn sm" type="submit">Done</button>
+                    </form>
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         )}
 

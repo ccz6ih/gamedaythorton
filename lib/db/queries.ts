@@ -75,10 +75,41 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
   const supabase = await serverClient();
   const today = dayKey(new Date().toISOString(), clinic.timezone);
 
+  /**
+   * A LIVE PRACTICE MUST NOT BE SHOWN DEMO DATA.
+   *
+   * Seed rows were loaded into The Med Bar's tenant before it went live and
+   * were never cleared. The dashboard counted them, so the headline figures
+   * were a mixture: every `payment` row is synthetic, which made "collected,
+   * last 30 days" a demo number; and all five open tasks name clients who do
+   * not exist. That is worse than a wrong figure — it is a confident one.
+   *
+   * `pilot_mode` is read directly because clinic_public deliberately omits it,
+   * the same reason app/console/layout.tsx queries it separately. RLS still
+   * scopes this to the viewer's own practice.
+   *
+   * Gameday keeps seeing its synthetic rows, because for a pilot tenant they
+   * are the only data there is and filtering would empty the screen.
+   */
+  const { data: flags } = await supabase
+    .from('clinic').select('pilot_mode').eq('id', clinic.id).maybeSingle();
+  const live = flags?.pilot_mode === false;
+
+  /**
+   * Real rows only, once a practice is taking real money.
+   *
+   * Applied with `.match()` rather than a generic wrapper around `.eq()`:
+   * Supabase's builder carries the column list through its own type, and a
+   * generic taking and returning it made the checker give up with "type
+   * instantiation is excessively deep". `.match({})` adds no filter at all, so
+   * a pilot tenant is untouched.
+   */
+  const realOnly: Record<string, unknown> = live ? { synthetic: false } : {};
+
   const [memberships, appts, ahead, tasks, threads, payments, purchases, redemptions, treatments] =
     await Promise.all([
-      supabase.from('membership').select('status, mrr_cents, started_at, cancelled_at'),
-      supabase.from('appointment').select('id, starts_at, status, intake_complete')
+      supabase.from('membership').select('status, mrr_cents, started_at, cancelled_at').match(realOnly),
+      supabase.from('appointment').select('id, starts_at, status, intake_complete').match(realOnly)
         .gte('starts_at', today + 'T00:00:00')
         .lte('starts_at', today + 'T23:59:59'),
       // Everything still to come after today, and how it was booked. The
@@ -88,16 +119,17 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
       // silent about.
       supabase.from('appointment')
         .select('id, starts_at, status, booking_channel, created_at')
+        .match(realOnly)
         .gt('starts_at', today + 'T23:59:59')
         .in('status', ['booked', 'confirmed'])
         .order('starts_at')
         .limit(200),
-      supabase.from('task').select('id, priority').eq('done', false),
-      supabase.from('message_thread').select('unread_staff'),
-      supabase.from('payment').select('amount_cents, status, created_at'),
-      supabase.from('package_purchase').select('id, sessions_total, price_paid_cents, status'),
-      supabase.from('package_redemption').select('purchase_id, sessions'),
-      supabase.from('treatment_record').select('id').eq('adverse_event', true)
+      supabase.from('task').select('id, priority').eq('done', false).match(realOnly),
+      supabase.from('message_thread').select('unread_staff').match(realOnly),
+      supabase.from('payment').select('amount_cents, status, created_at').match(realOnly),
+      supabase.from('package_purchase').select('id, sessions_total, price_paid_cents, status').match(realOnly),
+      supabase.from('package_redemption').select('purchase_id, sessions').match(realOnly),
+      supabase.from('treatment_record').select('id').eq('adverse_event', true).match(realOnly)
     ]);
 
   const m = memberships.data ?? [];
