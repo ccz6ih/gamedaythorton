@@ -11,7 +11,10 @@ import { getClinic, getToday } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { timeLabel, titleCase, dateLabel } from '@/lib/format';
 import { serverClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/actions';
+import { sendIntakeInvite, intakeLinkFor } from '@/lib/notify';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +29,74 @@ async function setStatus(formData: FormData) {
   // adding one would imply the policy could be bypassed.
   await supabase.from('appointment').update({ status }).eq('id', id);
   revalidatePath('/console/today');
+}
+
+/**
+ * Email the client their form.
+ *
+ * The confirmation already carries the link for anything booked since the form
+ * went live. This covers the rest — appointments made before it existed, and
+ * the ordinary "I can't find that email".
+ *
+ * Nothing is sent unless the form actually opens: intakeLinkFor() asks the same
+ * function the client's browser will, so a practice with no active template
+ * cannot mail out a link to a page that refuses to load.
+ */
+async function sendForm(formData: FormData) {
+  'use server';
+
+  const staff = await requireRole(['owner', 'admin', 'provider']);
+  const id = String(formData.get('id'));
+  const supabase = await serverClient();
+
+  const { data: appt } = await supabase
+    .from('appointment')
+    .select(`
+      id, starts_at, intake_token, synthetic,
+      patient:patient_id ( first_name, last_name, email ),
+      service:service_id ( name )
+    `)
+    .eq('id', id)
+    .maybeSingle();
+
+  const row = appt as unknown as {
+    starts_at: string; intake_token: string | null; synthetic: boolean;
+    patient: { first_name: string; last_name: string | null; email: string | null } | null;
+    service: { name: string } | null;
+  } | null;
+
+  if (!row?.patient?.email || !row.intake_token) {
+    redirect('/console/today?form=noaddress');
+  }
+
+  const url = await intakeLinkFor(row.intake_token);
+  if (!url) redirect('/console/today?form=noform');
+
+  const { data: clinicRow } = await supabase
+    .from('clinic').select('name, phone_voice, timezone').eq('id', staff.clinicId).maybeSingle();
+
+  const tz = (clinicRow?.timezone as string) || 'America/Denver';
+  const whenText = new Date(row.starts_at).toLocaleString('en-US', {
+    timeZone: tz, weekday: 'long', month: 'long', day: 'numeric',
+    hour: 'numeric', minute: '2-digit'
+  });
+
+  const result = await sendIntakeInvite({
+    clinicId: staff.clinicId,
+    clinicName: (clinicRow?.name as string) ?? 'The practice',
+    practicePhone: (clinicRow?.phone_voice as string) ?? null,
+    clientName: `${row.patient.first_name} ${row.patient.last_name ?? ''}`.trim(),
+    clientEmail: row.patient.email,
+    serviceName: row.service?.name ?? null,
+    whenText,
+    intakeUrl: url,
+    synthetic: row.synthetic === true
+  });
+
+  revalidatePath('/console/today');
+  // Says what happened rather than assuming it worked — the send is best-effort
+  // and she is about to tell a client "it's in your inbox".
+  redirect(`/console/today?form=${result.delivered ? 'sent' : 'failed'}`);
 }
 
 /**
@@ -48,7 +119,7 @@ async function completeTask(formData: FormData) {
 export default async function TodayPage({
   searchParams
 }: {
-  searchParams: Promise<{ offset?: string }>;
+  searchParams: Promise<{ offset?: string; form?: string }>;
 }) {
   const params = await searchParams;
   const offset = Number(params.offset ?? 0) || 0;
@@ -112,6 +183,29 @@ export default async function TodayPage({
       </header>
 
       <div className="view">
+        {/* Four outcomes, each said plainly. "Sent" when it went, and the three
+            reasons it did not — because she is about to tell somebody it is in
+            their inbox. */}
+        {params.form === 'sent' && (
+          <div className="note-band">The form has been emailed.</div>
+        )}
+        {params.form === 'failed' && (
+          <div className="note-band" role="alert">
+            That could not be emailed just now. The form still opens from the
+            link above if they are with you.
+          </div>
+        )}
+        {params.form === 'noaddress' && (
+          <div className="note-band" role="alert">
+            No email address on that client, so there is nowhere to send it.
+          </div>
+        )}
+        {params.form === 'noform' && (
+          <div className="note-band" role="alert">
+            No intake form is switched on for the practice yet.
+          </div>
+        )}
+
         <div className="grid g4">
           <div className="stat"><div className="lab">Booked</div><div className="stat-val">{rows.length}</div></div>
           <div className="stat"><div className="lab">Arrived</div><div className="stat-val">{arrived}</div></div>
@@ -178,6 +272,14 @@ export default async function TodayPage({
                         ) : (
                           <span className="pill" data-tone="warn"><i className="dot" />intake incomplete</span>
                         )
+                      )}
+                      {/* Emailing it is the other half: open it here if they
+                          are in front of you, send it if they are not. */}
+                      {!row.intake_complete && row.intake_token && row.patient && (
+                        <form action={sendForm} style={{ display: 'inline' }}>
+                          <input type="hidden" name="id" value={row.id} />
+                          <button className="linkish" type="submit">email the form</button>
+                        </form>
                       )}
                       {row.intake_complete && (
                         <span className="pill" data-tone="ok"><i className="dot" />intake done</span>

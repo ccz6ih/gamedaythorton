@@ -132,6 +132,21 @@ const samples = {
     }
   },
 
+  'intake-invite': {
+    subject: 'Your form for The Med Bar',
+    content: {
+      preheader: 'A short form to fill in before your visit to The Med Bar.',
+      greeting: 'Hi Amanda,',
+      lines: ['Before your visit to The Med Bar, please fill in your form. It takes about three minutes, and only your practitioner sees it.'],
+      panel: [
+        { label: 'Treatment', value: 'Waxing' },
+        { label: 'When', value: 'Monday, October 5 at 1:00 PM' }
+      ],
+      cta: { label: 'Fill in your form', url: 'https://www.medbarco.com/intake/19e3e5f6' },
+      footerLines: ['Any questions, call (970) 460-9270 or reply to this email.']
+    }
+  },
+
   'enquiry': {
     subject: 'New enquiry for The Med Bar',
     content: {

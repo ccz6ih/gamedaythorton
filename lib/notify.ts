@@ -425,6 +425,86 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
   return { logged: true, delivered: sent.ok, reason: sent.reason };
 }
 
+/* -------------------------------------------------------------- intake -- */
+
+export type IntakeInviteEmail = {
+  clinicId: string;
+  clinicName: string;
+  practicePhone: string | null;
+  clientName: string;
+  clientEmail: string;
+  serviceName: string | null;
+  whenText: string;
+  intakeUrl: string;
+  synthetic: boolean;
+};
+
+/**
+ * "Here is your form" — sent on its own, after the fact.
+ *
+ * The confirmation already carries this link for anything booked since the
+ * form went live. This is for the rest: appointments made before it existed,
+ * and the ordinary case of somebody who deleted the email or cannot find it.
+ *
+ * Deliberately a SEPARATE message rather than re-sending the confirmation. A
+ * second "you're booked in" three weeks after booking reads like a duplicate
+ * charge or a booking error, and the practice gets a worried phone call.
+ */
+export async function sendIntakeInvite(i: IntakeInviteEmail): Promise<NotifyResult> {
+  const first = i.clientName.split(' ')[0];
+
+  const body = [
+    `Hi ${first},`,
+    '',
+    `Before your visit to ${i.clinicName}, please fill in your form — it takes about three minutes.`,
+    '',
+    i.intakeUrl,
+    '',
+    ...(i.serviceName ? [`  ${i.serviceName}`] : []),
+    `  ${i.whenText}`,
+    '',
+    'Only your practitioner sees it.',
+    '',
+    i.practicePhone ? `Any questions, call ${i.practicePhone} or reply to this email.` : 'Any questions, just reply to this email.',
+    '',
+    `— ${i.clinicName}`
+  ].join('\n');
+
+  const brand = await emailBrand(i.clinicId, i.clinicName);
+  const html = renderEmail(brand, {
+    // Neutral, like every other preheader here: the treatment is named in the
+    // body, not in the line that sits in an inbox list.
+    preheader: `A short form to fill in before your visit to ${i.clinicName}.`,
+    greeting: `Hi ${first},`,
+    lines: [
+      `Before your visit to ${i.clinicName}, please fill in your form. It takes about ` +
+      `three minutes, and only your practitioner sees it.`
+    ],
+    panel: [
+      ...(i.serviceName ? [{ label: 'Treatment', value: i.serviceName }] : []),
+      { label: 'When', value: i.whenText }
+    ],
+    cta: { label: 'Fill in your form', url: i.intakeUrl },
+    footerLines: [
+      i.practicePhone
+        ? `Any questions, call ${i.practicePhone} or reply to this email.`
+        : 'Any questions, just reply to this email.'
+    ]
+  });
+
+  const sent = await deliver(i.clientEmail, `Your form for ${i.clinicName}`, body, html);
+
+  await logRun({
+    clinicId: i.clinicId,
+    ruleKey: 'intake_invite',
+    clinicName: i.clinicName,
+    synthetic: i.synthetic,
+    sent
+  });
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}
+
 /* ------------------------------------------------------------ invoices -- */
 
 export type PaymentLinkEmail = {
