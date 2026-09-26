@@ -1475,3 +1475,108 @@ a.cal-row:hover { border-color: var(--gd-accent); }
   .task-row { padding: var(--gd-3) var(--gd-4); }
   .task-row .btn { min-height: 40px; }
 }
+
+/* ==========================================================================
+   INTAKE — the client's own form, on their own phone
+   ==========================================================================
+   Standalone: this page has no console chrome and no storefront nav, because
+   the person reading it arrived from an email and is doing one task. Sized for
+   a thumb throughout — the realistic context is a car park five minutes before
+   an appointment.
+   ========================================================================== */
+
+.intake {
+  min-height: 100dvh;
+  background: var(--gd-bg, #EFE7DA);
+  color: var(--gd-text, #16201A);
+  padding: var(--gd-5) var(--gd-4) var(--gd-10);
+}
+.intake-wrap { max-width: 34rem; margin: 0 auto; }
+.intake h1 {
+  font-family: var(--brand-display-font, Georgia, serif);
+  font-weight: 400;
+  font-size: 1.6rem;
+  margin: 0 0 var(--gd-3);
+}
+.intake-lead { margin: 0 0 var(--gd-4); line-height: 1.6; }
+.intake-note { font-size: .82rem; color: var(--gd-text-muted); line-height: 1.6; margin-top: var(--gd-3); }
+.intake-head { margin-bottom: var(--gd-5); }
+
+.intake-error {
+  border: 1px solid var(--gd-critical);
+  border-radius: var(--gd-r-sm);
+  padding: var(--gd-3) var(--gd-4);
+  margin-bottom: var(--gd-4);
+  font-size: .88rem;
+}
+
+.intake-section {
+  background: var(--gd-surface, #fff);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  padding: var(--gd-4);
+  margin-bottom: var(--gd-4);
+}
+.intake-section h2 { margin: 0 0 var(--gd-4); font-size: 1rem; }
+
+.intake-field { margin-bottom: var(--gd-4); border: 0; padding: 0; }
+.intake-field:last-child { margin-bottom: 0; }
+.intake-field > label,
+.intake-field legend {
+  display: block;
+  font-size: .88rem;
+  font-weight: 600;
+  margin-bottom: var(--gd-2);
+  padding: 0;
+  line-height: 1.4;
+}
+.intake-field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;   /* iOS zooms the page on focus below 16px. */
+  padding: .6rem .7rem;
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-bg);
+  color: inherit;
+  resize: vertical;
+}
+
+.intake-choices { display: flex; flex-direction: column; gap: 2px; }
+/* A whole row is the target, not the 20px circle inside it. */
+.intake-opt,
+.intake-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  padding: .55rem .5rem;
+  border-radius: var(--gd-r-sm);
+  cursor: pointer;
+  line-height: 1.45;
+  font-size: .9rem;
+  min-height: 44px;
+}
+.intake-opt:hover, .intake-consent:hover { background: var(--gd-bg); }
+.intake-opt input, .intake-consent input {
+  flex: none;
+  width: 20px; height: 20px;
+  margin-top: .1rem;
+  accent-color: var(--gd-accent);
+}
+.intake-consent { align-items: flex-start; padding: .7rem .5rem; }
+.intake-req { color: var(--gd-text-muted); font-style: normal; font-size: .8rem; }
+
+.intake-submit {
+  width: 100%;
+  min-height: 52px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--brand-accent-ink, #fff);
+  background: var(--gd-accent);
+  border: 0;
+  border-radius: var(--gd-r-md);
+  cursor: pointer;
+  margin-top: var(--gd-2);
+}
+.intake-submit:focus-visible { outline: 2px solid var(--gd-text); outline-offset: 2px; }

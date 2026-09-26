@@ -97,6 +97,21 @@ const ALWAYS_OPEN = [
   '/confirm',
 
   /**
+   * The client-facing intake form.
+   *
+   * Same argument as /confirm, and the stakes are higher: the person opening it
+   * has no account and is holding a single-purpose token that IS the
+   * authorisation. Gated, the link in every confirmation email lands a client
+   * on a staff sign-in form, and the form goes back to paper — which is the
+   * thing it was built to replace.
+   *
+   * app.intake_for_token is what enforces anything. It returns the form, a
+   * first name and an appointment time, and nothing else about the person; once
+   * submitted it returns no answers at all.
+   */
+  '/intake',
+
+  /**
    * Public storefronts: /c/<slug>.
    *
    * These sit in front of the gate rather than behind it, because a shop window
