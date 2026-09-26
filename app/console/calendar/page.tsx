@@ -11,9 +11,10 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getClinic } from '@/lib/db/queries';
-import { getCalendarWeek, weekStart } from '@/lib/db/calendar';
+import { getCalendarWeek, getCalendarMonth, weekStart } from '@/lib/db/calendar';
 import { serverClient } from '@/lib/supabase/server';
 import { WeekGrid } from '@/components/WeekGrid';
+import { MonthGrid } from '@/components/MonthGrid';
 import { money } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ function shiftDay(date: string, days: number): string {
 export default async function CalendarPage({
   searchParams
 }: {
-  searchParams: Promise<{ week?: string; day?: string; at?: string }>;
+  searchParams: Promise<{ week?: string; day?: string; at?: string; month?: string; on?: string }>;
 }) {
   const params = await searchParams;
   const clinic = await getClinic();
@@ -43,6 +44,16 @@ export default async function CalendarPage({
   const tz = clinic.timezone || 'America/Denver';
   const thisWeek = weekStart(new Date(), tz);
   const validDay = params.day && /^\d{4}-\d{2}-\d{2}$/.test(params.day) ? params.day : null;
+
+  /**
+   * MONTH VIEW.
+   *
+   * Same validation rule as the week: only a date we could have generated is
+   * accepted, because a hand-typed value would otherwise choose what the query
+   * asks the database for.
+   */
+  const validMonth = params.month && /^\d{4}-\d{2}$/.test(params.month) ? params.month : null;
+  const validOn = params.on && /^\d{4}-\d{2}-\d{2}$/.test(params.on) ? params.on : null;
 
   // Only accept a date we generated. A hand-typed value would otherwise decide
   // what the query asks for.
@@ -92,6 +103,19 @@ export default async function CalendarPage({
 
   const shown = { ...week, events: week.events.filter(matchesFilter) };
 
+  /**
+   * The month, when one is asked for. Fetched AFTER the location list because
+   * its chosen day has to be filtered by the same rule as the week — a filter
+   * that applied to one view and not the other would be worse than no filter,
+   * since the two would disagree about the same afternoon.
+   */
+  const month = validMonth
+    ? await getCalendarMonth(clinic, validMonth, validOn ?? `${validMonth}-01`)
+    : null;
+  const monthShown = month
+    ? { ...month, selectedEvents: month.selectedEvents.filter(matchesFilter) }
+    : null;
+
   const appointments = shown.events.filter(e => e.kind === 'appointment');
   const live = appointments.filter(e => e.status !== 'cancelled' && e.status !== 'no_show');
   const online = live.filter(e => e.bookedOnline).length;
@@ -122,11 +146,17 @@ export default async function CalendarPage({
         </div>
         <div className="spacer" />
         <div className="row tight">
-          {validDay ? (
+          {/* The month carries its own ‹ › inside the grid, next to the name
+              of the month they move. A second pair up here would be two
+              controls doing the same job a thumb-length apart. */}
+          {monthShown ? (
+            <Link className="btn sm" href={`/console/calendar?week=${weekStart(new Date(monthShown.selected + 'T12:00:00'), tz)}`}>Week</Link>
+          ) : validDay ? (
             <>
               <Link className="btn sm" href={`/console/calendar?day=${shiftDay(validDay, -1)}`}>&lsaquo;</Link>
               <Link className="btn sm" href={`/console/calendar?day=${shiftDay(validDay, 1)}`}>&rsaquo;</Link>
               <Link className="btn sm" href={`/console/calendar?week=${requested}`}>Week</Link>
+              <Link className="btn sm" href={`/console/calendar?month=${validDay.slice(0, 7)}&on=${validDay}`}>Month</Link>
             </>
           ) : (
             <>
@@ -134,6 +164,7 @@ export default async function CalendarPage({
               <Link className="btn sm" href="/console/calendar">This week</Link>
               <Link className="btn sm" href={`/console/calendar?week=${shiftWeek(requested, 1)}`}>&rsaquo;</Link>
               <Link className="btn sm" href={`/console/calendar?day=${requested}`}>Day</Link>
+              <Link className="btn sm" href={`/console/calendar?month=${requested.slice(0, 7)}&on=${requested}`}>Month</Link>
             </>
           )}
           <Link className="btn sm primary" href="/console/book">Book</Link>
@@ -180,6 +211,11 @@ export default async function CalendarPage({
           )}
         </div>
 
+        {/* Every figure below counts THIS WEEK. Printed above a month grid
+            they would read as the month's, and "how full" in particular would
+            be wrong by a factor of four. The month shows its own density in
+            the cells. */}
+        {!monthShown && (
         <div className="grid g4">
           <div className="stat">
             <div className="lab">Booked</div>
@@ -208,9 +244,12 @@ export default async function CalendarPage({
             </div>
           </div>
         </div>
+        )}
 
         <section className="card flush" style={{ marginTop: 'var(--gd-5)' }}>
-          <WeekGrid week={week} focusDate={validDay} />
+          {monthShown
+            ? <MonthGrid month={monthShown} timezone={tz} base={at ? `at=${at}` : ''} />
+            : <WeekGrid week={week} focusDate={validDay} />}
         </section>
 
         {live.length === 0 && (

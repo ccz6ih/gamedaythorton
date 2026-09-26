@@ -66,16 +66,21 @@ export function weekStart(anchor: Date, timeZone: string): string {
   return `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
 }
 
-export async function getCalendarWeek(clinic: Clinic, startDate: string): Promise<CalendarWeek> {
+/** YYYY-MM-DD for a Date, read in whatever zone the Date already carries. */
+function localKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Every appointment and block that starts in a date range, as CalendarEvents.
+ *
+ * EXTRACTED SO THE WEEK AND THE MONTH CANNOT DISAGREE. This was the body of
+ * getCalendarWeek; the month view needs exactly the same mapping, and a second
+ * copy of it is a guarantee that one of them eventually shows a different
+ * status colour or forgets `elsewhere`.
+ */
+async function eventsBetween(fromIso: string, toIso: string): Promise<CalendarEvent[]> {
   const supabase = await serverClient();
-  const tz = clinic.timezone || 'America/Denver';
-
-  const start = new Date(startDate + 'T00:00:00');
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7);
-
-  const fromIso = `${startDate}T00:00:00`;
-  const toIso = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}T00:00:00`;
 
   const [{ data: appts }, { data: blocks }] = await Promise.all([
     supabase.from('appointment')
@@ -152,6 +157,18 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
     });
   }
 
+  return events;
+}
+
+export async function getCalendarWeek(clinic: Clinic, startDate: string): Promise<CalendarWeek> {
+  const tz = clinic.timezone || 'America/Denver';
+
+  const start = new Date(startDate + 'T00:00:00');
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+
+  const events = await eventsBetween(`${startDate}T00:00:00`, `${localKey(end)}T00:00:00`);
+
   /* ------------------------------------------------------------- days -- */
   const todayKey = dayKeyIn(new Date(), tz);
   const openDays = new Set(
@@ -191,6 +208,129 @@ export async function getCalendarWeek(clinic: Clinic, startDate: string): Promis
   if (firstHour > lastHour) { firstHour = 8; lastHour = 18; }
 
   return { startDate, days, events, firstHour, lastHour };
+}
+
+/* ============================================================================
+   THE MONTH
+   ============================================================================
+   The week answers "what does this week look like". The month answers the
+   question that comes before it: WHICH DAY. Finding a free Tuesday by stepping
+   through weeks one arrow at a time is how the booking screen felt, and it is
+   the thing a paper appointment book does better than most software.
+
+   It carries counts, not appointments. A month grid that tries to print who is
+   coming turns into six rows of clipped text on a phone; what it needs to show
+   is where the space is, and then get out of the way so the chosen day can be
+   read properly underneath.
+   ========================================================================== */
+
+export type MonthCell = {
+  date: string;
+  dayNum: number;
+  dow: string;
+  isToday: boolean;
+  /** Is the practice normally open on this weekday? */
+  open: boolean;
+  /** Does this cell belong to the month being shown, or the padding around it? */
+  inMonth: boolean;
+  /** Appointments and blocks starting that day. */
+  count: number;
+  /** Any of them somewhere other than the usual room. */
+  hasElsewhere: boolean;
+  /** In the past, in the practice's timezone. */
+  isPast: boolean;
+};
+
+export type CalendarMonth = {
+  /** YYYY-MM of the month being shown. */
+  month: string;
+  label: string;
+  prevMonth: string;
+  nextMonth: string;
+  /** Always whole weeks, Sunday-first, so the grid is rectangular. */
+  cells: MonthCell[];
+  selected: string;
+  selectedLabel: string;
+  selectedEvents: CalendarEvent[];
+  selectedOpen: boolean;
+};
+
+function monthShift(month: string, by: number): string {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(y!, m! - 1 + by, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+export async function getCalendarMonth(
+  clinic: Clinic,
+  month: string,
+  selected: string
+): Promise<CalendarMonth> {
+  const tz = clinic.timezone || 'America/Denver';
+  const [y, m] = month.split('-').map(Number);
+
+  const first = new Date(y!, m! - 1, 1);
+  const last = new Date(y!, m!, 0);
+
+  /**
+   * Padded out to whole weeks. The grid has to be rectangular or the columns
+   * stop lining up with their weekday headers, and a month that starts on a
+   * Thursday would otherwise draw three empty cells as a ragged edge.
+   */
+  const gridStart = new Date(first);
+  gridStart.setDate(1 - first.getDay());
+  const gridEnd = new Date(last);
+  gridEnd.setDate(last.getDate() + (6 - last.getDay()) + 1);
+
+  const events = await eventsBetween(`${localKey(gridStart)}T00:00:00`, `${localKey(gridEnd)}T00:00:00`);
+
+  const todayKey = dayKeyIn(new Date(), tz);
+  const openDays = new Set((clinic.hours ?? []).filter(h => h.open && h.close).map(h => h.day));
+
+  // One pass, so a busy month is not 42 filters over the same array.
+  const byDay = new Map<string, CalendarEvent[]>();
+  for (const e of events) {
+    const key = dayKeyIn(new Date(e.startsAt), tz);
+    const list = byDay.get(key);
+    if (list) list.push(e); else byDay.set(key, [e]);
+  }
+
+  const cells: MonthCell[] = [];
+  for (let d = new Date(gridStart); d < gridEnd; d.setDate(d.getDate() + 1)) {
+    const key = localKey(d);
+    const dayEvents = byDay.get(key) ?? [];
+    cells.push({
+      date: key,
+      dayNum: d.getDate(),
+      dow: DOW[d.getDay()]!,
+      isToday: key === todayKey,
+      open: openDays.has(DOW[d.getDay()]!),
+      inMonth: d.getMonth() === m! - 1,
+      count: dayEvents.length,
+      hasElsewhere: dayEvents.some(e => e.elsewhere),
+      isPast: key < todayKey
+    });
+  }
+
+  const selectedEvents = (byDay.get(selected) ?? [])
+    .slice()
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+
+  const selDate = new Date(selected + 'T12:00:00');
+
+  return {
+    month,
+    label: first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    prevMonth: monthShift(month, -1),
+    nextMonth: monthShift(month, 1),
+    cells,
+    selected,
+    selectedLabel: selDate.toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric'
+    }),
+    selectedEvents,
+    selectedOpen: openDays.has(DOW[selDate.getDay()]!)
+  };
 }
 
 /* ============================================================================
