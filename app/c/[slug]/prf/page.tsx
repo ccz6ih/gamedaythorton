@@ -22,6 +22,7 @@
  * unhidden from the practice's own review.
  */
 
+import { FaqConversation } from '@/components/FaqConversation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -342,14 +343,21 @@ export default async function StorefrontPRF({ params }: { params: Promise<{ slug
             <h2>Common questions</h2>
           </div>
 
-          <div className="sf-menu-group">
-            {FAQ.map(f => (
-              <details className="sf-more" key={f.q} style={{ marginBottom: 'var(--gd-4)' }}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
-            ))}
-          </div>
+          {/*
+            A conversation rather than an accordion, on this page specifically.
+
+            The reference FAQs elsewhere stay as <details>, because somebody
+            looking up one fact wants to scan. The person on THIS page is
+            usually nervous, curious, and not sure what they are allowed to
+            ask — and a conversation answers them by showing somebody else
+            asking the awkward question first.
+
+            The same FAQ array still feeds the FAQPage structured data above,
+            so how it is rendered changes nothing for search or answer
+            engines. And with no JavaScript this is a plain readable list,
+            which is more crawlable than a collapsed accordion, not less.
+          */}
+          <FaqConversation items={FAQ} />
 
           <p className="sf-note" style={{ marginTop: 'var(--gd-8)' }}>
             This page is general information about platelet-rich fibrin as a

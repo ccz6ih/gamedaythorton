@@ -6482,3 +6482,120 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   line-height: 1.6;
   color: var(--gd-text-muted);
 }
+
+/* ==========================================================================
+   FAQ AS A CONVERSATION
+   ==========================================================================
+   The no-JS state is the DEFAULT below: a plain, readable question-and-answer
+   list. Everything animated is nested under [data-anim="on"], which the
+   component only sets once it has measured and confirmed motion is welcome.
+   Written this way round so the readable version cannot rot — it is what you
+   get if anything at all goes wrong.
+   ========================================================================== */
+
+.faqx { display: flex; flex-direction: column; gap: 2.5rem; }
+.faqx-pair { display: flex; flex-direction: column; gap: 1rem; }
+.faqx-row { display: flex; }
+.faqx-row-q { justify-content: flex-start; }
+.faqx-row-a { justify-content: flex-end; }
+
+.faqx-msg {
+  position: relative;
+  max-width: 78%;
+  padding: 1.25rem 1.6rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--gd-border-strong);
+  overflow: hidden;
+}
+.faqx-q { background: var(--gd-surface-raised); border-bottom-left-radius: .4rem; }
+.faqx-a {
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink, #fff);
+  border-color: var(--gd-accent);
+  border-bottom-right-radius: .4rem;
+}
+.faqx-a p { color: inherit; }
+
+.faqx-body { display: flex; flex-direction: column; gap: .7rem; }
+.faqx-body p { margin: 0; font-size: .95rem; line-height: 1.6; font-weight: 500; }
+.faqx-q .faqx-body p { font-weight: 700; }
+
+/* Hidden unless the animation is running — there is nobody typing on a static
+   page, and three dots with no motion look like a rendering fault. */
+.faqx-dots { display: none; }
+
+/* ------------------------------------------------------- animated state -- */
+
+.faqx[data-anim="on"] .faqx-msg {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  transform: scale(0);
+  transition:
+    transform .32s cubic-bezier(.2, .8, .3, 1),
+    width .42s cubic-bezier(.65, 0, .35, 1),
+    height .42s cubic-bezier(.65, 0, .35, 1) .12s,
+    padding .42s cubic-bezier(.65, 0, .35, 1),
+    border-radius .42s ease;
+}
+.faqx[data-anim="on"] .faqx-msg .faqx-body { opacity: 0; transition: opacity .28s ease .18s; }
+
+.faqx[data-anim="on"] .faqx-dots {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  gap: .3rem;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+.faqx[data-anim="on"] .faqx-dots i {
+  width: .45rem; height: .45rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .55;
+  animation: faqx-pulse 1s infinite ease-in-out;
+}
+.faqx[data-anim="on"] .faqx-dots i:nth-child(2) { animation-delay: .15s; }
+.faqx[data-anim="on"] .faqx-dots i:nth-child(3) { animation-delay: .3s; }
+
+@keyframes faqx-pulse {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-.22rem); }
+}
+
+/* Landed. */
+.faqx[data-anim="on"] .faqx-msg.is-in { transform: scale(1); }
+
+/* Opened — width first, height just behind it, then the words. */
+.faqx[data-anim="on"] .faqx-msg.is-open {
+  width: var(--faqx-w);
+  height: var(--faqx-h);
+  padding: 1.25rem 1.6rem;
+  border-radius: 1.5rem;
+}
+.faqx[data-anim="on"] .faqx-q.is-open { border-bottom-left-radius: .4rem; }
+.faqx[data-anim="on"] .faqx-a.is-open { border-bottom-right-radius: .4rem; }
+.faqx[data-anim="on"] .faqx-msg.is-open .faqx-dots { opacity: 0; }
+.faqx[data-anim="on"] .faqx-msg.is-open .faqx-body { opacity: 1; }
+
+/* Belt and braces. The component checks this before it sets data-anim, so
+   this should never apply — it is here in case a future change forgets to. */
+@media (prefers-reduced-motion: reduce) {
+  .faqx[data-anim="on"] .faqx-msg {
+    width: auto; height: auto;
+    padding: 1.25rem 1.6rem;
+    border-radius: 1.5rem;
+    transform: none;
+    transition: none;
+  }
+  .faqx[data-anim="on"] .faqx-msg .faqx-body { opacity: 1; }
+  .faqx[data-anim="on"] .faqx-dots { display: none; }
+}
+
+@media (max-width: 640px) {
+  .faqx-msg { max-width: 92%; padding: 1.1rem 1.25rem; }
+  .faqx[data-anim="on"] .faqx-msg.is-open { padding: 1.1rem 1.25rem; }
+}
