@@ -44,6 +44,11 @@ export const STOREFRONT_PATHS = [
   '/facials',
   '/scar-revision',
   '/injectables',
+  // The skin quiz. /quiz/result is listed too: it is a real page a visitor
+  // lands on, and an unlisted child would 307 to /admin exactly as
+  // /mens-skin-care did.
+  '/quiz',
+  '/quiz/result',
   /**
    * Added 15 Sep 2026. It shipped registered in lib/sitemap.ts but NOT here,
    * so the middleware did not recognise it as a public page and answered

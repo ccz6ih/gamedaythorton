@@ -6321,3 +6321,126 @@ details[open] > .sf-faq-question .sf-faq-arrow {
  * comfortably in Cormorant runs into the Book button without this.
  */
 .sf-nav-links .sf-link { letter-spacing: .01em; }
+
+/* ==========================================================================
+   SKIN QUIZ
+   ==========================================================================
+   Sized for a thumb on a phone, because that is where a quiz linked from
+   Instagram gets taken. Whole rows are tap targets, not the 20px control.
+   ========================================================================== */
+
+.quiz-form { display: grid; gap: var(--gd-6); }
+
+.quiz-q { border: 0; padding: 0; margin: 0; }
+.quiz-q legend {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-1);
+  line-height: 1.3;
+  padding: 0;
+  margin-bottom: var(--gd-2);
+}
+.quiz-n {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem; height: 1.6rem;
+  margin-top: .1rem;
+  border-radius: 50%;
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink, #fff);
+  font-family: var(--brand-ui-font);
+  font-size: .8rem;
+  font-weight: 700;
+}
+.quiz-help {
+  margin: 0 0 var(--gd-3) 2.2rem;
+  font-size: .86rem;
+  color: var(--gd-text-muted);
+}
+
+.quiz-opts { display: grid; gap: 2px; margin-left: 2.2rem; }
+.quiz-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  min-height: 44px;
+  padding: .6rem .7rem;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  cursor: pointer;
+  line-height: 1.45;
+}
+.quiz-opt:hover { border-color: var(--gd-accent); }
+.quiz-opt input { flex: none; width: 20px; height: 20px; margin-top: .12rem; accent-color: var(--gd-accent); }
+/* :has is safe to lean on here — without it the row simply does not highlight,
+   which costs polish and nothing else. */
+.quiz-opt:has(input:checked) {
+  border-color: var(--gd-accent);
+  background: var(--gd-accent-dim);
+}
+.quiz-hint { display: block; font-style: normal; font-size: .78rem; color: var(--gd-text-dim); }
+
+.quiz-submit { width: 100%; min-height: 52px; justify-content: center; }
+.quiz-note {
+  font-size: .82rem;
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+  margin-top: var(--gd-3);
+}
+
+/* ------------------------------------------------------------ results -- */
+
+.quiz-picks { display: grid; gap: var(--gd-3); margin-bottom: var(--gd-6); }
+.quiz-pick {
+  display: flex;
+  gap: var(--gd-4);
+  padding: var(--gd-4);
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-md);
+  background: var(--gd-surface);
+}
+.quiz-pick-rank {
+  flex: none;
+  width: 2rem; height: 2rem;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink, #fff);
+  font-weight: 700;
+  font-size: .9rem;
+}
+.quiz-pick h3 { margin: 0 0 .2rem; font-size: var(--gd-step-1); }
+.quiz-pick-why { margin: 0 0 .4rem; font-size: .84rem; color: var(--gd-accent); }
+.quiz-pick-blurb { margin: 0 0 .4rem; font-size: .9rem; line-height: 1.55; }
+.quiz-pick-meta { margin: 0; font-size: .82rem; color: var(--gd-text-muted); font-variant-numeric: tabular-nums; }
+
+.quiz-cta { margin-top: var(--gd-5); }
+.quiz-guides { margin: var(--gd-3) 0 0; padding-left: 1.1rem; line-height: 2; }
+
+.quiz-capture { margin-top: var(--gd-4); display: grid; gap: var(--gd-3); }
+.quiz-capture-row { display: grid; gap: var(--gd-3); grid-template-columns: 1fr 1fr; }
+.quiz-capture input {
+  font: inherit;
+  font-size: 16px;   /* stops iOS zooming the page on focus */
+  padding: .7rem .8rem;
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-sm);
+  background: var(--gd-bg);
+  color: inherit;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .quiz-opts, .quiz-help { margin-left: 0; }
+  .quiz-capture-row { grid-template-columns: 1fr; }
+  .quiz-pick { flex-direction: column; gap: var(--gd-3); }
+}
+
+/* The quiz's own reading column. Named in the quiz- namespace rather than
+   invented as an sf- class: --sf-measure is a custom property, not a class,
+   and npm run test:css caught `sf-measure` being used as one. */
+.quiz-col { max-width: var(--sf-measure); }
