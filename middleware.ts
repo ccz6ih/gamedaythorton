@@ -112,6 +112,20 @@ const ALWAYS_OPEN = [
   '/intake',
 
   /**
+   * The client's own sign-in, and where a magic link lands.
+   *
+   * Gated, a client following the link from their email would be bounced to
+   * the passcode box or the staff login — which is what /portal itself used to
+   * do, and the reason nobody could ever reach the portal.
+   *
+   * Neither route reveals anything: the sign-in page gives the same answer for
+   * an address on file and one that is not, and the callback hands out a
+   * session only in exchange for a one-time code Supabase emailed.
+   */
+  '/portal/sign-in',
+  '/auth/callback',
+
+  /**
    * Public storefronts: /c/<slug>.
    *
    * These sit in front of the gate rather than behind it, because a shop window

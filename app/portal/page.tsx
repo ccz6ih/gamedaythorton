@@ -30,12 +30,25 @@ async function signOut() {
   'use server';
   const supabase = await serverClient();
   await supabase.auth.signOut();
-  redirect('/admin');
+  // Their own door, not the staff one.
+  redirect('/portal/sign-in');
 }
 
 export default async function PortalPage() {
   const viewer = await currentViewer();
-  if (!viewer) redirect('/admin?next=/portal');
+
+  /**
+   * SENT TO THEIR OWN SIGN-IN, not /admin.
+   *
+   * This redirected clients to the STAFF login, which is a password form for
+   * an account they do not have and never will. It was harmless only because
+   * no client could reach the portal at all; the moment one can, it is the
+   * first thing they would hit.
+   *
+   * `!viewer` also covers the signed-in-but-unlinked case — an auth user with
+   * no patient row. The sign-in page explains that state rather than looping.
+   */
+  if (!viewer) redirect('/portal/sign-in?reason=no_match');
   if (viewer.kind !== 'patient') redirect('/console');
 
   const clinic = await getClinic();
