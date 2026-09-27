@@ -194,6 +194,11 @@ export default async function StorefrontLayout({ children, params }: Props) {
   const nav = [
     { href: links.home, label: 'Home' },
     { href: links.services, label: 'Services' },
+    /* Second, straight after Services. It is the softest entry point on the
+       site — somebody not ready to pick a treatment off a menu can still find
+       out something useful about themselves, and it is the page most likely to
+       turn a browser into an enquiry. Burying it under About would waste it. */
+    { href: links.quiz, label: 'Skin quiz' },
     { href: links.prf, label: 'PRF' },
     { href: links.shop, label: 'Shop' },
     { href: links.packages, label: 'Packages' },

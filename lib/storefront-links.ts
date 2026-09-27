@@ -95,6 +95,9 @@ export function storefrontLinks(base: string) {
     enquire: `${base}/enquire`,
     book: `${base}/book`,
     cart: `${base}/cart`,
+    /** The skin quiz. Its RESULT page is deliberately absent — that URL
+     *  carries somebody's answers and is never linked to, only arrived at. */
+    quiz: `${base}/quiz`,
     /** The PRF education/pillar page. */
     prf: `${base}/prf`,
     prfCompare: `${base}/prf/compare`,
