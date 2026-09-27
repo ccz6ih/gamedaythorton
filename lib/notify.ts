@@ -316,7 +316,10 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     // part is what a screen reader and a watch get, and it saying "a form is
     // needed" with no link while the HTML carries a button is the sort of
     // mismatch nobody notices until a client complains they never got one.
-    b.intakeUrl ? 'Please fill in your form before you come in — it takes about three minutes:' : null,
+    b.intakeUrl
+      ? 'Your booking includes a short health form and consent. It takes about three '
+        + 'minutes and covers everything booked for that day:'
+      : null,
     b.intakeUrl ?? null,
     b.intakeUrl ? '' : null,
     !b.intakeUrl && b.requiresConsent
@@ -347,9 +350,11 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
      * do it, which is how the whole thing ended up on paper in the treatment
      * room. One button, and the visit starts with it already read.
      */
-    cta: b.intakeUrl ? { label: 'Fill in your form', url: b.intakeUrl } : null,
+    cta: b.intakeUrl ? { label: 'Complete your form' , url: b.intakeUrl } : null,
     note: b.intakeUrl
-      ? 'It takes about three minutes and saves time when you arrive. Only your practitioner sees it.'
+      ? 'Your booking includes a short health form and consent to complete before you come in. '
+        + 'It takes about three minutes, covers everything booked for that day, and only your '
+        + 'practitioner sees it.'
       : b.requiresConsent
         ? 'This treatment needs a short assessment and a consent form before we start, so please allow a few extra minutes.'
         : null,
