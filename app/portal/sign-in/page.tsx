@@ -91,7 +91,7 @@ export default async function PortalSignIn({
   const { sent, error, reason } = await searchParams;
 
   return (
-    <main className="intake">
+    <main className="intake-page">
       <div className="intake-wrap" style={{ maxWidth: '26rem' }}>
         <h1>Your visits</h1>
 

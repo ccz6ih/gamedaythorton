@@ -146,7 +146,7 @@ export default async function IntakePage({
   }
 
   const shell = (title: string, body: React.ReactNode) => (
-    <main className="intake">
+    <main className="intake-page">
       <div className="intake-wrap">
         <h1>{title}</h1>
         {body}
@@ -183,7 +183,7 @@ export default async function IntakePage({
   const answers = form.answers ?? {};
 
   return (
-    <main className="intake">
+    <main className="intake-page">
       <div className="intake-wrap">
         <div className="intake-head">
           <h1>Before your visit</h1>

@@ -47,7 +47,8 @@
     "test:labels": "node scripts/checkout-label-test.cjs",
     "email:preview": "node scripts/email-preview.cjs",
     "icons": "node scripts/make-pwa-icons.cjs",
-    "calendar:preview": "node scripts/calendar-preview.cjs"
+    "calendar:preview": "node scripts/calendar-preview.cjs",
+    "test:classes": "node scripts/class-collision-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
