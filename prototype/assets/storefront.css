@@ -6444,3 +6444,41 @@ details[open] > .sf-faq-question .sf-faq-arrow {
    invented as an sf- class: --sf-measure is a custom property, not a class,
    and npm run test:css caught `sf-measure` being used as one. */
 .quiz-col { max-width: var(--sf-measure); }
+
+/* ------------------------------------------------- quiz: the teaching -- */
+/* Reads like an article, not a product card. Wider line height and real
+   paragraph spacing, because this half is meant to be READ rather than
+   scanned on the way to a button. */
+
+.quiz-teach { font-size: .95rem; line-height: 1.7; margin: 0 0 var(--gd-4); }
+
+.quiz-facts { display: grid; gap: var(--gd-4); margin: var(--gd-5) 0; }
+.quiz-fact {
+  padding: var(--gd-4);
+  border-left: 3px solid var(--gd-accent);
+  background: var(--gd-surface);
+  border-radius: 0 var(--gd-r-sm) var(--gd-r-sm) 0;
+}
+.quiz-fact h3 {
+  margin: 0 0 .5rem;
+  font-family: var(--brand-ui-font);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--gd-text-muted);
+}
+.quiz-fact p { margin: 0 0 .6rem; font-size: .95rem; line-height: 1.65; }
+.quiz-fact p:last-child { margin-bottom: 0; }
+/* What a practitioner does with the information — the useful half. */
+.quiz-fact-practice { color: var(--gd-text-muted); }
+
+.quiz-picks-head { margin-bottom: var(--gd-5); }
+.quiz-picks-head h2 { margin-bottom: var(--gd-3); }
+
+/* The reasoning is prose now, so it needs room rather than one accent line. */
+.quiz-pick-why {
+  margin: 0 0 .5rem;
+  font-size: .88rem;
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}

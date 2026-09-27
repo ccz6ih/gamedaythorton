@@ -95,6 +95,17 @@ export const QUESTIONS: QuizQuestion[] = [
     ]
   },
   {
+    key: 'reacts',
+    title: 'When you try a new product, your skin…',
+    help: 'How easily skin is set off changes where a practitioner starts.',
+    options: [
+      { value: 'often', label: 'Often stings or goes red' },
+      { value: 'sometimes', label: 'Occasionally, if it is strong' },
+      { value: 'rarely', label: 'Takes most things in its stride' },
+      { value: 'unsure', label: 'I have not really tested it' }
+    ]
+  },
+  {
     key: 'downtime',
     title: 'How much downtime can you live with?',
     help: 'Being honest here changes the answer more than anything else.',
@@ -126,6 +137,8 @@ export const QUESTIONS: QuizQuestion[] = [
  */
 export const CONCERNS: Record<string, {
   label: string;
+  /** The reasoning, shown instead of "because you mentioned X". */
+  why: string;
   /** Said back to them, in their words, not ours. */
   mirror: string;
   matchers: Matcher[];
@@ -134,6 +147,8 @@ export const CONCERNS: Record<string, {
 }> = {
   lines: {
     label: 'Expression lines',
+    why:
+      "Expression lines come from muscle movement rather than the skin surface, which is why the usual first conversation here is about relaxing the movement rather than resurfacing.",
     mirror: 'lines that show up when you move your face',
     matchers: [
       { nameIncludes: ['Jeuveau'] },
@@ -145,6 +160,8 @@ export const CONCERNS: Record<string, {
   },
   texture: {
     label: 'Texture and marks',
+    why:
+      "Texture and old marks sit in the skin itself, so the usual approach is treatments that work on the surface and just below it rather than anything injected for volume.",
     mirror: 'texture, pores or marks left behind',
     matchers: [
       { nameIncludes: ['PRF Microneedling'] },
@@ -157,6 +174,8 @@ export const CONCERNS: Record<string, {
   },
   dull: {
     label: 'Brightness',
+    why:
+      "Dullness is generally about the surface layer and hydration, which is why the usual answer is a facial rather than anything more involved.",
     mirror: 'skin that looks flat or tired',
     matchers: [
       { nameIncludes: ['Getaway Glow'] },
@@ -170,6 +189,8 @@ export const CONCERNS: Record<string, {
   },
   breakouts_face: {
     label: 'Breakouts',
+    why:
+      "Facial breakouts are usually approached by calming and clearing rather than resurfacing, since aggravated skin tends to react badly to aggressive treatment.",
     mirror: 'breakouts on your face',
     matchers: [
       { nameIncludes: ['Skin Clearing'] },
@@ -181,6 +202,8 @@ export const CONCERNS: Record<string, {
   },
   breakouts_body: {
     label: 'Back and chest',
+    why:
+      "Back and chest skin is thicker than facial skin with larger follicles, so it is generally treated differently rather than with a scaled-up facial.",
     mirror: 'breakouts on your back or chest',
     matchers: [
       { nameIncludes: ['Bacne'] },
@@ -191,6 +214,8 @@ export const CONCERNS: Record<string, {
   },
   eyes: {
     label: 'Under-eye',
+    why:
+      "Under-eye concerns are usually about volume and skin quality rather than pigment, which is why the starting point here addresses the tissue rather than lightening anything.",
     mirror: 'the area under your eyes',
     matchers: [
       { nameIncludes: ['Under-Eye'] },
@@ -201,6 +226,8 @@ export const CONCERNS: Record<string, {
   },
   redness: {
     label: 'Calming',
+    why:
+      "Skin that reddens easily is generally calmed before it is treated, so gentler options come first and stronger ones only once it has settled.",
     mirror: 'redness or skin that is easily set off',
     matchers: [
       { nameIncludes: ['LED Light'] },
@@ -212,6 +239,8 @@ export const CONCERNS: Record<string, {
   },
   hair: {
     label: 'Hair',
+    why:
+      "Thinning hair is treated at the scalp rather than the hair itself, which is why this sits with the injectables rather than anything topical.",
     mirror: 'thinning hair',
     matchers: [{ nameIncludes: ['Hair Restoration'] }],
     low: [],
@@ -219,6 +248,8 @@ export const CONCERNS: Record<string, {
   },
   contour: {
     label: 'Body',
+    why:
+      "A stubborn area that does not shift with training or diet is generally approached as a contouring question rather than a weight one.",
     mirror: 'a stubborn area you would like to change',
     matchers: [
       { nameIncludes: ['Cryo Body Sculpting'] },
@@ -228,16 +259,195 @@ export const CONCERNS: Record<string, {
   },
   recovery: {
     label: 'Recovery',
+    why:
+      "Recovery and soreness are a different job from anything cosmetic, and are treated locally where it hurts.",
     mirror: 'aches and recovery after training',
     matchers: [{ nameIncludes: ['Localized Cryotherapy'] }],
     low: [{ nameIncludes: ['Localized Cryotherapy'] }]
   }
 };
 
+/* =========================================================================
+   THE PROFILE — what the quiz is actually for
+   =========================================================================
+   The first version went straight from answers to a list of treatments, and
+   Craig's read was right: it felt like every product quiz, told somebody
+   nothing about themselves, and arrived at a shortlist that looked like a
+   sales pitch because no reasoning came before it.
+
+   So the result now leads with a profile and an explanation, and the
+   treatments come last, each carrying its own why.
+
+   ---------------------------------------------------------------------------
+   WHY FITZPATRICK IS DEFENSIBLE HERE
+   ---------------------------------------------------------------------------
+   It is not a diagnosis and not something we invented. It is a classification
+   published in 1975 that sorts skin by how it RESPONDS TO SUN rather than by
+   colour, it was designed from the start to be self-reported, and it is the
+   thing practitioners actually ask about before choosing settings for a laser
+   or the strength of a peel.
+
+   So explaining it is teaching somebody the vocabulary their practitioner
+   already uses — which is genuinely interesting, genuinely useful, and
+   shareable in a way "you are a Glow Girl" is not.
+
+   ALL OF THIS COPY STILL NEEDS JAMIE'S EYE, same as the intake questions. It
+   is reference material about a standard scale rather than a claim about a
+   treatment, and every line is run through lib/claims at render — but she is
+   the clinician and it goes out in her name.
+   ========================================================================= */
+
+export type Phototype = {
+  roman: string;
+  name: string;
+  /** What they told us, restated as the scale describes it. */
+  behaviour: string;
+  /** What practitioners generally do with that information. */
+  practice: string;
+};
+
+export const PHOTOTYPES: Record<string, Phototype> = {
+  burns: {
+    roman: 'I–II',
+    name: 'Burns easily, rarely tans',
+    behaviour:
+      'On the Fitzpatrick scale this is the fair end — skin that goes red in the sun and does not '
+      + 'hold much colour afterwards.',
+    practice:
+      'Practitioners generally consider this the most straightforward end of the scale for '
+      + 'resurfacing treatments, with daily sun protection doing more of the work than anything '
+      + 'done in a clinic.'
+  },
+  burns_then_tans: {
+    roman: 'III',
+    name: 'Burns first, then tans',
+    behaviour:
+      'The middle of the Fitzpatrick scale, and the most common answer — skin that catches the sun '
+      + 'before it settles into a tan.',
+    practice:
+      'This sits comfortably with most of what a med spa offers. The usual caution is timing rather '
+      + 'than suitability: treatments are generally kept away from a fresh tan.'
+  },
+  tans: {
+    roman: 'IV',
+    name: 'Tans easily, rarely burns',
+    behaviour:
+      'Further down the Fitzpatrick scale — skin with more background pigment, which browns rather '
+      + 'than burns.',
+    practice:
+      'Practitioners generally start more gently here, because pigment can respond unpredictably to '
+      + 'aggressive treatment. It is the single most common reason to build up slowly rather than '
+      + 'go in hard on a first visit.'
+  },
+  never_burns: {
+    roman: 'V–VI',
+    name: 'Almost never burns',
+    behaviour:
+      'The deeper end of the Fitzpatrick scale, where burning is rare and pigment is abundant.',
+    practice:
+      'Conservative settings and patch testing are the norm here, and plenty of treatments are a '
+      + 'poor fit. Asking a practitioner what they have done on skin like yours specifically is a '
+      + 'fair and useful question.'
+  },
+  unsure: {
+    roman: '—',
+    name: 'Worth working out together',
+    behaviour:
+      'Not knowing is a perfectly normal answer, especially if you are careful with sun in the '
+      + 'first place.',
+    practice:
+      'A practitioner can usually place it in about a minute by asking two or three follow-up '
+      + 'questions. It matters because it is what settings and strengths get chosen from.'
+  }
+};
+
+export const FITZPATRICK_NOTE =
+  'The Fitzpatrick scale was published in 1975 and is still what practitioners reach for. It sorts '
+  + 'skin by how it responds to sun rather than by colour, which is why the question asked about '
+  + 'burning rather than showing you a shade card.';
+
+export const MOISTURE: Record<string, { name: string; note: string }> = {
+  tight: {
+    name: 'Dry-leaning',
+    note:
+      'Skin that feels tight is usually described as dry, which is about oil rather than water — '
+      + 'which is why a richer moisturiser tends to help more than drinking more water.'
+  },
+  shiny: {
+    name: 'Oil-rich',
+    note:
+      'Shine by the afternoon usually means skin producing plenty of oil. Stripping it back hard '
+      + 'often makes it produce more, so the usual approach is to manage it rather than fight it.'
+  },
+  both: {
+    name: 'Combination',
+    note:
+      'Oily through the middle and drier around the edges is the most common pattern there is. It '
+      + 'usually means treating areas differently rather than looking for one product that does '
+      + 'everything.'
+  },
+  comfortable: {
+    name: 'Balanced',
+    note:
+      'Skin that mostly behaves is a good starting point, and the honest advice is to change less '
+      + 'rather than more.'
+  }
+};
+
+export const REACTIVITY: Record<string, { name: string; note: string }> = {
+  often: {
+    name: 'Easily set off',
+    note:
+      'Skin that stings or reddens with new products is generally treated as reactive, which shapes '
+      + 'the order things are introduced far more than it rules treatments out.'
+  },
+  sometimes: {
+    name: 'Mildly reactive',
+    note: 'Reacting only to stronger actives is ordinary, and mostly a question of introducing them slowly.'
+  },
+  rarely: {
+    name: 'Resilient',
+    note:
+      'Skin that tolerates most things gives a practitioner more room — though tolerating something '
+      + 'and needing it are different questions.'
+  },
+  unsure: {
+    name: 'Untested',
+    note: 'Worth mentioning at a consultation, since it is easier to find out gently than the hard way.'
+  }
+};
+
+export type SkinProfile = {
+  /** The headline, built from what they said rather than a personality label. */
+  title: string;
+  phototype: Phototype;
+  moisture?: { name: string; note: string };
+  reactivity?: { name: string; note: string };
+};
+
+export function profileOf(a: QuizAnswers): SkinProfile {
+  const phototype = PHOTOTYPES[a.sun ?? 'unsure'] ?? PHOTOTYPES.unsure!;
+  const moisture = a.feel ? MOISTURE[a.feel] : undefined;
+  const reactivity = a.reacts ? REACTIVITY[a.reacts] : undefined;
+
+  /* Descriptive, not a personality quiz result. "Dry-leaning, easily set off,
+     type II" is something somebody recognises and can repeat to a
+     practitioner; "You are a Dewy Dreamer" is something they screenshot once
+     and never think about again. */
+  const parts = [moisture?.name, reactivity?.name === 'Resilient' ? 'resilient' : reactivity?.name?.toLowerCase()]
+    .filter(Boolean);
+  const title = parts.length
+    ? `${parts.join(', ')} — Fitzpatrick ${phototype.roman}`
+    : `Fitzpatrick ${phototype.roman}`;
+
+  return { title, phototype, moisture, reactivity };
+}
+
 export type QuizAnswers = {
   focus: string[];
   sun?: string;
   feel?: string;
+  reacts?: string;
   downtime?: string;
   history?: string;
 };

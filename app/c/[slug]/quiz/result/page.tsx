@@ -36,7 +36,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, anonClient } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
-import { answersFromParams, shortlist, mirrorLine, summaryForPractice, CONCERNS } from '@/lib/skin-quiz';
+import {
+  answersFromParams, shortlist, mirrorLine, summaryForPractice,
+  CONCERNS, profileOf, FITZPATRICK_NOTE
+} from '@/lib/skin-quiz';
 import { claimsIn } from '@/lib/claims';
 import { money } from '@/lib/format';
 
@@ -124,6 +127,7 @@ export default async function QuizResult({
     price_mode: string | null; duration_min: number | null;
   }[];
 
+  const profile = profileOf(answers);
   const picks = shortlist(answers, services);
   const consult = services.find(s => (s.category ?? '').toLowerCase() === 'consult');
 
@@ -145,20 +149,72 @@ export default async function QuizResult({
     <>
       <section className="sf-section">
         <div className="sf-wrap quiz-col">
-          <p className="sf-eyebrow">Your shortlist</p>
-          <h1 className="sf-display">Here is where I would start</h1>
-          {mirror && <p className="sf-hero-lead">{mirror}</p>}
-          {answers.downtime === 'none' && (
-            <p className="quiz-note">
-              You said you cannot take downtime, so everything below is chosen
-              with that in mind.
-            </p>
-          )}
+          <p className="sf-eyebrow">Your skin, in short</p>
+          {/* The headline is what they told us, restated in the vocabulary a
+              practitioner uses — not a personality label. Somebody can repeat
+              "dry-leaning, easily set off, Fitzpatrick III" in a consultation
+              and be understood. Nobody can do that with "Dewy Dreamer". */}
+          <h1 className="sf-display">{profile.title}</h1>
+          <p className="sf-hero-lead">{profile.phototype.name}.</p>
+          {mirror && <p className="quiz-note">{mirror}</p>}
         </div>
       </section>
 
       <section className="sf-section sf-invert">
         <div className="sf-wrap quiz-col">
+          <h2>What that actually means</h2>
+          {safe(FITZPATRICK_NOTE) && <p className="quiz-teach">{FITZPATRICK_NOTE}</p>}
+
+          <div className="quiz-facts">
+            <div className="quiz-fact">
+              <h3>Sun response · Fitzpatrick {profile.phototype.roman}</h3>
+              {safe(profile.phototype.behaviour) && <p>{profile.phototype.behaviour}</p>}
+              {safe(profile.phototype.practice) && (
+                <p className="quiz-fact-practice">{profile.phototype.practice}</p>
+              )}
+            </div>
+
+            {profile.moisture && (
+              <div className="quiz-fact">
+                <h3>Oil and moisture · {profile.moisture.name}</h3>
+                {safe(profile.moisture.note) && <p>{profile.moisture.note}</p>}
+              </div>
+            )}
+
+            {profile.reactivity && (
+              <div className="quiz-fact">
+                <h3>Reactivity · {profile.reactivity.name}</h3>
+                {safe(profile.reactivity.note) && <p>{profile.reactivity.note}</p>}
+              </div>
+            )}
+          </div>
+
+          <p className="quiz-note">
+            None of this is a diagnosis — it is what you told us, in the words a
+            practitioner would use. Worth taking to any clinic, including one
+            that is not this one.
+          </p>
+        </div>
+      </section>
+
+      <section className="sf-section sf-invert">
+        <div className="sf-wrap quiz-col">
+          <div className="quiz-picks-head">
+            <h2>If you wanted to do something about it</h2>
+            <p className="quiz-teach">
+              These are what a practitioner would usually reach for, and why. Not
+              a prescription, and not in any order you have to follow — plenty of
+              people read this far and decide to do nothing, which is a fine
+              outcome.
+            </p>
+            {answers.downtime === 'none' && (
+              <p className="quiz-note">
+                You said you cannot take downtime, so anything with a recovery
+                period has been left off rather than caveated.
+              </p>
+            )}
+          </div>
+
           {picks.length === 0 ? (
             <>
               <h2>Let us talk it through</h2>
@@ -172,14 +228,21 @@ export default async function QuizResult({
               {picks.map(({ service, because }, i) => {
                 const price = priceOf(service);
                 const blurb = service.description ? safe(service.description) : null;
+                // The reason comes from the concern that put it here. Where a
+                // treatment answers more than one, the first is the strongest.
+                const reason = answers.focus
+                  .map(k => CONCERNS[k])
+                  .find(c => c && because.includes(c.label))?.why;
+                const whyLine = reason ? safe(reason) : null;
                 return (
                   <article className="quiz-pick" key={service.id}>
                     <div className="quiz-pick-rank">{i + 1}</div>
                     <div>
                       <h3>{service.name}</h3>
-                      <p className="quiz-pick-why">
-                        Because you mentioned {because.join(' and ').toLowerCase()}.
-                      </p>
+                      {/* The reasoning, not the restatement. "Because you
+                          mentioned under-eye" told somebody nothing and read as
+                          a pitch precisely because no thinking preceded it. */}
+                      {whyLine && <p className="quiz-pick-why">{whyLine}</p>}
                       {blurb && <p className="quiz-pick-blurb">{blurb}</p>}
                       <p className="quiz-pick-meta">
                         {price}
