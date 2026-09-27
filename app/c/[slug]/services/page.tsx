@@ -115,6 +115,21 @@ export default async function StorefrontServices({ params }: { params: Promise<{
 
           {/* A rail, not a dropdown. Thirty services in a closed select is a
               menu you have to already know your way around. */}
+          {/*
+            The rescue for the person this page loses.
+
+            Thirty-six treatments is a wall if you do not already know the
+            vocabulary, and the honest failure mode of a price list is somebody
+            reading it, feeling none the wiser, and closing the tab. This is the
+            other door, offered before the wall rather than after it.
+          */}
+          <p className="sf-quiz-nudge">
+            Not sure where to start?{' '}
+            <Link className="sf-link" href={links.quiz}>Take the skin quiz</Link>
+            {' '}— five questions, and it tells you about your own skin before it
+            mentions a single treatment.
+          </p>
+
           {groups.length > 1 && (
             <nav className="sf-jump" aria-label="Jump to a category">
               {groups.map(g => (

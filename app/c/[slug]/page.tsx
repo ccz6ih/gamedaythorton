@@ -147,6 +147,33 @@ export default async function StorefrontHome({ params }: { params: Promise<{ slu
         </div>
       </section>
 
+      {/*
+        HIGH ON THE PAGE, AND ON PURPOSE.
+
+        Most first-time traffic lands here and leaves without ever reaching the
+        menu. This is the one thing on the home page somebody can DO that costs
+        them nothing and is not a booking — the low step before the big one, for
+        the visitor who is curious but nowhere near ready to pick a treatment
+        and hand over a card.
+
+        Worded around what they get, not what we get. "Find out about your skin"
+        is an offer; "take our quiz" is a chore.
+      */}
+      <section className="sf-section sf-quiz-band">
+        <div className="sf-wrap">
+          <div className="sf-section-head">
+            <h2>Not sure what your skin actually needs?</h2>
+            <p>
+              Five questions, under a minute. You will get your skin type
+              explained in the words a practitioner would use, what that means
+              in practice, and only then what is worth asking about. No email
+              needed to see it.
+            </p>
+          </div>
+          <Link className="sf-btn" href={links.quiz}>Take the skin quiz</Link>
+        </div>
+      </section>
+
       {/* The 4 Clinical Disciplines Pinned Stacked Card Deck */}
       <PinnedDisciplinesDeck links={links} />
 

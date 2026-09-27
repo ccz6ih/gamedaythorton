@@ -6599,3 +6599,22 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   .faqx-msg { max-width: 92%; padding: 1.1rem 1.25rem; }
   .faqx[data-anim="on"] .faqx-msg.is-open { padding: 1.1rem 1.25rem; }
 }
+
+/* ------------------------------------------------- quiz entry points ---- */
+
+/* On the services page, above the category rail. Quiet — it is a door for the
+   person the price list is losing, not a banner competing with the prices. */
+.sf-quiz-nudge {
+  margin: var(--gd-4) 0 0;
+  font-size: .95rem;
+  line-height: 1.6;
+  color: var(--gd-text-muted);
+}
+
+/* On the home page. Bordered rather than inverted, so it reads as an offer
+   sitting in the page rather than an advert pasted over it. */
+.sf-quiz-band {
+  border-top: 1px solid var(--gd-border);
+  border-bottom: 1px solid var(--gd-border);
+}
+.sf-quiz-band .sf-section-head { margin-bottom: var(--gd-5); }
