@@ -321,6 +321,7 @@ export default async function QuizResult({
                       focus: answers.focus.join(','),
                       sun: answers.sun ?? '',
                       feel: answers.feel ?? '',
+                      reacts: answers.reacts ?? '',
                       downtime: answers.downtime ?? '',
                       history: answers.history ?? ''
                     }).filter(([, v]) => v) as [string, string][]

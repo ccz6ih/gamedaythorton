@@ -469,6 +469,9 @@ export function answersFromParams(params: Record<string, string | string[] | und
     focus: [...new Set(focus)].slice(0, 6),
     sun: one('sun'),
     feel: one('feel'),
+    // Added with the reactivity question and missed here, so every answer to
+    // it was silently dropped — the profile simply never mentioned it.
+    reacts: one('reacts'),
     downtime: one('downtime'),
     history: one('history')
   };
@@ -539,6 +542,7 @@ export function summaryForPractice(answers: QuizAnswers): string {
     `Focus: ${answers.focus.map(k => CONCERNS[k]?.label ?? k).join(', ') || '—'}`,
     `Sun response: ${label('sun', answers.sun) ?? '—'}`,
     `Skin feels: ${label('feel', answers.feel) ?? '—'}`,
+    `Reacts to new products: ${label('reacts', answers.reacts) ?? '—'}`,
     `Downtime: ${label('downtime', answers.downtime) ?? '—'}`,
     `Starting from: ${label('history', answers.history) ?? '—'}`
   ].join('\n');
