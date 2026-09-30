@@ -83,18 +83,35 @@ export async function addNote(patientId: string, form: FormData): Promise<NoteRe
   // Photographs are attached to the note, so they arrive with the same save
   // rather than as a second step somebody forgets.
   const photos = form.getAll('photos').filter((f): f is File => f instanceof File && f.size > 0);
-  const poses = String(form.get('photo_pose') ?? 'before');
+  /**
+   * One label per photo, in the same order the files arrive.
+   *
+   * This was a single value applied to every photo in the batch — so a visit
+   * that produced a before AND an after, uploaded together, stored them both
+   * as whatever the radio happened to say. pose_key is exactly what the
+   * comparison view reads, so the photos quietly stopped meaning anything.
+   *
+   * Falls back to the old single value, and then to 'before', so a form that
+   * has not been reloaded still saves rather than failing.
+   */
+  const poseList = String(form.get('photo_poses') ?? '').split(',').map(p => p.trim());
+  const posesFallback = String(form.get('photo_pose') ?? 'before');
+  const poseAt = (i: number) => {
+    const v = poseList[i];
+    return v === 'before' || v === 'after' ? v : posesFallback;
+  };
 
-  for (const file of photos) {
+  for (const [i, file] of photos.entries()) {
+    const pose = poseAt(i);
     try {
-      const path = await uploadClientPhoto(file, viewer.clinicId, patientId, poses);
+      const path = await uploadClientPhoto(file, viewer.clinicId, patientId, pose);
       if (!path) continue;
       await supabase.from('photo').insert({
         clinic_id: viewer.clinicId,
         patient_id: patientId,
         note_id: note.id,
         captured_at: new Date().toISOString().slice(0, 10),
-        pose_key: poses,
+        pose_key: pose,
         storage_path: path,
         placeholder: false,
         synthetic: false

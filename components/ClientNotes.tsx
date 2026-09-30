@@ -198,10 +198,6 @@ export function ClientNotes({
               <div className="field">
                 <span>Photos</span>
                 <PhotoInput />
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '.4rem' }}>
-                  <label className="inline"><input type="radio" name="photo_pose" value="before" defaultChecked /> Before</label>
-                  <label className="inline"><input type="radio" name="photo_pose" value="after" /> After</label>
-                </div>
                 <small>Stored privately. Never published, never on the website.</small>
               </div>
             </div>

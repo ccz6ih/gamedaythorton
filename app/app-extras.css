@@ -1669,3 +1669,74 @@ a.pill-action:hover { filter: brightness(1.12); }
   color: var(--gd-text-muted);
   font-size: .78rem;
 }
+
+/* ------------------------------------------------------- photo picking -- */
+/* Built for a thumb. She is standing up, between clients, on a phone. */
+
+.photo-pick { display: block; }
+
+/* The native input is hidden but NOT display:none — a hidden input cannot be
+   opened by its label on some mobile browsers, and then the button does
+   nothing at all. Clipped out of sight instead, still focusable. */
+.photo-pick-native {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.photo-pick-btn { display: inline-flex; align-items: center; min-height: 44px; cursor: pointer; }
+.photo-pick-native:focus-visible + .photo-pick-btn { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+
+.photo-thumbs {
+  list-style: none;
+  margin: var(--gd-3) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--gd-3);
+}
+.photo-thumb {
+  position: relative;
+  border: 1px solid var(--gd-border);
+  border-radius: var(--gd-r-sm);
+  overflow: hidden;
+  background: var(--gd-surface-raised);
+}
+.photo-thumb img { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+.photo-thumb-poses { display: grid; grid-template-columns: 1fr 1fr; }
+.photo-thumb-poses button {
+  font: inherit;
+  font-size: .68rem;
+  padding: .45rem .2rem;
+  min-height: 34px;
+  border: 0;
+  border-top: 1px solid var(--gd-border);
+  background: var(--gd-surface);
+  color: var(--gd-text-muted);
+  cursor: pointer;
+}
+.photo-thumb-poses button + button { border-left: 1px solid var(--gd-border); }
+.photo-thumb-poses button.is-on {
+  background: var(--gd-accent);
+  color: var(--brand-accent-ink, #fff);
+  font-weight: 700;
+}
+
+/* Top-right, away from the Before/After pair, so a mis-tap does not delete
+   the photo she was only trying to label. */
+.photo-thumb-x {
+  position: absolute;
+  top: .25rem; right: .25rem;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(0, 0, 0, .62);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
