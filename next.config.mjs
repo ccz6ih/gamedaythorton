@@ -15,6 +15,21 @@ import { STOREFRONT_DOMAINS, STOREFRONT_PATHS, STOREFRONT_HEADER_SOURCES } from 
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /**
+   * Server Actions cap the request body at 1MB by default, and photos are
+   * submitted through one. A phone photo is 2–5MB, so saving a treatment note
+   * with a before-and-after failed with "Body exceeded 1 MB limit" surfaced to
+   * the practitioner as "Application error: a server-side exception occurred".
+   *
+   * components/PhotoInput.tsx shrinks images in the browser first, so real
+   * payloads are a few hundred KB. This is the safety net for the case where
+   * that cannot run — and it is set to match the 15MB-per-photo limit
+   * lib/client-media.ts already claims, so that friendly message can finally
+   * be the one somebody sees instead of a framework 413.
+   */
+  experimental: {
+    serverActions: { bodySizeLimit: '16mb' }
+  },
   reactStrictMode: true,
   poweredByHeader: false,
 

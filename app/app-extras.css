@@ -1648,3 +1648,24 @@ a.pill-action:hover { filter: brightness(1.12); }
 @media (max-width: 640px) {
   .intake-answers > div { grid-template-columns: 1fr; gap: 0; }
 }
+
+/* -------------------------------------------- notes: one box by default -- */
+
+.soap-split { margin: var(--gd-2) 0 var(--gd-4); }
+.soap-split summary {
+  cursor: pointer;
+  font-size: .82rem;
+  color: var(--gd-text-muted);
+  padding: .4rem 0;
+}
+.soap-split summary:hover { color: var(--gd-accent); }
+.soap-split[open] { padding-bottom: var(--gd-2); }
+
+/* Reassurance while photos are being shrunk, and the numbers afterwards —
+   somebody who just hit a 1MB wall deserves to see that it worked. */
+.photo-status {
+  display: block;
+  margin-top: .35rem;
+  color: var(--gd-text-muted);
+  font-size: .78rem;
+}

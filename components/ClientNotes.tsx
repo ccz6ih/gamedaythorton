@@ -19,6 +19,7 @@
  * and a form sitting open above the history pushes the history off the screen.
  */
 
+import { PhotoInput } from '@/components/PhotoInput';
 import { useState, useTransition, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { addNote, amendNote, removePhoto } from '@/app/console/clients/[id]/actions';
@@ -133,19 +134,46 @@ export function ClientNotes({
                 <small>Leave blank for now.</small>
               </label>
             </div>
+            {/*
+              ONE BOX, because that is how the notes are actually written.
 
-            {SOAP.map(([field, label]) => (
-              <label className="field" key={field as string}>
-                <span>{label}</span>
-                <textarea name={field as string} rows={field === 'subjective' ? 3 : 2}
-                  placeholder={
-                    field === 'subjective' ? 'What the client reported, in their words.' :
-                    field === 'objective' ? 'What you observed and did — areas, products, units.' :
-                    field === 'assessment' ? 'Your read on it.' :
-                    'Next steps, follow-up interval, aftercare given.'
-                  } />
-              </label>
-            ))}
+              Jamie dictates into voice notes between clients and pastes the
+              result. Four fields meant four paste operations and deciding, on
+              a phone, which sentence is "assessment" and which is "plan" —
+              the app imposing a filing system on somebody holding a client's
+              chart in one hand.
+
+              The server already does the right thing with this: a note with
+              only a body is stored as kind 'note', and one with the four
+              fields as 'soap'. Nothing is parsed or split. Guessing where an
+              assessment ends in dictated prose would put words in a clinical
+              record that she did not write there, and that record is the thing
+              that has to hold up.
+            */}
+            <label className="field">
+              <span>Notes</span>
+              <textarea name="body" rows={8}
+                placeholder="Paste or type the whole note. What they reported, what you saw and did, your read on it, and what happens next." />
+              <small>One box is fine. Paste straight from a voice note if that is quicker.</small>
+            </label>
+
+            {/* Still here for anybody who wants the structure, and for the
+                notes already written that way. Closed by default. */}
+            <details className="soap-split">
+              <summary>Fill in S/O/A/P separately instead</summary>
+              {SOAP.map(([field, label]) => (
+                <label className="field" key={field as string}>
+                  <span>{label}</span>
+                  <textarea name={field as string} rows={field === 'subjective' ? 3 : 2}
+                    placeholder={
+                      field === 'subjective' ? 'What the client reported, in their words.' :
+                      field === 'objective' ? 'What you observed and did — areas, products, units.' :
+                      field === 'assessment' ? 'Your read on it.' :
+                      'Next steps, follow-up interval, aftercare given.'
+                    } />
+                </label>
+              ))}
+            </details>
 
             <div className="grid g3">
               <label className="field">
@@ -169,7 +197,7 @@ export function ClientNotes({
               </label>
               <div className="field">
                 <span>Photos</span>
-                <input name="photos" type="file" accept="image/*" multiple />
+                <PhotoInput />
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '.4rem' }}>
                   <label className="inline"><input type="radio" name="photo_pose" value="before" defaultChecked /> Before</label>
                   <label className="inline"><input type="radio" name="photo_pose" value="after" /> After</label>
@@ -222,7 +250,10 @@ export function ClientNotes({
               </button>
             </header>
 
-            {n.kind === 'note' && n.body && <p className="note-body">{n.body}</p>}
+            {/* Whatever the kind. A note saved as 'soap' can still carry a body — and
+                a record that stores text it then refuses to display is worse than
+                one that never took it. */}
+            {n.body && <p className="note-body">{n.body}</p>}
 
             {SOAP.map(([field, label]) =>
               n[field] ? (
