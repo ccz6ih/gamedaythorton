@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getStorefront, getStorefrontServices } from '@/lib/db/storefront';
-import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
+import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { BookingFlow, type BookService } from '@/components/BookingFlow';
 import { priceLabel } from '@/lib/format';
 
@@ -34,17 +34,26 @@ export const dynamic = 'force-dynamic';
  * either, for the same reason — a page Google cannot fetch is a page whose
  * canonical it never reads.
  *
- * Relative, resolved against the metadataBase the storefront layout sets, and
- * built from storefrontBase so it is `/book` on medbarco.com and
- * `/c/<slug>/book` on the shared deployment. Hardcoding `/book` would publish
- * a canonical that 404s for every tenant without its own domain.
+ * ABSOLUTE, and built from siteOrigin() rather than left relative.
+ *
+ * A relative canonical is legal and Google resolves it, but this is the one
+ * tag where being unambiguous is the entire job — and the layout's
+ * metadataBase only exists when NEXT_PUBLIC_APP_URL is set, so in production
+ * it was rendering `href="/book"` with nothing to resolve against. siteOrigin
+ * is the function this codebase already wrote for the multi-tenant version of
+ * exactly this question: it answers from the Host header, so each practice's
+ * canonical names that practice's own domain without anybody configuring it.
+ *
+ * The path comes from storefrontBase for the same reason — `/book` on
+ * medbarco.com, `/c/<slug>/book` on the shared deployment. Hardcoding either
+ * one publishes a canonical that 404s for half the tenants.
  */
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   const { slug } = await params;
-  const base = await storefrontBase(slug);
-  return { title: 'Book', alternates: { canonical: `${base}/book` } };
+  const [origin, base] = await Promise.all([siteOrigin(), storefrontBase(slug)]);
+  return { title: 'Book', alternates: { canonical: `${origin}${base}/book` } };
 }
 
 export default async function BookPage({
