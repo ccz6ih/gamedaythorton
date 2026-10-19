@@ -18,7 +18,34 @@ import { BookingFlow, type BookService } from '@/components/BookingFlow';
 import { priceLabel } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Book' };
+
+/**
+ * ONE BOOKING PAGE, NOT NINE.
+ *
+ * `?service=<uuid>` only preselects a dropdown — the page, its copy and its
+ * availability are identical whatever it says. Google had indexed eight of
+ * these variants and was showing them against real queries, which costs twice:
+ * eight near-identical pages split the ranking signal between them, and the
+ * result a human sees in the SERP is a raw UUID.
+ *
+ * Canonical rather than noindex, deliberately. One of those variants already
+ * sits at position 7 and has produced a click; noindex throws that away, while
+ * a canonical folds it back into /book. Nothing is disallowed in robots.txt
+ * either, for the same reason — a page Google cannot fetch is a page whose
+ * canonical it never reads.
+ *
+ * Relative, resolved against the metadataBase the storefront layout sets, and
+ * built from storefrontBase so it is `/book` on medbarco.com and
+ * `/c/<slug>/book` on the shared deployment. Hardcoding `/book` would publish
+ * a canonical that 404s for every tenant without its own domain.
+ */
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const base = await storefrontBase(slug);
+  return { title: 'Book', alternates: { canonical: `${base}/book` } };
+}
 
 export default async function BookPage({
   params, searchParams
