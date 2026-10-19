@@ -635,6 +635,11 @@ export async function sendPaymentLink(p: PaymentLinkEmail): Promise<NotifyResult
 /* ----------------------------------------------------------- reminders -- */
 
 export type ReminderEmail = {
+  /** The same three the other messages carry, so a video link actually
+   *  reaches the person who needs to click it. */
+  modality?: Modality | null;
+  meetingUrl?: string | null;
+  clinicAddress?: string | null;
   appointmentId: string;
   clinicId: string;
   clinicName: string;
@@ -703,9 +708,24 @@ export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyR
    * fail a typecheck when nothing reads them, which is exactly how this
    * survived: every layer was correct except the last one.
    */
-  const elsewhere = r.locationName
-    ? `${r.locationName}${r.locationAddress ? `\n${r.locationAddress}` : ''}`
-    : null;
+  /**
+   * The same sentence the confirmation uses, not a second version of it.
+   *
+   * This only ever knew about a location, so a consult that became a video
+   * call had its link pasted into the console and then told nobody. The
+   * reminder is the last message before the appointment and the one most
+   * likely to be read standing up — it is exactly where the link belongs.
+   */
+  const elsewhere = whereLine({
+    modality: r.modality,
+    clinicName: r.clinicName,
+    clinicAddress: r.clinicAddress,
+    locationName: r.locationName,
+    locationAddress: r.locationAddress,
+    clientPhone: null,
+    practicePhone: r.practicePhone,
+    meetingUrl: r.meetingUrl
+  }, false);
 
   const body = [
     `Hi ${r.clientName.split(' ')[0]},`,

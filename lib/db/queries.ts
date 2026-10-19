@@ -216,6 +216,9 @@ export type TodayRow = {
   location: { name: string; is_default: boolean } | null;
   /** So the console can open the client's own form, or see it is still blank. */
   intake_token: string | null;
+  /** Where to be, and the link when it is a video call. */
+  modality: 'in_person' | 'phone' | 'video' | null;
+  meeting_url: string | null;
 };
 
 export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow[]> {
@@ -226,7 +229,7 @@ export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow
   const { data } = await supabase
     .from('appointment')
     .select(`
-      id, starts_at, duration_min, status, room, intake_complete, intake_token,
+      id, starts_at, duration_min, status, room, intake_complete, intake_token, modality, meeting_url,
       patient:patient_id ( id, first_name, last_name ),
       service:service_id ( name, category ),
       provider:provider_id ( name ),

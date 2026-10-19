@@ -1740,3 +1740,25 @@ a.pill-action:hover { filter: brightness(1.12); }
   line-height: 1;
   cursor: pointer;
 }
+
+/* --------------------------------------------- where: change it inline -- */
+
+.where-edit { margin-top: var(--gd-2); }
+.where-edit summary {
+  cursor: pointer;
+  font-size: .74rem;
+  color: var(--gd-text-dim);
+  padding: .3rem 0;
+}
+.where-edit summary:hover { color: var(--gd-accent); }
+.where-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gd-2);
+  align-items: center;
+  margin: var(--gd-2) 0 .3rem;
+}
+.where-form select { min-height: 40px; }
+/* The link is the long field; it takes whatever is left and drops to its own
+   row on a phone rather than squeezing the other two into nothing. */
+.where-form input[type="url"] { flex: 1 1 14rem; min-height: 40px; font-size: 16px; }

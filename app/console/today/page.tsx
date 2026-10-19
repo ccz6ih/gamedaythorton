@@ -100,6 +100,39 @@ async function sendForm(formData: FormData) {
 }
 
 /**
+ * Change where an appointment is happening, and paste the link.
+ *
+ * The common case is a consult that books in as a phone call and becomes a
+ * video call once they agree a time — so this has to be editable AFTER the
+ * booking, not only at it. It lives on Today because that is the screen she
+ * already opens, rather than behind an appointment detail page that does not
+ * exist yet.
+ */
+async function setWhere(formData: FormData) {
+  'use server';
+
+  await requireRole(['owner', 'admin', 'provider']);
+  const id = String(formData.get('id'));
+  const modality = String(formData.get('modality'));
+  if (!['in_person', 'phone', 'video'].includes(modality)) return;
+
+  /**
+   * A link is kept only for a video call, and only if it is actually a link.
+   * Storing "zoom" or a half-pasted string would put it into the reminder
+   * email looking like something a client can click.
+   */
+  const raw = String(formData.get('meeting_url') ?? '').trim();
+  const url = modality === 'video' && /^https?:\/\/\S+$/i.test(raw) ? raw : null;
+
+  const supabase = await serverClient();
+  await supabase.from('appointment').update({ modality, meeting_url: url }).eq('id', id);
+
+  revalidatePath('/console/today');
+  revalidatePath('/console/calendar');
+  redirect(`/console/today?where=${modality === 'video' && !url && raw ? 'badlink' : 'saved'}`);
+}
+
+/**
  * Tick a task off.
  *
  * RLS scopes the update to the caller's own practice, same as setStatus above.
@@ -119,7 +152,7 @@ async function completeTask(formData: FormData) {
 export default async function TodayPage({
   searchParams
 }: {
-  searchParams: Promise<{ offset?: string; form?: string }>;
+  searchParams: Promise<{ offset?: string; form?: string; where?: string }>;
 }) {
   const params = await searchParams;
   const offset = Number(params.offset ?? 0) || 0;
@@ -200,6 +233,15 @@ export default async function TodayPage({
             No email address on that client, so there is nowhere to send it.
           </div>
         )}
+        {params.where === 'saved' && (
+          <div className="note-band">Saved. The client sees this in their reminder.</div>
+        )}
+        {params.where === 'badlink' && (
+          <div className="note-band" role="alert">
+            Saved, but that did not look like a link so it was not kept — a video
+            link needs to start with https://
+          </div>
+        )}
         {params.form === 'noform' && (
           <div className="note-band" role="alert">
             No intake form is switched on for the practice yet.
@@ -275,6 +317,12 @@ export default async function TodayPage({
                       )}
                       {/* Emailing it is the other half: open it here if they
                           are in front of you, send it if they are not. */}
+                      {/* Where to be, at a glance, next to the name. */}
+                      <span className="pill" data-tone={row.modality && row.modality !== 'in_person' ? 'warn' : undefined}>
+                        {row.modality === 'phone' ? 'phone call'
+                          : row.modality === 'video' ? 'video call'
+                          : 'in person'}
+                      </span>
                       {!row.intake_complete && row.intake_token && row.patient && (
                         <form action={sendForm} style={{ display: 'inline' }}>
                           <input type="hidden" name="id" value={row.id} />
@@ -332,6 +380,32 @@ export default async function TodayPage({
                       <Link className="btn sm ghost" href={`/console/clients/${row.patient.id}`}>Open</Link>
                     )}
                   </span>
+
+                  {/*
+                    Editable AFTER the booking, which is the whole point: a
+                    consult arrives as a phone call and becomes a video call
+                    once they agree a time. Closed by default so it costs
+                    nothing on the rows that never change.
+                  */}
+                  <details className="where-edit">
+                    <summary>Change where &middot; add a link</summary>
+                    <form action={setWhere} className="where-form">
+                      <input type="hidden" name="id" value={row.id} />
+                      <select name="modality" defaultValue={row.modality ?? 'in_person'}>
+                        <option value="in_person">In person</option>
+                        <option value="phone">Phone call</option>
+                        <option value="video">Video call</option>
+                      </select>
+                      <input name="meeting_url" type="url" inputMode="url"
+                             placeholder="https://… (video calls only)"
+                             defaultValue={row.meeting_url ?? ''} />
+                      <button className="btn sm" type="submit">Save</button>
+                    </form>
+                    <small className="dim">
+                      The client gets this in their reminder the day before, so a
+                      link added on the morning will not reach them in time.
+                    </small>
+                  </details>
                 </div>
               ))}
             </div>

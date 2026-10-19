@@ -79,10 +79,10 @@ export async function GET(request: Request) {
   const { data: due, error } = await supabase
     .from('appointment')
     .select(`
-      id, starts_at, duration_min, clinic_id, confirm_token,
+      id, starts_at, duration_min, clinic_id, confirm_token, modality, meeting_url,
       patient:patient_id ( first_name, last_name, email ),
       service:service_id ( name ),
-      clinic:clinic_id ( name, phone_voice, pilot_mode ),
+      clinic:clinic_id ( name, phone_voice, pilot_mode, address_line1, address_city, address_state, address_zip ),
       location:location_id ( name, address, is_default )
     `)
     .gte('starts_at', from)
@@ -98,9 +98,15 @@ export async function GET(request: Request) {
   const appointments = (due ?? []) as unknown as {
     id: string; starts_at: string; clinic_id: string;
     confirm_token: string | null;
+    modality: 'in_person' | 'phone' | 'video' | null;
+    meeting_url: string | null;
     patient: { first_name: string; last_name: string; email: string | null } | null;
     service: { name: string } | null;
-    clinic: { name: string; phone_voice: string | null; pilot_mode: boolean } | null;
+    clinic: {
+      name: string; phone_voice: string | null; pilot_mode: boolean;
+      address_line1: string | null; address_city: string | null;
+      address_state: string | null; address_zip: string | null;
+    } | null;
     location: { name: string; address: string | null; is_default: boolean } | null;
   }[];
 
@@ -154,6 +160,18 @@ export async function GET(request: Request) {
        */
       locationName: appt.location && !appt.location.is_default ? appt.location.name : null,
       locationAddress: appt.location && !appt.location.is_default ? appt.location.address : null,
+      // Whether it is a visit, a call or a video link — and the link itself.
+      // Without these the reminder silently reverts to describing a location
+      // for an appointment that does not have one.
+      // Only used when it IS the usual room; whereLine ignores it otherwise.
+
+      modality: appt.modality ?? 'in_person',
+      meetingUrl: appt.meeting_url ?? null,
+      clinicAddress: [
+        appt.clinic?.address_line1,
+        [appt.clinic?.address_city, appt.clinic?.address_state].filter(Boolean).join(', '),
+        appt.clinic?.address_zip
+      ].filter(Boolean).join(' · ') || null,
       confirmUrl: appt.confirm_token ? `${base}/confirm/${appt.confirm_token}` : null
     });
 
