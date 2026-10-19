@@ -27,6 +27,7 @@
 import { notificationPreview, checkoutLineLabel } from '@/lib/phi';
 import { serverClient } from '@/lib/supabase/server';
 import { emailBrand, emailOrigin, renderEmail } from '@/lib/email-theme';
+import { whereLine, type Modality } from '@/lib/appointment-where';
 
 export type NotifyResult = {
   logged: boolean;
@@ -272,6 +273,15 @@ export async function intakeLinkFor(token: string | null | undefined): Promise<s
 }
 
 export type BookingEmail = {
+  /** How this appointment happens. Absent means in person, which is what
+   *  every appointment made before 0044 actually was. */
+  modality?: Modality | null;
+  /** Set ONLY when it is not the usual room. */
+  locationName?: string | null;
+  locationAddress?: string | null;
+  meetingUrl?: string | null;
+  /** The practice's own address, for the usual room. */
+  clinicAddress?: string | null;
   clinicId: string;
   clinicName: string;
   practicePhone: string | null;
@@ -304,6 +314,9 @@ export type BookingEmail = {
  * its way when sending is switched off.
  */
 export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyResult> {
+  const brand = await emailBrand(b.clinicId, b.clinicName);
+  const where = whereLine({ modality: b.modality, clinicName: b.clinicName, clinicAddress: b.clinicAddress ?? brand.addressText, locationName: b.locationName, locationAddress: b.locationAddress, clientPhone: b.clientPhone, practicePhone: b.practicePhone, meetingUrl: b.meetingUrl }, false);
+  const clientWhere = where;
   const body = [
     `Hi ${b.clientName.split(' ')[0]},`,
     '',
@@ -311,6 +324,10 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     '',
     `  ${b.serviceName}`,
     `  ${b.whenText}`,
+    // Kept in step with the HTML panel. A text part that omits where to be
+    // while the HTML carries it is the mismatch nobody notices until somebody
+    // drives to the wrong town.
+    ...clientWhere.split('\n').map(l => `  ${l}`),
     '',
     // Same three states as the HTML half, kept in step deliberately: the text
     // part is what a screen reader and a watch get, and it saying "a form is
@@ -332,7 +349,6 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     `— ${b.clinicName}`
   ].filter(v => v !== null).join('\n');
 
-  const brand = await emailBrand(b.clinicId, b.clinicName);
   const html = renderEmail(brand, {
     // Neutral. The treatment is named in the body, never in the line that shows
     // in an inbox list next to the subject.
@@ -341,7 +357,8 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
     lines: [`You're booked in at ${b.clinicName}.`],
     panel: [
       { label: 'Treatment', value: b.serviceName },
-      { label: 'When', value: b.whenText }
+      { label: 'When', value: b.whenText },
+      { label: 'Where', value: clientWhere }
     ],
     /**
      * The form becomes the action when there is one.
@@ -379,6 +396,9 @@ export async function sendBookingConfirmation(b: BookingEmail): Promise<NotifyRe
 
 /** Tells the practice somebody booked. */
 export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> {
+  const brand = await emailBrand(b.clinicId, b.clinicName);
+  const where = whereLine({ modality: b.modality, clinicName: b.clinicName, clinicAddress: b.clinicAddress ?? brand.addressText, locationName: b.locationName, locationAddress: b.locationAddress, clientPhone: b.clientPhone, practicePhone: b.practicePhone, meetingUrl: b.meetingUrl }, true);
+  const noticeWhere = where;
   if (!b.practiceInbox) {
     await logRun({
       clinicId: b.clinicId,
@@ -396,6 +416,10 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
     '',
     `  ${b.serviceName}`,
     `  ${b.whenText}`,
+    // Kept in step with the HTML panel deliberately. A text part that omits
+    // where to be, while the HTML carries it, is the mismatch nobody notices
+    // until somebody drives to the wrong town.
+    ...noticeWhere.split('\n').map(l => `  ${l}`),
     '',
     `Contact: ${b.clientEmail}${b.clientPhone ? ` · ${b.clientPhone}` : ''}`,
     b.note ? `\nThey said:\n${b.note}` : null,
@@ -403,13 +427,16 @@ export async function sendBookingNotice(b: BookingEmail): Promise<NotifyResult> 
     'It is on your calendar in the console.'
   ].filter(v => v !== null).join('\n');
 
-  const brand = await emailBrand(b.clinicId, b.clinicName);
   const html = renderEmail(brand, {
     preheader: `A new booking came in for ${b.clinicName}.`,
     lines: [`${b.clientName} booked online.`],
     panel: [
       { label: 'Treatment', value: b.serviceName },
       { label: 'When', value: b.whenText },
+      // The row that was missing entirely, and the reason she could not tell a
+      // phone consult from a visit. Always present, never conditional — the
+      // absence of a Where line is what made every booking look the same.
+      { label: 'Where', value: noticeWhere },
       { label: 'Contact', value: `${b.clientEmail}${b.clientPhone ? `\n${b.clientPhone}` : ''}` },
       ...(b.note ? [{ label: 'They said', value: b.note }] : [])
     ],

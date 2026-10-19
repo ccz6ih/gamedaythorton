@@ -99,6 +99,8 @@ export async function book(input: {
     clinic_id: string; service_name: string; practice_name: string;
     practice_phone: string | null; notify_email: string | null;
     starts_at: string; requires_consent: boolean; synthetic: boolean;
+    /** Added by 0044, so the notice can say whether it is a visit or a call. */
+    modality: 'in_person' | 'phone' | 'video' | null;
     /** Added by 0040, so the confirmation can carry the client's own form. */
     intake_token: string | null;
   };
@@ -130,6 +132,9 @@ export async function book(input: {
     whenText,
     note: input.note ?? null,
     requiresConsent: result.requires_consent === true,
+    // Whether this is a visit, a phone call or a video call. Without it every
+    // booking notice looked identical and a consult was a guess.
+    modality: result.modality ?? 'in_person',
     /**
      * Only when the practice actually has a form live.
      *

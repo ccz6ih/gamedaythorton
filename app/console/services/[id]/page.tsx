@@ -73,6 +73,9 @@ async function save(formData: FormData) {
       description: text(formData, 'description'),
       duration_min: int(formData, 'duration_min', 30)!,
       buffer_after_min: int(formData, 'buffer_after_min', 0)!,
+      // How this treatment is normally delivered. Copied onto each new
+      // appointment; changing it never rewrites ones already booked.
+      default_modality: requiredText(formData, 'default_modality'),
       price_mode: mode,
       price_cents: mode === 'flat' ? priceCents : mode === 'free' ? 0 : null,
       price_from_cents: mode === 'from' || mode === 'per_unit' ? fromCents : null,
@@ -240,6 +243,20 @@ export default async function ServiceFormPage({
                     {categories.map(c => <option value={c} key={c} />)}
                   </datalist>
                 </div>
+              <div className="field">
+                <label htmlFor="default_modality">How it happens</label>
+                <select id="default_modality" name="default_modality"
+                        defaultValue={String(service?.default_modality ?? 'in_person')}>
+                  <option value="in_person">In person</option>
+                  <option value="phone">Phone call</option>
+                  <option value="video">Video call</option>
+                </select>
+                <div className="hint">
+                  Put on every new booking, and said plainly in the emails. A
+                  consultation is often a phone call; a treatment never is.
+                </div>
+              </div>
+
                 <div className="field">
                   <label htmlFor="duration_min">Minutes</label>
                   <input
