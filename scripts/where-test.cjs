@@ -25,3 +25,37 @@ for (const [name, w] of cases) {
   console.log('     short   : ' + whereShort(w));
 }
 fs.rmSync(BUILD, { recursive:true, force:true });
+
+/*
+ * Two screens can now set this, and they must agree.
+ *
+ * The booking form and the inline editor on Today write the same two columns.
+ * If only one of them insists a meeting link is a link, or only one of them
+ * clears a leftover link when an appointment moves back to in-person, the
+ * difference shows up as a client holding a dead URL — so assert the guards
+ * exist in both rather than trusting that they do.
+ */
+let fails = 0;
+const must = (where, ok, what) => {
+  if (!ok) { fails++; console.log('  FAIL  ' + where + ' — ' + what); }
+};
+for (const f of ['app/console/book/page.tsx', 'app/console/today/page.tsx']) {
+  const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+  must(f, /\^https\?:\\\/\\\/\\S\+\$/i.test(src), 'no https:// check on the meeting link');
+  must(f, /modality === 'video'/.test(src), 'link is not conditioned on a video call');
+  for (const m of ['in_person', 'phone', 'video']) {
+    must(f, src.includes(`'${m}'`), `does not know about ${m}`);
+  }
+}
+
+/* A staff booking must tell the client. It used to send nothing at all. */
+const bookSrc = fs.readFileSync(path.join(ROOT, 'app/console/book/page.tsx'), 'utf8');
+must('book', bookSrc.includes('sendBookingConfirmation'), 'staff booking sends the client nothing');
+must('book', /told=\$\{told\}/.test(bookSrc), 'does not report whether the client was told');
+const todaySrc = fs.readFileSync(path.join(ROOT, 'app/console/today/page.tsx'), 'utf8');
+for (const t of ['sent', 'no_email', 'unsent']) {
+  must('today', todaySrc.includes(`'${t}'`), `no banner for told=${t}`);
+}
+
+console.log(fails ? `\n  ${fails} failed` : '\n  both screens agree, and a staff booking is announced');
+process.exit(fails ? 1 : 0);

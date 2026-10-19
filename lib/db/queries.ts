@@ -488,13 +488,19 @@ export type ServiceRow = {
   requires_labs: boolean;
   online_bookable: boolean;
   active: boolean;
+  /**
+   * How this service usually happens, from 0044. The booking form pre-selects
+   * it so a consultation that is normally a phone call does not have to be
+   * corrected afterwards on Today.
+   */
+  default_modality: 'in_person' | 'phone' | 'video' | null;
 };
 
 export async function getServices(): Promise<ServiceRow[]> {
   const supabase = await serverClient();
   const { data } = await supabase
     .from('service')
-    .select('id, name, category, duration_min, buffer_after_min, price_mode, price_cents, price_from_cents, unit_label, requires_consent, requires_labs, online_bookable, active')
+    .select('id, name, category, duration_min, buffer_after_min, price_mode, price_cents, price_from_cents, unit_label, requires_consent, requires_labs, online_bookable, active, default_modality')
     .order('category')
     .order('sort_order');
   return (data ?? []) as ServiceRow[];

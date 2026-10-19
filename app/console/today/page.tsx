@@ -152,7 +152,10 @@ async function completeTask(formData: FormData) {
 export default async function TodayPage({
   searchParams
 }: {
-  searchParams: Promise<{ offset?: string; form?: string; where?: string }>;
+  searchParams: Promise<{
+    offset?: string; form?: string; where?: string;
+    booked?: string; told?: string;
+  }>;
 }) {
   const params = await searchParams;
   const offset = Number(params.offset ?? 0) || 0;
@@ -232,6 +235,34 @@ export default async function TodayPage({
           <div className="note-band" role="alert">
             No email address on that client, so there is nowhere to send it.
           </div>
+        )}
+        {/*
+          WHETHER THE CLIENT WAS TOLD, not just whether it was booked.
+
+          A staff booking used to say "booked" and stop, which is the same as
+          always claiming success: if nothing went out, somebody has to ring
+          them, and that is only actionable if the screen says so.
+        */}
+        {params.booked === '1' && params.told === 'sent' && (
+          <div className="note-band">
+            Booked, and their confirmation has gone — with where to be, and the
+            meeting link if it is a video call.
+          </div>
+        )}
+        {params.booked === '1' && params.told === 'no_email' && (
+          <div className="note-band warn" role="alert">
+            Booked, but there is no email address on that client, so nothing has
+            been sent. They do not know yet.
+          </div>
+        )}
+        {params.booked === '1' && params.told === 'unsent' && (
+          <div className="note-band warn" role="alert">
+            Booked, but the confirmation did not go out. The appointment is on
+            the books — the client has not been told.
+          </div>
+        )}
+        {params.booked === '1' && !params.told && (
+          <div className="note-band">Booked.</div>
         )}
         {params.where === 'saved' && (
           <div className="note-band">Saved. The client sees this in their reminder.</div>

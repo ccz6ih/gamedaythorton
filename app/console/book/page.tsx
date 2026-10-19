@@ -21,12 +21,28 @@ import { serverClient } from '@/lib/supabase/server';
 import { getClinic, getServices, getClients } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { requireStaff, pilotFields, text, requiredText, int, formMessage } from '@/lib/actions';
+import { sendBookingConfirmation, intakeLinkFor } from '@/lib/notify';
 import { dateLabel, timeLabel, priceLabel } from '@/lib/format';
 import { localToInstant, DEFAULT_TZ } from '@/lib/time';
+import type { Modality } from '@/lib/appointment-where';
 
 export const dynamic = 'force-dynamic';
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/**
+ * The three ways an appointment can happen, and what to call each of them to
+ * somebody standing at a front desk. Both this form and the inline editor on
+ * Today offer the same three words, because two screens describing the same
+ * column differently is how a phone consult ends up labelled "virtual" in one
+ * place and "remote" in the other.
+ */
+const MODALITIES: Modality[] = ['in_person', 'phone', 'video'];
+const MODALITY_LABEL: Record<Modality, string> = {
+  in_person: 'In person',
+  phone: 'Phone call',
+  video: 'Video call'
+};
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(':').map(Number);
@@ -40,6 +56,14 @@ async function book(formData: FormData) {
   'use server';
 
   const staff = await requireStaff();
+
+  /**
+   * Declared out here so the redirect after the try can report it. 'no_email'
+   * is the honest default: until we have found an address, nobody has been
+   * told anything.
+   */
+  let told: 'sent' | 'unsent' | 'no_email' = 'no_email';
+
   const qs = new URLSearchParams({
     service: String(formData.get('service_id') ?? ''),
     date: String(formData.get('date') ?? ''),
@@ -77,21 +101,43 @@ async function book(formData: FormData) {
     const supabase = await serverClient();
     const { data: service } = await supabase
       .from('service')
-      .select('duration_min, buffer_after_min')
+      .select('duration_min, buffer_after_min, default_modality')
       .eq('id', serviceId)
       .maybeSingle();
     if (!service) throw new Error('That service no longer exists.');
+
+    /**
+     * Read the service's default from the database, not from the form.
+     *
+     * The form's pre-selection is a convenience for whoever is looking at the
+     * screen; this is the value of record. If the field is missing or has been
+     * tampered with, the service's own default stands — and that column itself
+     * defaults to 'in_person'.
+     */
+    const asked = text(formData, 'modality');
+    const modality = MODALITIES.includes(asked as Modality)
+      ? (asked as Modality)
+      : (service.default_modality as Modality | null) ?? 'in_person';
+
+    const pasted = text(formData, 'meeting_url') ?? '';
+    const meetingUrl =
+      modality === 'video' && /^https?:\/\/\S+$/i.test(pasted) ? pasted : null;
+    if (modality === 'video' && pasted && !meetingUrl) {
+      throw new Error(
+        'That meeting link does not look like a link. Paste the whole thing, starting with https://. Booked without it, you can add it later on Today.'
+      );
+    }
 
     // The practice's own zone. The clinic row carries it; America/Denver is the
     // fallback and is what every other time in this codebase already assumes.
     const { data: tzRow } = await supabase
       .from('clinic')
-      .select('timezone')
+      .select('timezone, name, phone_voice, address_line1, address_city, address_state, address_zip')
       .eq('id', staff.clinicId)
       .maybeSingle();
     const timeZone = tzRow?.timezone || DEFAULT_TZ;
 
-    const { error } = await supabase.from('appointment').insert({
+    const { data: booked, error } = await supabase.from('appointment').insert({
       clinic_id: staff.clinicId,
       patient_id: patientId,
       service_id: serviceId,
@@ -127,21 +173,112 @@ async function book(formData: FormData) {
        * location's address. A client who sees Loveland drives to Loveland.
        */
       location_id: text(formData, 'location_id'),
+      /**
+       * In person, on the phone, or on video — decided here rather than
+       * inherited silently.
+       *
+       * The form pre-selects the service's own default, so the common case is
+       * one fewer decision, but a consultation booked over the phone that the
+       * client would rather do on video can be said so at the time. The
+       * fallback is the service default, which is itself 'in_person', so an
+       * absent field never means something new.
+       *
+       * The link is only kept when this is a video call and only when it
+       * parses. A half-pasted string in a client's reminder, looking like
+       * something they can click, is worse than no link at all — and a
+       * leftover link on an appointment that moved back to in-person is worse
+       * again.
+       */
+      modality,
+      meeting_url: meetingUrl,
       room: text(formData, 'room'),
       notes: text(formData, 'notes'),
       intake_complete: false,
       ...(await pilotFields(staff.clinicId))
-    });
+    })
+      .select(`
+        id, starts_at, intake_token,
+        patient:patient_id ( first_name, last_name, email, phone ),
+        service:service_id ( name, requires_consent ),
+        location:location_id ( name, address, is_default )
+      `)
+      .maybeSingle();
     // The database has an exclusion constraint on provider + time, so a
     // double-booking surfaces here as a real error rather than as two people in a
     // waiting room.
     if (error) throw new Error(error.message);
+
+    /**
+     * Tell the client. Nothing used to.
+     *
+     * A booking the client made themselves has always sent a confirmation; a
+     * booking the practice made for them sent nothing at all, and the first
+     * they heard of it was the reminder the day before. That was survivable
+     * while every appointment was in the same room at the same address. It
+     * stopped being survivable the moment a consultation could be a phone call
+     * or a video call: a link pasted here would have sat in the database until
+     * the night before.
+     *
+     * It is the same whereLine() the public path uses, so both say the same
+     * sentence. No practice notice goes with it — she does not need an email
+     * about a booking she just made.
+     *
+     * After the insert and in its own try, because the appointment exists
+     * whether or not this sends. The helper logs its own failures.
+     */
+    const row = booked as unknown as {
+      starts_at: string; intake_token: string | null;
+      patient: { first_name: string; last_name: string; email: string | null; phone: string | null } | null;
+      service: { name: string; requires_consent: boolean } | null;
+      location: { name: string; address: string | null; is_default: boolean } | null;
+    } | null;
+
+    if (row?.patient?.email) {
+      const elsewhere = row.location && !row.location.is_default;
+      try {
+        const sent = await sendBookingConfirmation({
+          clinicId: staff.clinicId,
+          clinicName: tzRow?.name ?? 'the practice',
+          clinicAddress: [tzRow?.address_line1, tzRow?.address_city, tzRow?.address_state, tzRow?.address_zip]
+            .filter(Boolean).join(', ') || null,
+          practicePhone: tzRow?.phone_voice ?? null,
+          practiceInbox: null,
+          clientName: `${row.patient.first_name} ${row.patient.last_name}`,
+          clientEmail: row.patient.email,
+          clientPhone: row.patient.phone ?? null,
+          serviceName: row.service?.name ?? 'your appointment',
+          whenText: new Date(row.starts_at).toLocaleString('en-US', {
+            timeZone, dateStyle: 'full', timeStyle: 'short'
+          }),
+          note: null,
+          requiresConsent: row.service?.requires_consent === true,
+          modality,
+          meetingUrl,
+          locationName: elsewhere ? row.location!.name : null,
+          locationAddress: elsewhere ? row.location!.address : null,
+          intakeUrl: await intakeLinkFor(row.intake_token),
+          ...(await pilotFields(staff.clinicId))
+        });
+        told = sent.delivered ? 'sent' : 'unsent';
+      } catch {
+        // The booking stands. Nothing here may undo it.
+        told = 'unsent';
+      }
+    }
   } catch (err) {
     redirect(`/console/book?${qs}&error=${encodeURIComponent(formMessage(err))}`);
   }
 
   revalidatePath('/console/today');
-  redirect('/console/today?booked=1');
+  /**
+   * Say whether the client was actually told.
+   *
+   * "Booked" on its own is not enough information to act on: if nothing went
+   * out, somebody has to pick up the phone, and she can only know that if the
+   * screen says so. The old behaviour — silence, every time — was the same as
+   * always claiming success.
+   */
+  redirect(`/console/today?booked=1&told=${told}`);
 }
 
 export default async function BookPage({
@@ -364,21 +501,84 @@ export default async function BookPage({
                 full day both used to hide the Who, the notes and the submit
                 button, which made "book them anyway" impossible rather than
                 merely discouraged. */}
-                {(locations?.length ?? 0) > 1 && (
-                  <section className="card">
-                    <div className="card-head"><div><h2>Where</h2></div></div>
-                    {/*
-                      Only shown when there is a choice. A practice with one
-                      room does not need a field that always says the same
-                      thing.
+                {/*
+                  ALWAYS SHOWN, even for a practice with one room.
 
-                      This is not a tenancy switch. Seeing her own client in
-                      Gameday's room for an afternoon keeps the appointment on
-                      HER books at HER prices; filing it under Gameday would put
-                      her client in their patient list and her money in their
-                      takings.
+                  It used to appear only when there were two locations to
+                  choose between, which was right while "where" meant only
+                  "which address". It does not any more: a consultation can
+                  happen on the phone or on video, and the client has to be
+                  told which. Jamie had a consult arrive with no way to know,
+                  and no way to say.
+                */}
+                <section className="card">
+                  <div className="card-head">
+                    <div>
+                      <h2>Where</h2>
+                      <p>
+                        This is the sentence the client reads in their
+                        confirmation and again in their reminder.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="modality">How it happens</label>
+                    {/*
+                      Pre-selected from the service's own default, so booking a
+                      consultation that is normally a phone call needs no
+                      thought — but it is a dropdown rather than a fixed value,
+                      because the one that matters is the consult booked by
+                      phone that becomes a video call once they agree a time.
                     */}
+                    <select
+                      id="modality"
+                      name="modality"
+                      defaultValue={selectedService.default_modality ?? 'in_person'}
+                    >
+                      {MODALITIES.map(m => (
+                        <option key={m} value={m}>{MODALITY_LABEL[m]}</option>
+                      ))}
+                    </select>
+                    <div className="hint">
+                      {selectedService.default_modality === 'phone'
+                        ? `${selectedService.name} is usually a phone call. We will tell them we are ringing them.`
+                        : selectedService.default_modality === 'video'
+                          ? `${selectedService.name} is usually a video call. Paste the link below and it goes out with the confirmation.`
+                          : `${selectedService.name} is usually in person. Change it here for this one appointment — the service itself is untouched.`}
+                    </div>
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="meeting_url">Meeting link</label>
+                    <input
+                      id="meeting_url"
+                      name="meeting_url"
+                      type="url"
+                      inputMode="url"
+                      placeholder="https://…"
+                      autoComplete="off"
+                    />
+                    <div className="hint">
+                      Only used for a video call, and ignored otherwise. You can
+                      leave it blank and add it later on Today — but it has to
+                      be there before the reminder goes out the day before, or
+                      it reaches them too late to be any use.
+                    </div>
+                  </div>
+
+                  {(locations?.length ?? 0) > 1 && (
                     <div className="field">
+                      {/*
+                        Only when there is a choice. A practice with one room
+                        does not need a field that always says the same thing.
+
+                        This is not a tenancy switch. Seeing her own client in
+                        Gameday's room for an afternoon keeps the appointment on
+                        HER books at HER prices; filing it under Gameday would put
+                        her client in their patient list and her money in their
+                        takings.
+                      */}
                       <label htmlFor="location_id">Location</label>
                       <select id="location_id" name="location_id" defaultValue="">
                         {locations!.map(l => (
@@ -389,11 +589,12 @@ export default async function BookPage({
                       </select>
                       <div className="hint">
                         The address for whichever is chosen is what goes in the
-                        client&rsquo;s confirmation and reminder.
+                        client&rsquo;s confirmation and reminder. Ignored if this
+                        is a phone or video call.
                       </div>
                     </div>
-                  </section>
-                )}
+                  )}
+                </section>
 
                 <section className="card">
                   <div className="card-head"><div><h2>Who</h2></div></div>
