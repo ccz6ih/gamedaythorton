@@ -46,6 +46,15 @@
   --gd-accent-press:  color-mix(in srgb, var(--brand-accent) 82%, black);
   --gd-accent-dim:    color-mix(in srgb, var(--brand-accent) 14%, transparent);
   --gd-accent-line:   color-mix(in srgb, var(--brand-accent) 38%, transparent);
+  /* The second accent, same trap, and this is the surface it exists for: the
+     eyebrows and section labels below all read --gd-accent-2. Its default
+     chains through --brand-accent rather than standing alone, so a clinic with
+     one colour still resolves against ITS colour here and not the fallback
+     red. */
+  --brand-accent-2:   var(--brand-accent);
+  --gd-accent-2:      var(--brand-accent-2);
+  --gd-accent-2-dim:  color-mix(in srgb, var(--brand-accent-2) 14%, transparent);
+  --gd-accent-2-line: color-mix(in srgb, var(--brand-accent-2) 38%, transparent);
   --gd-font:          var(--brand-font);
   /* Same trap one level down: tokens.css declares --brand-display-font from
      --brand-font on :root, so it resolves there too. A practice that names a
@@ -140,12 +149,35 @@
   padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(2rem, 5vw, 3.5rem);
   border-bottom: 1px solid var(--gd-border);
 }
+/* --------------------------------------------------------------------------
+   THE LABEL VOICE — and the rule for which accent gets used where.
+
+   A practice with two accents needs a reason for each, or it just looks
+   undecided. The one in force across this file:
+
+       anything you PRESS is the primary      (buttons, links, hovers, CTAs)
+       anything that LABELS or NUMBERS is the second
+
+   Which is how Jamie's own work reads: the champagne is the booking box and
+   the price, the sage is the display numeral, the caption under an icon, the
+   rule between sections. Five rules below move to the second accent on that
+   basis. The other ~180 uses of --gd-accent are deliberately untouched —
+   they are all things you click.
+
+   Weights come down and tracking goes up at the same time. Hers sit around a
+   medium weight at a fifth of an em; at 600/700 the same label reads as a
+   heading shouting rather than a caption whispering, which is most of why the
+   site felt adjacent to her brand rather than of it.
+
+   A clinic with one accent is unaffected: --gd-accent-2 falls back to the
+   primary, so these rules render exactly as they did.
+   -------------------------------------------------------------------------- */
 .sf-eyebrow {
   font-size: var(--gd-step--2);
   text-transform: uppercase;
-  letter-spacing: .16em;
-  color: var(--gd-accent);
-  font-weight: 600;
+  letter-spacing: .2em;
+  color: var(--gd-accent-2);
+  font-weight: 500;
   margin-bottom: var(--gd-4);
 }
 .sf-hero h1 {
@@ -497,8 +529,8 @@
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--gd-accent);
-  font-weight: 600;
+  color: var(--gd-accent-2);
+  font-weight: 500;
   margin-bottom: 0.35rem;
 }
 
@@ -785,9 +817,9 @@
 .sf-fact dt {
   font-size: var(--gd-step--2);
   text-transform: uppercase;
-  letter-spacing: .12em;
-  font-weight: 700;
-  color: var(--gd-accent);
+  letter-spacing: .18em;
+  font-weight: 500;
+  color: var(--gd-accent-2);
   margin-bottom: var(--gd-3);
 }
 .sf-fact dd {
@@ -1124,8 +1156,8 @@
 .sf-card-brand {
   font-size: var(--gd-step--2);
   text-transform: uppercase;
-  letter-spacing: .14em;
-  color: var(--gd-accent);
+  letter-spacing: .2em;
+  color: var(--gd-accent-2);
   margin-bottom: var(--gd-2);
 }
 .sf-card h3 {
@@ -1331,10 +1363,10 @@
 }
 .sf-about-manifesto-kicker,
 .sf-about-number {
-  color: var(--gd-accent);
+  color: var(--gd-accent-2);
   font-size: var(--gd-step--2);
-  font-weight: 600;
-  letter-spacing: .16em;
+  font-weight: 500;
+  letter-spacing: .2em;
   text-transform: uppercase;
 }
 .sf-about-manifesto-kicker { margin: 0 0 var(--gd-3); }

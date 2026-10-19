@@ -130,6 +130,18 @@ export default async function StorefrontLayout({ children, params }: Props) {
 
   const style: React.CSSProperties & Record<string, string> = {} as never;
   if (brand.accent) style['--brand-accent'] = brand.accent;
+  /**
+   * The second accent, which the eyebrows and section labels read.
+   *
+   * Only set when the practice has one. Omitting it leaves the `.sf` rule's
+   * fallback in force, and that fallback chains to --brand-accent — so a
+   * one-colour clinic gets ITS colour on labels rather than the default red,
+   * and renders exactly as it did before this token existed.
+   *
+   * Inline here beats the class rule in .sf, which is the whole arrangement:
+   * the stylesheet states the default, this states the practice.
+   */
+  if (brand.accent2) style['--brand-accent-2'] = brand.accent2;
   if (brand.accentInk) style['--brand-accent-ink'] = brand.accentInk;
   // The brand kit stores radius as a number (14), and CSS needs a unit —
   // `calc(14 * 0.6)` is invalid and silently drops the whole declaration.

@@ -62,6 +62,30 @@
   --gd-accent-dim:    color-mix(in srgb, var(--brand-accent) 14%, transparent);
   --gd-accent-line:   color-mix(in srgb, var(--brand-accent) 38%, transparent);
 
+  /* --- The SECOND accent -------------------------------------------------
+   * Some practices have two, and modelling one was wrong.
+   *
+   * The Med Bar's printed and social work runs a warm champagne AND a soft
+   * sage, and they are not interchangeable: the champagne is what you press —
+   * buttons, prices, the booking box — and the sage is structure, the thing
+   * that labels and divides. Collapsing them onto one token produced a site
+   * that was recognisably SOMETHING of hers and not quite her.
+   *
+   * Sampled from her own posts rather than picked: the display numerals and
+   * the botanical rules land at h70 s22% l72%. The value her kit actually
+   * carries holds that hue and lightness but lifts the chroma, because her
+   * muted body text is already the same sage at half the saturation and a
+   * label the colour of the paragraph beneath it is not a label.
+   *
+   * DEFAULTS TO THE PRIMARY, exactly as --brand-display-font defaults to
+   * --brand-font. A clinic that has only one accent renders precisely as it
+   * did before this token existed, so nothing already shipped changes.
+   */
+  --brand-accent-2:   var(--brand-accent);
+  --gd-accent-2:      var(--brand-accent-2);
+  --gd-accent-2-dim:  color-mix(in srgb, var(--brand-accent-2) 14%, transparent);
+  --gd-accent-2-line: color-mix(in srgb, var(--brand-accent-2) 38%, transparent);
+
   /* --- Dark surfaces (default). The clinics are dark rooms and the real
          usage context is a phone at 11pm. --------------------------------- */
   --gd-bg:             #141414;

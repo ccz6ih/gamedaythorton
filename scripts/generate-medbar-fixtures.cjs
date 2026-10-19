@@ -88,6 +88,27 @@ const clinic = {
     // gold line art, cream. An earlier version of this file had a muted brown
     // on a light surface, which was nothing like her actual brand.
     accent: '#d9a88c',
+    /**
+     * The sage. Sampled from her own posts, then adjusted for one reason.
+     *
+     * Her carousels run two accents: this one on the display numerals, the
+     * botanical rules and the Green Envee line, and a warm one on anything you
+     * press. Counting the commonest saturated pixel across those posts just
+     * returns a cheekbone — the face fills the frame — so it was taken by hue
+     * band, where the brand marks are small by area but unmistakable at h70
+     * s22% l72%.
+     *
+     * WHY IT IS NOT THAT VALUE EXACTLY. Her live brand kit already sets muted
+     * body text to #C3C9BD, which is the same sage at half the chroma. Using
+     * the sampled colour would have made every eyebrow on the site the same
+     * colour as the paragraph under it — a label that does not label. This
+     * keeps her hue and her lightness and raises the saturation until it
+     * separates: dE 20.5 from the muted text rather than 10.1.
+     *
+     * 11.35:1 on her ground, the highest of the candidates tested, so it is
+     * safe for the small letterspaced caps it mostly sets.
+     */
+    accent2: '#c7d19e',
     accentInk: '#1a1513',
     radius: 14,
     font: '"Cal Sans", "Montserrat", sans-serif',

@@ -12,6 +12,14 @@ import type { Clinic } from '@/lib/db/queries';
 
 type BrandKit = {
   accent?: string;
+  /**
+   * The second accent, for a practice whose identity runs on two.
+   *
+   * The Med Bar's is a soft sage that sets labels and rules while the
+   * champagne stays on anything you press. Optional, and absent means "use
+   * the primary", so a one-accent clinic is untouched by this existing.
+   */
+  accent2?: string;
   accentInk?: string;
   radius?: number;
   font?: string;
@@ -99,6 +107,9 @@ export function vocab(clinic: Clinic | null) {
 export function Brand({ clinic, children }: { clinic: Clinic | null; children: React.ReactNode }) {
   const brand = brandOf(clinic);
   const accent = brand.accent && hexToRgb(brand.accent) ? brand.accent : '#d7262f';
+  // Validated the same way, and falling back to the primary rather than to the
+  // default red — an unset second accent must be invisible, not Gameday's.
+  const accent2 = brand.accent2 && hexToRgb(brand.accent2) ? brand.accent2 : accent;
   const ink = brand.accentInk && brand.accentInk !== 'auto' ? brand.accentInk : inkFor(accent);
   const radius = typeof brand.radius === 'number' ? brand.radius : 10;
 
@@ -162,6 +173,14 @@ export function Brand({ clinic, children }: { clinic: Clinic | null; children: R
     '--gd-accent-dim': `color-mix(in srgb, ${accent} 14%, transparent)`,
     '--gd-accent-line': `color-mix(in srgb, ${accent} 38%, transparent)`,
     '--gd-ring': `0 0 0 3px color-mix(in srgb, ${accent} 14%, transparent)`,
+    // Restated for the same reason as everything above it: tokens.css writes
+    // these as var(--brand-accent-2), which resolves once on :root. Setting
+    // only --brand-accent-2 here would leave the derived pair pointing at
+    // whatever it computed to first. scripts/brand-token-test.cjs enforces it.
+    '--brand-accent-2': accent2,
+    '--gd-accent-2': accent2,
+    '--gd-accent-2-dim': `color-mix(in srgb, ${accent2} 14%, transparent)`,
+    '--gd-accent-2-line': `color-mix(in srgb, ${accent2} 38%, transparent)`,
     '--gd-font': font,
     '--gd-font-num': font,
     '--gd-r-sm': `${Math.round(radius * 0.6)}px`,

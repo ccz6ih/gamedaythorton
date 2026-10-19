@@ -46,6 +46,27 @@ async function saveBrand(formData: FormData) {
       brand.accentInk = inkFor(accent);
     }
 
+    /**
+     * The second accent — labels and numbers, where the first one is
+     * everything you press.
+     *
+     * Optional, and clearable: a practice that decides it only has one colour
+     * has to be able to say so, and leaving the field empty is the obvious way
+     * to do it. An empty value deletes the key rather than storing "", because
+     * Brand.tsx falls back to the primary when it is ABSENT, and an empty
+     * string would fail hex validation and silently become the default red.
+     *
+     * No ink is computed for it, unlike the primary: this one sets text ON the
+     * page rather than being a ground that text sits on.
+     */
+    const accent2 = text(formData, 'accent2');
+    if (text(formData, 'accent2_on') === '1' && accent2) {
+      if (!/^#[0-9a-fA-F]{6}$/.test(accent2)) throw new Error('A colour looks like #a1b2c3.');
+      brand.accent2 = accent2;
+    } else {
+      delete brand.accent2;
+    }
+
     const surface = text(formData, 'surface');
     if (surface) brand.surface = surface;
 
@@ -192,8 +213,12 @@ export default async function BrandPage({
             <div className="card-head">
               <div>
                 <div className="eyebrow">Colour</div>
-                <h2>Your accent</h2>
-                <p>One colour, used for buttons, links and the line-art marks on your menu.</p>
+                <h2>Your accents</h2>
+                <p>
+                  The first is everything someone presses — buttons, links, the
+                  line-art marks on your menu. The second is everything that
+                  labels or numbers.
+                </p>
               </div>
             </div>
             <div className="stack">
@@ -202,6 +227,7 @@ export default async function BrandPage({
                   <label htmlFor="accent">Accent colour</label>
                   <input id="accent" name="accent" type="color" defaultValue={accent}
                     style={{ height: '2.75rem', padding: '.2rem' }} />
+                  <div className="hint">Buttons, links, prices.</div>
                 </div>
                 <div className="field">
                   <label htmlFor="surface">Background</label>
@@ -209,6 +235,42 @@ export default async function BrandPage({
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
                   </select>
+                </div>
+              </div>
+
+              {/*
+                THE SECOND ACCENT, behind a switch rather than always on.
+
+                A colour input can never be empty — it always submits
+                something — so the checkbox is the only honest way to say "I
+                have one colour, not two". Unchecked deletes the key, and
+                Brand.tsx then falls back to the primary, which is exactly how
+                every clinic rendered before this field existed.
+
+                Defaults to the primary in the picker so a practice turning it
+                on for the first time starts from its own colour rather than
+                from black.
+              */}
+              <div className="grid g2">
+                <div className="field">
+                  <label htmlFor="accent2">Second accent</label>
+                  <input id="accent2" name="accent2" type="color"
+                    defaultValue={brand.accent2 ?? accent}
+                    style={{ height: '2.75rem', padding: '.2rem' }} />
+                  <div className="hint">
+                    Eyebrows, section labels, the small letterspaced capitals.
+                  </div>
+                </div>
+                <div className="field">
+                  <label htmlFor="accent2_on">Use a second colour</label>
+                  <label className="opt" htmlFor="accent2_on" style={{ cursor: 'pointer' }}>
+                    <input id="accent2_on" name="accent2_on" type="checkbox" value="1"
+                      defaultChecked={Boolean(brand.accent2)} />
+                    <span style={{ marginLeft: '.5rem' }}>On</span>
+                  </label>
+                  <div className="hint">
+                    Off means labels use your accent colour, as before.
+                  </div>
                 </div>
               </div>
 
