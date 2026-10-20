@@ -213,7 +213,7 @@ export type TodayRow = {
    * This is the screen she opens in the morning to see what the day holds, so
    * it is the one that most needs to say "the two o'clock is in Northglenn".
    */
-  location: { name: string; is_default: boolean } | null;
+  location: { name: string; city: string | null; is_default: boolean } | null;
   /** So the console can open the client's own form, or see it is still blank. */
   intake_token: string | null;
   /** Where to be, and the link when it is a video call. */
@@ -233,7 +233,7 @@ export async function getToday(clinic: Clinic, offsetDays = 0): Promise<TodayRow
       patient:patient_id ( id, first_name, last_name ),
       service:service_id ( name, category ),
       provider:provider_id ( name ),
-      location:location_id ( name, is_default )
+      location:location_id ( name, city, is_default )
     `)
     .gte('starts_at', day + 'T00:00:00')
     .lte('starts_at', day + 'T23:59:59')
@@ -324,7 +324,7 @@ export async function getChart(patientId: string) {
           'id, starts_at, status, duration_min, reason_code, room, notes, ' +
           'modality, meeting_url, intake_complete, service_id, ' +
           'service:service_id (name, category, price_cents, price_mode, price_from_cents, unit_label), ' +
-          'location:location_id (name, address, is_default)'
+          'location:location_id (name, address, city, is_default)'
         )
         .eq('patient_id', patientId).order('starts_at', { ascending: false }),
       supabase.from('treatment_record').select('*').eq('patient_id', patientId)
@@ -834,4 +834,23 @@ export function checkinAverage(row: Record<string, unknown> | undefined) {
   const values = CHECKIN_DIMS.map(([k]) => Number(row[k])).filter(v => !Number.isNaN(v));
   if (!values.length) return null;
   return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+/**
+ * The practice's usual room.
+ *
+ * An appointment with no location_id is not an appointment with no place —
+ * it is one at the default, which is a real address the client was told. Both
+ * the chart and Today need to name it, because "in person" is not an answer
+ * for somebody who works in two cities.
+ */
+export async function getDefaultLocation(): Promise<{ name: string; city: string | null } | null> {
+  const supabase = await serverClient();
+  const { data } = await supabase
+    .from('location')
+    .select('name, city')
+    .eq('is_default', true)
+    .eq('active', true)
+    .maybeSingle();
+  return (data as { name: string; city: string | null } | null) ?? null;
 }

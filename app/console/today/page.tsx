@@ -7,7 +7,8 @@
  */
 
 import Link from 'next/link';
-import { getClinic, getToday } from '@/lib/db/queries';
+import { getClinic, getToday, getDefaultLocation } from '@/lib/db/queries';
+import { locationLabel } from '@/lib/appointment-where';
 import { vocab } from '@/components/Brand';
 import { timeLabel, titleCase, dateLabel } from '@/lib/format';
 import { serverClient } from '@/lib/supabase/server';
@@ -164,6 +165,8 @@ export default async function TodayPage({
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
   const rows = await getToday(clinic, offset);
+  // Named once for the whole list, rather than per row.
+  const usualRoom = await getDefaultLocation();
   const words = vocab(clinic);
 
   /**
@@ -349,10 +352,18 @@ export default async function TodayPage({
                       {/* Emailing it is the other half: open it here if they
                           are in front of you, send it if they are not. */}
                       {/* Where to be, at a glance, next to the name. */}
+                      {/*
+                        The CITY when it is in person, not the word "in
+                        person", which tells somebody who works in two of them
+                        nothing. Falls back to the usual room when the
+                        appointment has no location of its own, because a null
+                        location_id means the default — a real address the
+                        client was given — and not "nowhere".
+                      */}
                       <span className="pill" data-tone={row.modality && row.modality !== 'in_person' ? 'warn' : undefined}>
                         {row.modality === 'phone' ? 'phone call'
                           : row.modality === 'video' ? 'video call'
-                          : 'in person'}
+                          : (locationLabel(row.location, usualRoom) ?? 'in person')}
                       </span>
                       {!row.intake_complete && row.intake_token && row.patient && (
                         <form action={sendForm} style={{ display: 'inline' }}>

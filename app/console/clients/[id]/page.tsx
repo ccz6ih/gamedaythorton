@@ -11,10 +11,10 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getClinic, getChart, hasModule } from '@/lib/db/queries';
+import { getClinic, getChart, hasModule, getDefaultLocation } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
 import { dateLabel, relative, money, num, titleCase, phone, initials, daysUntil, timeLabel, priceLabel } from '@/lib/format';
-import { whereShort, type Modality } from '@/lib/appointment-where';
+import { whereShort, locationLabel, type Modality } from '@/lib/appointment-where';
 import { serverClient } from '@/lib/supabase/server';
 import { signedPhotoUrls } from '@/lib/client-media';
 import { ClientNotes, type NoteRow } from '@/components/ClientNotes';
@@ -49,6 +49,9 @@ export default async function ChartPage({
   const feedback = await searchParams;
   const clinic = await getClinic();
   const chart = await getChart(id);
+  // The usual room, so an appointment with no location of its own can still
+  // be named rather than described as merely "in person".
+  const usualRoom = await getDefaultLocation();
 
   // RLS returns nothing rather than refusing, so an out-of-tenant id looks
   // identical to a nonexistent one — which is the correct behaviour: a 403 would
@@ -70,7 +73,7 @@ export default async function ChartPage({
       name?: string; price_cents?: number | null; price_mode?: string | null;
       price_from_cents?: number | null; unit_label?: string | null;
     } | null;
-    const location = a.location as { name?: string; is_default?: boolean } | null;
+    const location = a.location as { name?: string; city?: string; is_default?: boolean } | null;
     const status = String(a.status);
     const upcoming = new Date(String(a.starts_at)).getTime() > Date.now();
 
@@ -91,10 +94,19 @@ export default async function ChartPage({
 
     // Where, said the same short way the Today list says it, so the two
     // screens cannot describe one appointment differently.
+    /*
+      THE CITY, AND FOR THE DEFAULT ROOM TOO.
+
+      This said only "In person" for an appointment that was definitely in
+      Loveland. Two reasons, both wrong here: the default location was
+      deliberately left unnamed — right for a practice with one room, useless
+      for one with two — and the name would have been "The Med Bar", which
+      disambiguates nothing. The city does.
+    */
     bits.push(whereShort({
       modality: a.modality as Modality | null,
       clinicName: clinic.name,
-      locationName: location && location.is_default === false ? location.name : null
+      locationName: locationLabel(location, usualRoom)
     }));
 
     if (a.room) bits.push(String(a.room));

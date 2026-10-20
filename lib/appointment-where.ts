@@ -83,3 +83,27 @@ export function whereShort(w: WhereInput): string {
   if (modality === 'video') return 'Video';
   return w.locationName ?? 'In person';
 }
+
+/**
+ * What to CALL a room, in one or two words.
+ *
+ * The city, not the name, and that is the whole point. This practice's
+ * default location is called "The Med Bar" and its second is called "Gameday
+ * Men's Health — Northglenn"; showing the name tells somebody who works in
+ * both rooms nothing useful, while "Loveland" and "Northglenn" tell them
+ * everything in one word.
+ *
+ * `fallback` is the practice's default room, used when an appointment has no
+ * location of its own. A null location_id does not mean "nowhere" — it means
+ * the usual place, which is a real address the client was given, and leaving
+ * it unnamed is why the chart said only "In person" for an appointment that
+ * was definitely in Loveland.
+ */
+export function locationLabel(
+  loc: { name?: string | null; city?: string | null } | null | undefined,
+  fallback?: { name?: string | null; city?: string | null } | null
+): string | null {
+  const pick = (l?: { name?: string | null; city?: string | null } | null) =>
+    (l?.city?.trim() || l?.name?.trim() || null);
+  return pick(loc) ?? pick(fallback);
+}
