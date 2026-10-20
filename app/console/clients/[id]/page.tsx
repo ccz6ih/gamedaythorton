@@ -28,6 +28,14 @@ type TimelineEvent = {
   kind: 'visit' | 'lab' | 'dose' | 'flag' | 'treatment' | 'money';
   what: string;
   detail?: string | null;
+  /**
+   * Something to do about this event, from here.
+   *
+   * The chart is where somebody already is when they decide to act, and
+   * sending them to another screen to re-find the client and re-pick the
+   * treatment is three chances to pick the wrong one.
+   */
+  action?: { label: string; href: string } | null;
 };
 
 export default async function ChartPage({
@@ -108,12 +116,27 @@ export default async function ChartPage({
      */
     if (upcoming && a.intake_complete === false) bits.push('form not returned');
 
+    /**
+     * Invoice it from here, prefilled.
+     *
+     * Not offered on a no-show, where what has to be decided is whether to
+     * charge at all rather than how much; and not on an appointment with no
+     * service attached, because there would be nothing to put on the line.
+     */
+    const serviceId = a.service_id ? String(a.service_id) : null;
+
     events.push({
       at: String(a.starts_at),
       kind: status === 'no_show' ? 'flag' : 'visit',
       what: `${service?.name ?? 'Visit'}${status === 'no_show' ? ' — no-show' : ''}`,
       detail: [bits.join(' · '), a.notes ? String(a.notes) : null]
-        .filter(Boolean).join('\n')
+        .filter(Boolean).join('\n'),
+      action: serviceId && status !== 'no_show'
+        ? {
+            label: 'Send invoice',
+            href: `/console/charge?client=${encodeURIComponent(id)}&item=${encodeURIComponent(serviceId)}`
+          }
+        : null
     });
   });
 
@@ -625,6 +648,11 @@ export default async function ChartPage({
                 <div className="when">{dateLabel(e.at, 'long')} · {relative(e.at)}</div>
                 <div className="what">{e.what}</div>
                 {e.detail ? <div className="detail">{e.detail}</div> : null}
+                {e.action ? (
+                  <Link className="btn ghost sm tl-action" href={e.action.href}>
+                    {e.action.label}
+                  </Link>
+                ) : null}
               </div>
             ))}
           </div>

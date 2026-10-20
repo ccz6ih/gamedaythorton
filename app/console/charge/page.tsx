@@ -87,6 +87,20 @@ export default async function ChargePage({
           }))}
           taxBps={taxBps}
           stripeReady={stripeConfigured()}
+          /**
+           * Arrived from a chart, with the appointment already in mind.
+           *
+           * `item` takes ids, repeatable, so an invoice for a visit that had
+           * two things on it arrives with both. Unknown ids are dropped
+           * rather than erroring — a stale link from a service that has since
+           * been retired should open an empty form, not a failure.
+           */
+          preselect={{
+            clientId: typeof q.client === 'string' ? q.client : null,
+            itemIds: Array.isArray(q.item)
+              ? q.item
+              : typeof q.item === 'string' ? [q.item] : []
+          }}
         />
       </div>
     </>

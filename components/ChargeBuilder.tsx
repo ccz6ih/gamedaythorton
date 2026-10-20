@@ -54,18 +54,49 @@ const blank = (): Line => ({
 });
 
 export function ChargeBuilder({
-  catalogue, clients, taxBps, stripeReady
+  catalogue, clients, taxBps, stripeReady, preselect
 }: {
   catalogue: Catalogue[];
   clients: Client[];
   taxBps: number;
   stripeReady: boolean;
+  /**
+   * Arrived here from a client's chart with an appointment in mind.
+   *
+   * Everything stays editable afterwards — this fills the form in, it does
+   * not lock it. The treatment that ran long and the extra area are the whole
+   * reason this screen exists, and a prefilled line that cannot be changed
+   * would defeat it.
+   */
+  preselect?: { clientId?: string | null; itemIds?: string[] } | null;
 }) {
-  const [lines, setLines] = useState<Line[]>([blank()]);
-  const [clientId, setClientId] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  /**
+   * Built once, from the URL, rather than applied by an effect after mount.
+   *
+   * An effect would briefly render an empty form and then fill it, which on
+   * a slow connection reads as the page losing what you asked for. It also
+   * means a later edit cannot be stamped back over by the same effect
+   * re-running.
+   */
+  const initialLines = (): Line[] => {
+    const picked = (preselect?.itemIds ?? [])
+      .map(id => catalogue.find(c => c.id === id))
+      .filter((c): c is Catalogue => Boolean(c))
+      .map(item => ({
+        ...blank(),
+        name: item.name,
+        dollars: item.cents != null ? (item.cents / 100).toFixed(2) : '',
+        productId: item.kind === 'product' ? item.id : null
+      }));
+    return picked.length ? picked : [blank()];
+  };
+  const initialClient = clients.find(c => c.id === preselect?.clientId);
+
+  const [lines, setLines] = useState<Line[]>(initialLines);
+  const [clientId, setClientId] = useState(initialClient?.id ?? '');
+  const [name, setName] = useState(initialClient?.name ?? '');
+  const [email, setEmail] = useState(initialClient?.email ?? '');
+  const [phone, setPhone] = useState(initialClient?.phone ?? '');
   const [discount, setDiscount] = useState('');
   const [discountNote, setDiscountNote] = useState('');
   const [taxable, setTaxable] = useState(true);

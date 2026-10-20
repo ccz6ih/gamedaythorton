@@ -322,7 +322,7 @@ export async function getChart(patientId: string) {
       supabase.from('appointment')
         .select(
           'id, starts_at, status, duration_min, reason_code, room, notes, ' +
-          'modality, meeting_url, intake_complete, ' +
+          'modality, meeting_url, intake_complete, service_id, ' +
           'service:service_id (name, category, price_cents, price_mode, price_from_cents, unit_label), ' +
           'location:location_id (name, address, is_default)'
         )

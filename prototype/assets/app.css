@@ -703,3 +703,8 @@ tbody tr.clickable:hover { background: var(--gd-surface-raised); }
 .rowlink b { font-weight: 600; }
 .rowlink .dim { font-size: .82rem; color: var(--gd-text-dim); }
 .rowlink:hover b { color: var(--gd-accent); }
+
+/* The action on a timeline event. Offset so it reads as belonging to the
+   entry above it rather than floating between two, and quiet by default —
+   it is available, not demanded. */
+.tl-item .tl-action { margin-top: .5rem; }
