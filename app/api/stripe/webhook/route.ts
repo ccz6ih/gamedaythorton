@@ -18,6 +18,7 @@ import type Stripe from 'stripe';
 import { verifyWebhook, isPilotMode } from '@/lib/stripe';
 import { serviceClient, serviceRoleConfigured } from '@/lib/supabase/service';
 import { scrubForLog } from '@/lib/phi';
+import { sendOrderNotice } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';        // needs the raw body; not edge-safe
@@ -195,6 +196,27 @@ async function settleShopOrder(event: Stripe.Event, session: Stripe.Checkout.Ses
     }));
   } else {
     console.info('[shop] order paid', scrubForLog({ order_no: result.order_no }));
+    /**
+     * Tell the practice. Nothing did.
+     *
+     * Only on `applied`, which is the point: Stripe retries this endpoint, and
+     * mark_paid is idempotent — a redelivery of the same event returns
+     * applied:false, so she gets one email per order rather than one per
+     * attempt. An already-settled order is not news.
+     *
+     * Read back rather than returned by the RPC, because the function answers
+     * {applied, reason, order_no} and an email needs the basket and the
+     * address. This file is the only sanctioned service-role consumer, which
+     * is exactly why the read belongs here and not in a page.
+     *
+     * Never allowed to fail the webhook. Returning non-200 to Stripe because
+     * an email bounced would make it retry a payment that is already recorded.
+     */
+    try {
+      await notifyPracticeOfOrder(session.id);
+    } catch (err) {
+      console.error('[shop] order notice failed', err instanceof Error ? err.message : err);
+    }
   }
 
   return NextResponse.json({ received: true, applied: result.applied === true, reason: result.reason });
@@ -220,4 +242,92 @@ async function failShopOrder(session: Stripe.Checkout.Session, status: 'failed' 
     console.warn('[shop] mark_failed failed', scrubForLog({ session: session.id, message: error.message }));
   }
   return NextResponse.json({ received: true, applied: !error });
+}
+
+/**
+ * Read a settled order back and email the practice about it.
+ *
+ * Separated from the handler so the happy path there stays readable, and so
+ * every failure in here is contained — see the call site for why this must
+ * never be able to fail the webhook.
+ */
+async function notifyPracticeOfOrder(sessionId: string): Promise<void> {
+  const db = serviceClient();
+
+  const { data: raw, error } = await db
+    .from('shop_order')
+    .select(
+      'id, clinic_id, order_no, contact_name, contact_email, contact_phone, note, ' +
+      'subtotal_cents, tax_cents, total_cents, fulfilment, synthetic, ' +
+      'ship_name, ship_line1, ship_line2, ship_city, ship_state, ship_postal'
+    )
+    .eq('stripe_checkout_session_id', sessionId)
+    .maybeSingle();
+
+  // Stated rather than inferred: the generated types do not cover a select
+  // this wide, and the inferred union collapses to an error shape.
+  const order = raw as unknown as {
+    id: string; clinic_id: string; order_no: string;
+    contact_name: string; contact_email: string; contact_phone: string | null;
+    note: string | null;
+    subtotal_cents: number; tax_cents: number; total_cents: number;
+    fulfilment: string | null; synthetic: boolean;
+    ship_name: string | null; ship_line1: string | null; ship_line2: string | null;
+    ship_city: string | null; ship_state: string | null; ship_postal: string | null;
+  } | null;
+
+  if (error || !order) {
+    console.error('[shop] could not read the order to notify', error?.message ?? 'not found');
+    return;
+  }
+
+  const [{ data: items }, { data: clinic }] = await Promise.all([
+    db.from('shop_order_item')
+      .select('name, qty, unit_price_cents')
+      .eq('order_id', order.id),
+    db.from('clinic')
+      .select('name, lead_email, email')
+      .eq('id', order.clinic_id)
+      .maybeSingle()
+  ]);
+
+  /**
+   * The practice's inbox, read with the SERVICE role on purpose.
+   *
+   * `lead_email` is not granted to anon — reading it from a public path is
+   * what once made the booking notice vanish in silence, because a
+   * column-level denial takes out the whole select. Here the service role can
+   * see it, and falling back to the practice's general address means a missing
+   * lead_email still reaches somebody.
+   */
+  const inbox = (clinic?.lead_email as string | null) ?? (clinic?.email as string | null) ?? null;
+
+  const shipTo = [
+    order.ship_name,
+    order.ship_line1,
+    order.ship_line2,
+    [order.ship_city, order.ship_state, order.ship_postal].filter(Boolean).join(' ')
+  ].filter(v => v && String(v).trim()).join('\n') || null;
+
+  await sendOrderNotice({
+    clinicId: order.clinic_id,
+    clinicName: clinic?.name ?? 'the practice',
+    practiceInbox: inbox,
+    orderNo: order.order_no,
+    customerName: order.contact_name,
+    customerEmail: String(order.contact_email),
+    customerPhone: order.contact_phone,
+    note: order.note,
+    lines: (items ?? []).map(i => ({
+      name: i.name,
+      qty: i.qty,
+      unitPriceCents: i.unit_price_cents
+    })),
+    subtotalCents: order.subtotal_cents,
+    taxCents: order.tax_cents,
+    totalCents: order.total_cents,
+    fulfilment: order.fulfilment ?? 'ship',
+    shipTo,
+    synthetic: order.synthetic === true
+  });
 }

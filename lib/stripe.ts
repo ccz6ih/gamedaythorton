@@ -329,6 +329,27 @@ export async function createShopCheckoutSession(input: ShopCheckoutInput) {
     success_url: input.successUrl,
     cancel_url: input.cancelUrl,
     shipping_address_collection: { allowed_countries: ['US'] },
+    /**
+     * The promotion-code box, which the customer previously had no way to use.
+     *
+     * Order-level discounts already existed — see `discounts` below — but only
+     * as something STAFF applied to a custom charge. A person on the shop with
+     * a code in their hand had nowhere to type it.
+     *
+     * Deliberately Stripe's own codes rather than a mechanism of ours. Jamie
+     * creates them in a dashboard she already has: percentage or fixed,
+     * expiry, usage caps, first-time-customer-only, all without a screen for
+     * her to learn or for anybody to maintain. The price is still ours — the
+     * line items come from app.shop_order_create, which reads the product
+     * table itself — and Stripe only ever subtracts from them.
+     *
+     * It matters more here than it would elsewhere: this practice's real
+     * traffic is Facebook, roughly ten times what Google sends, and she
+     * already posts product carousels. A code in the caption is the shortest
+     * path from a post to a sale, and the booking_complete event means it can
+     * finally be measured.
+     */
+    allow_promotion_codes: true,
     // Ours, not Stripe's. The webhook looks the order up by session id and by
     // this, and trusts neither as a price — only as a pointer into our own
     // database, which is where the price lives.

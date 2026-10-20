@@ -778,3 +778,122 @@ export async function sendAppointmentReminder(r: ReminderEmail): Promise<NotifyR
 
   return { logged: true, delivered: sent.ok, reason: sent.reason };
 }
+
+/* --------------------------------------------------------------- orders -- */
+
+export type OrderNoticeEmail = {
+  clinicId: string;
+  clinicName: string;
+  /** Where the practice wants to hear about orders. */
+  practiceInbox: string | null;
+  orderNo: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  note: string | null;
+  lines: { name: string; qty: number; unitPriceCents: number }[];
+  subtotalCents: number;
+  taxCents: number;
+  totalCents: number;
+  /** 'ship' or 'pickup'. Decides whether an address is expected at all. */
+  fulfilment: string;
+  /** Already formatted, one line per part. Null for a collection. */
+  shipTo: string | null;
+  synthetic: boolean;
+};
+
+const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
+/**
+ * Tell the practice somebody bought something.
+ *
+ * NOTHING TOLD HER AT ALL BEFORE THIS. The webhook recorded the payment, the
+ * console showed it under "To send", and that was the entire notification
+ * path — she had to think to go and look. For a practice taking a handful of
+ * orders a month that is exactly how a parcel sits unposted for a week while
+ * somebody waits for it.
+ *
+ * Sent from the webhook rather than the checkout action, because an order is
+ * not a sale until Stripe says it is paid. Firing when the session is created
+ * would announce every abandoned basket.
+ *
+ * The address is included because the whole point is that she can act on this
+ * without opening anything — but it is a postal address and an order, never
+ * anything clinical, so no PHI rule is in play and none of the trigger-checked
+ * builders are needed here.
+ */
+export async function sendOrderNotice(o: OrderNoticeEmail): Promise<NotifyResult> {
+  const brand = await emailBrand(o.clinicId, o.clinicName);
+
+  if (!o.practiceInbox) {
+    await logRun({
+      clinicId: o.clinicId,
+      ruleKey: 'order_notice',
+      clinicName: o.clinicName,
+      synthetic: o.synthetic,
+      sent: { ok: false, reason: 'no address' },
+      suppressed: 'No destination address set for this practice.'
+    });
+    return { logged: true, delivered: false, reason: 'no address configured' };
+  }
+
+  const itemLines = o.lines.map(l => `  ${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`);
+
+  // Said the same way in both halves. A practice reading the text part on a
+  // watch must not get a different instruction from the one in the HTML.
+  const how = o.fulfilment === 'pickup'
+    ? 'Collection — they are picking this up, do not post it.'
+    : o.shipTo
+      ? `Post to:\n${o.shipTo}`
+      : 'To post, but no address came through. Check the order in the console before sending.';
+
+  const body = [
+    `${o.customerName} ordered ${o.lines.reduce((n, l) => n + l.qty, 0)} item(s).`,
+    '',
+    ...itemLines,
+    '',
+    `  Subtotal ${money(o.subtotalCents)}`,
+    `  Tax      ${money(o.taxCents)}`,
+    `  Paid     ${money(o.totalCents)}`,
+    '',
+    how,
+    '',
+    `Contact: ${o.customerEmail}${o.customerPhone ? ` · ${o.customerPhone}` : ''}`,
+    o.note ? `\nThey said:\n${o.note}` : null,
+    '',
+    `Order ${o.orderNo}. It is in the console under To send.`
+  ].filter(v => v !== null).join('\n');
+
+  const html = renderEmail(brand, {
+    // Neutral on the lock screen: an order number and nothing about what was
+    // bought or by whom.
+    preheader: `Order ${o.orderNo} has been paid.`,
+    lines: [`${o.customerName} ordered and has paid.`],
+    panel: [
+      { label: 'Items', value: o.lines.map(l => `${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`).join('\n') },
+      { label: 'Paid', value: `${money(o.totalCents)} (incl. ${money(o.taxCents)} tax)` },
+      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Post to', value: how },
+      { label: 'Contact', value: `${o.customerEmail}${o.customerPhone ? `\n${o.customerPhone}` : ''}` },
+      ...(o.note ? [{ label: 'They said', value: o.note }] : [])
+    ],
+    cta: { label: 'Open the order', url: `${brand.origin}/console/orders` },
+    footerLines: [`Order ${o.orderNo}.`]
+  });
+
+  const sent = await deliver(
+    o.practiceInbox,
+    `Order ${o.orderNo} — ${money(o.totalCents)}`,
+    body,
+    html
+  );
+
+  await logRun({
+    clinicId: o.clinicId,
+    ruleKey: 'order_notice',
+    clinicName: o.clinicName,
+    synthetic: o.synthetic,
+    sent
+  });
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}
