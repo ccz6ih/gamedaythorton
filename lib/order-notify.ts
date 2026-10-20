@@ -24,7 +24,7 @@
  * So the caller brings its own authority and this module brings the content.
  */
 
-import { sendOrderNotice, sendOrderConfirmation, type NotifyResult } from '@/lib/notify';
+import { sendOrderNotice, sendOrderConfirmation, sendOrderShipped, type NotifyResult } from '@/lib/notify';
 
 /**
  * The shape both Supabase clients satisfy. Structural rather than imported,
@@ -172,4 +172,60 @@ export async function sendOrderEmails(
       confirmation.status === 'rejected' ? 'confirmation failed' : null
     ].filter(Boolean).join(', ') || undefined
   };
+}
+
+/**
+ * Tell the customer their parcel has gone.
+ *
+ * Reads the order back the same way sendOrderEmails does and for the same
+ * reason: the caller brings its authority, this brings the content, and
+ * neither the webhook nor the console keeps its own idea of which columns
+ * hold a shipping address.
+ *
+ * Returns whether it actually went, so the screen can say something true
+ * rather than claiming a send it did not make.
+ */
+export async function sendShippedEmail(db: OrderDb, orderId: string): Promise<boolean> {
+  const { data: raw, error } = await db
+    .from('shop_order')
+    .select(
+      'clinic_id, order_no, contact_name, contact_email, synthetic, ' +
+      'carrier, tracking_code, ship_name, ship_line1, ship_line2, ' +
+      'ship_city, ship_state, ship_postal'
+    )
+    .eq('id', orderId)
+    .maybeSingle();
+
+  if (error || !raw) return false;
+
+  const o = raw as {
+    clinic_id: string; order_no: string; contact_name: string;
+    contact_email: string; synthetic: boolean;
+    carrier: string | null; tracking_code: string | null;
+    ship_name: string | null; ship_line1: string | null; ship_line2: string | null;
+    ship_city: string | null; ship_state: string | null; ship_postal: string | null;
+  };
+
+  const { data: clinicRaw } = await db
+    .from('clinic').select('name').eq('id', o.clinic_id).maybeSingle();
+  const clinic = clinicRaw as { name?: string } | null;
+
+  const shipTo = [
+    o.ship_name, o.ship_line1, o.ship_line2,
+    [o.ship_city, o.ship_state, o.ship_postal].filter(Boolean).join(' ')
+  ].filter(v => v && String(v).trim()).join('\n') || null;
+
+  const sent = await sendOrderShipped({
+    clinicId: o.clinic_id,
+    clinicName: clinic?.name ?? 'the practice',
+    orderNo: o.order_no,
+    customerName: o.contact_name,
+    customerEmail: String(o.contact_email),
+    carrier: o.carrier,
+    trackingCode: o.tracking_code,
+    shipTo,
+    synthetic: o.synthetic === true
+  });
+
+  return sent.delivered;
 }

@@ -18,6 +18,7 @@ import { serverClient } from '@/lib/supabase/server';
 import { money, dateLabel, titleCase } from '@/lib/format';
 import { CollectButton } from '@/components/CollectButton';
 import { ResendOrderButton } from '@/components/ResendOrderButton';
+import { ShipButton } from '@/components/ShipButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -186,7 +187,16 @@ export default async function OrdersPage() {
               <footer className="card-foot">
                 {/* Recorded with who and when, because "did that go out?" is the
                     question this screen exists to answer. */}
+                {/*
+                  Two different completions, because they are two different
+                  events. "Collected" is somebody walking out with it;
+                  "posted" has a carrier and a reference attached and sends
+                  the customer a message saying so. A shop that only has the
+                  first one files every parcel as collected, which is how
+                  this screen behaved until now.
+                */}
                 <CollectButton orderId={o.id} orderNo={o.order_no} />
+                <ShipButton orderId={o.id} orderNo={o.order_no} />
                 {/* Next to it rather than hidden, because "they say they never
                     got it" arrives on the phone while this screen is open. */}
                 <ResendOrderButton orderId={o.id} orderNo={o.order_no} />

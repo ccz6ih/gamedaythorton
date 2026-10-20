@@ -985,3 +985,84 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
 
   return { logged: true, delivered: sent.ok, reason: sent.reason };
 }
+
+export type OrderShippedEmail = {
+  clinicId: string;
+  clinicName: string;
+  orderNo: string;
+  customerName: string;
+  customerEmail: string;
+  carrier: string | null;
+  trackingCode: string | null;
+  shipTo: string | null;
+  synthetic: boolean;
+};
+
+/**
+ * "It is on its way."
+ *
+ * The gap this closes is not sentimental. Between paying and a parcel landing
+ * there was no message of any kind, so the only way for a customer to find out
+ * what had happened was to ask — and the practice's answer was whatever it
+ * could remember, because nothing recorded a dispatch either.
+ *
+ * Carrier and tracking are shown only when they exist. A hand-delivered
+ * parcel has neither, and an email with an empty "Tracking:" label on it
+ * reads as broken rather than as considerate.
+ *
+ * No link is built for the tracking code. Guessing a carrier's URL format
+ * produces a dead link often enough that the number itself, copyable, is more
+ * useful than a link that 404s — and this code does not know which carrier
+ * somebody typed.
+ */
+export async function sendOrderShipped(o: OrderShippedEmail): Promise<NotifyResult> {
+  const brand = await emailBrand(o.clinicId, o.clinicName);
+
+  const how = o.carrier && o.trackingCode
+    ? `Sent with ${o.carrier}. Tracking: ${o.trackingCode}`
+    : o.carrier
+      ? `Sent with ${o.carrier}.`
+      : o.trackingCode
+        ? `Tracking: ${o.trackingCode}`
+        : 'It is on its way.';
+
+  const body = [
+    `Hi ${o.customerName.split(' ')[0]},`,
+    '',
+    `Your order ${o.orderNo} has been sent.`,
+    '',
+    `  ${how}`,
+    ...(o.shipTo ? ['', 'Going to:', ...o.shipTo.split('\n').map(l => `  ${l}`)] : []),
+    '',
+    `Reply to this email if anything looks wrong.`
+  ].join('\n');
+
+  const html = renderEmail(brand, {
+    preheader: `Order ${o.orderNo} is on its way.`,
+    lines: [`Your order has been sent.`],
+    panel: [
+      { label: 'Order', value: o.orderNo },
+      ...(o.carrier ? [{ label: 'Carrier', value: o.carrier }] : []),
+      ...(o.trackingCode ? [{ label: 'Tracking', value: o.trackingCode }] : []),
+      ...(o.shipTo ? [{ label: 'Going to', value: o.shipTo }] : [])
+    ],
+    footerLines: ['Reply to this email if anything looks wrong.']
+  });
+
+  const sent = await deliver(
+    o.customerEmail,
+    `Your order ${o.orderNo} is on its way`,
+    body,
+    html
+  );
+
+  await logRun({
+    clinicId: o.clinicId,
+    ruleKey: 'order_shipped',
+    clinicName: o.clinicName,
+    synthetic: o.synthetic,
+    sent
+  });
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}

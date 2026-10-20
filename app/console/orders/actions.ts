@@ -12,7 +12,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { serverClient } from '@/lib/supabase/server';
-import { sendOrderEmails, type OrderDb } from '@/lib/order-notify';
+import { sendOrderEmails, sendShippedEmail, type OrderDb } from '@/lib/order-notify';
 
 export type CollectResult = { ok: true } | { ok: false; error: string };
 
@@ -72,4 +72,54 @@ export async function resendOrderEmails(orderId: string): Promise<ResendResult> 
 
   revalidatePath('/console/orders');
   return { ok: true, detail: bits.join(' · ') };
+}
+
+export type ShipResult = { ok: true; detail: string } | { ok: false; error: string };
+
+/**
+ * Mark an order dispatched, and tell the customer.
+ *
+ * The database decides whether this is allowed: app.shop_order_ship checks
+ * is_staff() for the ORDER's clinic and refuses anything unpaid, so a forged
+ * id from another practice fails there rather than here.
+ *
+ * The email is sent after the record is written and is never allowed to undo
+ * it. A parcel that has gone has gone, whatever a mail provider thinks — and
+ * the resend button exists for the case where the message did not land.
+ */
+export async function markShipped(
+  orderId: string, carrier: string, tracking: string
+): Promise<ShipResult> {
+  const supabase = await serverClient();
+
+  const { data, error } = await supabase.rpc('shop_order_ship', {
+    p_order: orderId,
+    p_carrier: carrier.trim() || null,
+    p_tracking: tracking.trim() || null
+  });
+
+  if (error) return { ok: false, error: error.message || 'Could not update that order.' };
+
+  const r = (data ?? {}) as { ok?: boolean; reason?: string; status?: string; order_no?: string };
+  if (!r.ok) {
+    // Named rather than generic: "not paid" and "not yours" need different
+    // reactions from whoever is standing there.
+    const says: Record<string, string> = {
+      not_found: 'That order no longer exists.',
+      not_staff: 'That order belongs to another practice.',
+      not_paid: `That order is ${r.status ?? 'not paid'}, so it cannot be marked sent.`
+    };
+    return { ok: false, error: says[r.reason ?? ''] ?? 'Could not update that order.' };
+  }
+
+  let told = 'customer not emailed';
+  try {
+    const sent = await sendShippedEmail(supabase as unknown as OrderDb, orderId);
+    told = sent ? 'customer emailed' : 'customer not emailed';
+  } catch {
+    // The dispatch stands.
+  }
+
+  revalidatePath('/console/orders');
+  return { ok: true, detail: `${r.order_no ?? 'Order'} marked sent · ${told}` };
 }
