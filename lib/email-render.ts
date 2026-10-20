@@ -26,6 +26,20 @@ export type EmailBrand = {
   displayFont: string;
   bodyFont: string;
   logoUrl: string | null;
+  /**
+   * The colour the logo was DRAWN for.
+   *
+   * A practice uploads one logo file, and it is drawn to sit on that
+   * practice's own site background. The Med Bar's is white-on-near-black, and
+   * rendering it on this cream paper produced a header that was simply blank
+   * — the first real order confirmation went out with an invisible logo.
+   *
+   * Taking the practice's own background and putting the mark on a band of it
+   * is correct by construction and needs nobody to pick a variant: whatever
+   * ground the logo was made for is the ground it gets. Null means the
+   * practice has no opinion, and the logo sits on the paper as before.
+   */
+  logoBackdrop: string | null;
   addressText: string | null;
   phone: string | null;
   origin: string;
@@ -60,6 +74,7 @@ export function defaultBrand(clinicName: string, origin: string): EmailBrand {
     displayFont: "Georgia, 'Times New Roman', serif",
     bodyFont: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
     logoUrl: null,
+    logoBackdrop: null,
     addressText: null,
     phone: null,
     origin
@@ -140,9 +155,37 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
   const displayFont = cssSafe(brand.displayFont);
   const bodyFont = cssSafe(brand.bodyFont);
 
-  const header = brand.logoUrl
+  /**
+   * The logo, on the ground it was drawn for.
+   *
+   * When the practice has a background of its own, the mark sits in a band of
+   * it rather than directly on the paper. Without this a white logo on cream
+   * paper renders as nothing at all, which is exactly what the first real
+   * order confirmation looked like.
+   *
+   * A table rather than a div with padding, because Outlook ignores padding
+   * on a block element often enough to matter and this is the one element
+   * whose background is load-bearing.
+   */
+  const logoBackdrop = brand.logoBackdrop ? cssSafe(brand.logoBackdrop) : null;
+
+  const logoImg = brand.logoUrl
     ? `<img src="${esc(brand.logoUrl)}" alt="${esc(brand.clinicName)}" width="150"
            style="display:block;width:150px;max-width:60%;height:auto;border:0;outline:none;text-decoration:none;" />`
+    : null;
+
+  const header = logoImg
+    ? (logoBackdrop
+        ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                  style="border-collapse:separate;">
+             <tr>
+               <td bgcolor="${logoBackdrop}"
+                   style="background:${logoBackdrop};border-radius:${radius};padding:18px 22px;">
+                 ${logoImg}
+               </td>
+             </tr>
+           </table>`
+        : logoImg)
     : `<div style="font-family:${displayFont};font-size:22px;line-height:1.3;color:${ink};letter-spacing:.01em;">
          ${esc(brand.clinicName)}
        </div>`;
@@ -237,12 +280,26 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="x-apple-disable-message-reformatting" />
 <meta name="color-scheme" content="light" />
+<!--
+  An address in an email is data, not a link. iOS and some Gmail builds detect
+  one and style it as a blue underlined anchor, which is how a shipping
+  address rendered as three stacked links in the first order confirmation —
+  unreadable, and inviting a tap that does nothing useful.
+-->
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
 <meta name="supported-color-schemes" content="light" />
 <title>${esc(brand.clinicName)}</title>
 <style>
   /* Gmail keeps a little of this; everything structural is inline regardless. */
   body { margin:0 !important; padding:0 !important; width:100% !important; }
   a { color: ${accent}; }
+  /* The other half of format-detection: iOS wraps detected text in its own
+     anchor regardless, so the anchor is told to look like the text around it. */
+  a[x-apple-data-detectors] {
+    color: inherit !important; text-decoration: none !important;
+    font-size: inherit !important; font-family: inherit !important;
+    font-weight: inherit !important; line-height: inherit !important;
+  }
   @media only screen and (max-width:620px) {
     .gd-card { padding: 28px 22px !important; }
     .gd-shell { padding: 16px 12px !important; }

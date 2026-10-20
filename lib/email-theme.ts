@@ -116,6 +116,14 @@ export async function emailBrand(clinicId: string, clinicName: string): Promise<
       displayFont: brand.displayFont ? `${brand.displayFont}, ${base.displayFont}` : base.displayFont,
       bodyFont: brand.font ? `${brand.font}, ${base.bodyFont}` : base.bodyFont,
       logoUrl,
+      /**
+       * The practice's own ground, so a logo drawn for it stays visible.
+       *
+       * Only when there is a logo to put on it and the practice has actually
+       * set a background — otherwise the mark sits on the paper exactly as it
+       * did before this existed.
+       */
+      logoBackdrop: logoUrl && typeof brand.bg === 'string' && brand.bg ? brand.bg : null,
       addressText,
       phone: data.phone_voice ?? null
     };

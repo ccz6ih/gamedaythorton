@@ -921,11 +921,23 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
 
   const itemLines = o.lines.map(l => `  ${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`);
 
-  const next = o.fulfilment === 'pickup'
+  /**
+   * Said twice, two ways, on purpose.
+   *
+   * The plain-text part needs a sentence, because there is no label beside it
+   * to give it context. The HTML panel already has a label in the left
+   * column, so repeating the lead-in there produced "GOING TO — It is going
+   * to: Craig Carda", which is how the first real confirmation read.
+   */
+  const nextSentence = o.fulfilment === 'pickup'
     ? `You are collecting this one. ${o.clinicName} will be in touch when it is ready.`
     : o.shipTo
       ? `It is going to:\n${o.shipTo}`
       : `${o.clinicName} will be in touch to confirm delivery.`;
+
+  const nextPanel = o.fulfilment === 'pickup'
+    ? `${o.clinicName} will be in touch when it is ready.`
+    : o.shipTo ?? `${o.clinicName} will be in touch to confirm delivery.`;
 
   const body = [
     `Hi ${o.customerName.split(' ')[0]},`,
@@ -938,7 +950,7 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
     `  Tax      ${money(o.taxCents)}`,
     `  Paid     ${money(o.totalCents)}`,
     '',
-    next,
+    nextSentence,
     '',
     `Your order number is ${o.orderNo}. Reply to this email if anything looks wrong.`
   ].join('\n');
@@ -951,7 +963,7 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
       { label: 'Order', value: o.orderNo },
       { label: 'Items', value: o.lines.map(l => `${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`).join('\n') },
       { label: 'Paid', value: `${money(o.totalCents)} (incl. ${money(o.taxCents)} tax)` },
-      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Going to', value: next }
+      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Going to', value: nextPanel }
     ],
     footerLines: [`Reply to this email if anything looks wrong.`]
   });
