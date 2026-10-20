@@ -350,23 +350,24 @@ export async function createShopCheckoutSession(input: ShopCheckoutInput) {
      * finally be measured.
      *
      * ---------------------------------------------------------------------
-     * OFF UNTIL SETTLEMENT CAN SURVIVE A DISCOUNT. Turning this on by itself
-     * is actively worse than not having it.
+     * SAFE ONLY BECAUSE OF MIGRATION 0047, and it was briefly not.
      *
-     * app.shop_order_mark_paid compares what Stripe charged against the total
-     * we recorded and marks the order FAILED on any mismatch — which is
-     * exactly right while every price is ours, and exactly wrong the moment a
-     * code subtracts from it. The first customer to use one would be charged,
-     * and then have their order filed as failed, with the stock never
-     * released and nobody told the truth about it.
+     * app.shop_order_mark_paid used to compare what Stripe charged against the
+     * total we recorded and mark the order FAILED on any difference — right
+     * while every price is ours, and wrong the moment a code subtracts from
+     * it. This flag shipped before that function could cope, and was reverted
+     * the same hour: the first customer to use a code would have been charged
+     * and then had their order filed as failed.
      *
-     * The fix belongs in that function, not here: accept an amount BELOW the
-     * recorded total, record the difference in discount_cents, and keep
-     * refusing anything above it, which is the direction that actually
-     * signals something wrong. Once that ships, this flag goes back on.
+     * 0047 made the DIRECTION matter. Less than we priced is a discount the
+     * practice created in its own dashboard, so it settles and the difference
+     * is recorded in discount_cents. More is not explainable by anything
+     * legitimate and still fails.
+     *
+     * If that function is ever reverted, this line goes with it.
      * ---------------------------------------------------------------------
      */
-    // allow_promotion_codes: true,
+    allow_promotion_codes: true,
     // Ours, not Stripe's. The webhook looks the order up by session id and by
     // this, and trusts neither as a price — only as a pointer into our own
     // database, which is where the price lives.
