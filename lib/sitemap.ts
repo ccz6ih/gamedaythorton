@@ -15,7 +15,7 @@
  */
 
 import type { MetadataRoute } from 'next';
-import { getStorefront, getStorefrontProducts, getStorefrontServices } from '@/lib/db/storefront';
+import { getStorefront, getStorefrontProducts, getStorefrontServices, getStorefrontLocations } from '@/lib/db/storefront';
 import { PRF_TREATMENTS } from '@/lib/prf-content';
 
 /**
@@ -55,6 +55,27 @@ export async function sitemapFor(slug: string, origin: string): Promise<Metadata
     { url: `${base}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/enquire`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 }
   ];
+
+  /**
+   * The rooms, one page each.
+   *
+   * High priority deliberately. Search Console has this practice ranking for
+   * prf boulder, jeuveau denver and hydrafacial parker co, and for not one
+   * query naming a town she actually works in — so these are the pages most
+   * likely to change what the site ranks for, not the least.
+   *
+   * Driven by what is published rather than a hardcoded list, so a third room
+   * is a row with `public` set and not a deploy.
+   */
+  const locations = await getStorefrontLocations(slug);
+  for (const l of locations) {
+    pages.push({
+      url: `${base}/locations/${l.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: l.is_default ? 0.9 : 0.8
+    });
+  }
 
   const products = await getStorefrontProducts(clinic.id);
   for (const p of products) {

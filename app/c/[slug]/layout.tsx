@@ -11,7 +11,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getStorefront, hoursLines } from '@/lib/db/storefront';
+import { getStorefront, hoursLines, getStorefrontLocations } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks, siteOrigin } from '@/lib/storefront-links';
 import { CartBadge } from '@/components/CartBadge';
 import { StorefrontNav } from '@/components/StorefrontNav';
@@ -196,6 +196,20 @@ export default async function StorefrontLayout({ children, params }: Props) {
   const hours = hoursLines(clinic.hours);
 
   /**
+   * The published rooms, for the footer.
+   *
+   * Sitewide rather than on one page, because an orphaned page is a page
+   * Google reaches rarely and weights accordingly. These are the pages meant
+   * to fix the practice having no local presence at all, so they get a link
+   * from every page on the site.
+   *
+   * Empty for a practice that has published none, which is every tenant but
+   * this one — the column disappears rather than rendering a heading over
+   * nothing.
+   */
+  const rooms = await getStorefrontLocations(slug);
+
+  /**
    * Links are relative to the DOMAIN the visitor is on, not to the route the
    * pages happen to live at. On medbarco.com that means /services; on the
    * shared deployment it means /c/medbar-loveland/services. See
@@ -338,6 +352,21 @@ export default async function StorefrontLayout({ children, params }: Props) {
                 {clinic.email && <a href={`mailto:${clinic.email}`}>{clinic.email}</a>}
               </p>
             </div>
+
+            {rooms.length > 0 && (
+              <div>
+                <h4>Where we are</h4>
+                <ul className="sf-foot-links">
+                  {rooms.map(r => (
+                    <li key={r.slug}>
+                      <Link href={`${links.base}/locations/${r.slug}`}>
+                        {r.city}, {r.state}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {isSpa && (
               <div>

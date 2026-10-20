@@ -307,3 +307,49 @@ export function hoursLines(hours: StorefrontClinic['hours']) {
   }
   return [...byWindow.entries()].map(([window, days]) => ({ days: days.join(', '), window }));
 }
+
+/* ------------------------------------------------------------- locations -- */
+
+export type StorefrontLocation = {
+  slug: string;
+  name: string;
+  street: string | null;
+  city: string;
+  state: string;
+  postal_code: string | null;
+  intro: string;
+  areas_served: string[];
+  is_default: boolean;
+};
+
+/**
+ * The rooms a practice has published a page for.
+ *
+ * Through an RPC rather than a table read, and that is not incidental.
+ * `location` is readable only by staff — every other consumer is the console,
+ * the service role, or a security-definer function — so a plain select here
+ * would return zero rows and NO ERROR, because RLS filters rather than
+ * refuses. The page would 404 in production and render perfectly for anyone
+ * logged into the console. Migration 0046 has the full reasoning.
+ *
+ * The function also decides which columns leave the database, so `note` and
+ * anything added to the table later stays internal by default.
+ */
+export async function getStorefrontLocations(slug: string): Promise<StorefrontLocation[]> {
+  const supabase = anonClient();
+  const { data, error } = await supabase.rpc('public_locations', { p_clinic_slug: slug });
+  if (error) {
+    // Loud, because the silent version of this failure is a missing page.
+    console.error('[locations] public_locations failed', error.message);
+    return [];
+  }
+  return (data as unknown as StorefrontLocation[]) ?? [];
+}
+
+/** One published room, or null. */
+export async function getStorefrontLocation(
+  slug: string, city: string
+): Promise<StorefrontLocation | null> {
+  const all = await getStorefrontLocations(slug);
+  return all.find(l => l.slug === city) ?? null;
+}
