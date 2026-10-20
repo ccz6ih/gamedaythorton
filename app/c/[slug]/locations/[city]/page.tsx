@@ -61,7 +61,18 @@ export async function generateMetadata(
   const where = `${location.city}, ${location.state}`;
 
   return {
-    title: `${clinic.name} in ${where} | Aesthetics & Skin Treatments`,
+    /**
+     * No clinic name in here, and that is not an omission.
+     *
+     * The storefront layout sets `title.template` to "%s · <practice>", so
+     * naming the practice here renders "The Med Bar in Loveland, CO |
+     * Aesthetics & Skin Treatments · The Med Bar" — the brand twice in a
+     * title Google truncates around sixty characters, spending a third of the
+     * space somebody already knows. The template supplies it; this supplies
+     * the part that distinguishes one page from another, which for a location
+     * page means the treatment words and the town.
+     */
+    title: `Aesthetics & Skin Treatments in ${where}`,
     description:
       `${clinic.name} sees clients in ${where}` +
       `${location.street ? ` at ${location.street}` : ''}. ` +

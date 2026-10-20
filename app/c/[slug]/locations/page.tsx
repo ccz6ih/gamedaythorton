@@ -32,7 +32,9 @@ export async function generateMetadata(
   const cities = rooms.map(r => r.city).join(' and ');
 
   return {
-    title: `Where to find ${clinic.name} | ${cities || 'Locations'}`,
+    // The practice's name comes from the layout's title template; repeating
+    // it here spends a third of a truncated SERP title on the brand twice.
+    title: cities ? `Where to Find Us — ${cities}` : 'Where to Find Us',
     description: cities
       ? `${clinic.name} sees clients in ${cities}. Addresses, what each room is like, and how to book into either.`
       : `Where to find ${clinic.name}.`,
