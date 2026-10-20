@@ -870,11 +870,26 @@ export async function sendOrderNotice(o: OrderNoticeEmail): Promise<NotifyResult
     preheader: `Order ${o.orderNo} has been paid.`,
     lines: [`${o.customerName} ordered and has paid.`],
     panel: [
-      { label: 'Items', value: o.lines.map(l => `${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`).join('\n') },
-      { label: 'Paid', value: `${money(o.totalCents)} (incl. ${money(o.taxCents)} tax)` },
-      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Post to', value: how },
+      {
+        label: o.fulfilment === 'pickup' ? 'Collection' : 'Post to',
+        value: how,
+        // Only the posting case is an address worth protecting from the mail
+        // client's own linkifier. The collection line is a sentence.
+        asAddress: o.fulfilment !== 'pickup' && Boolean(o.shipTo)
+      },
       { label: 'Contact', value: `${o.customerEmail}${o.customerPhone ? `\n${o.customerPhone}` : ''}` },
       ...(o.note ? [{ label: 'They said', value: o.note }] : [])
+    ],
+    // Same ledger the customer gets, so the two emails about one order agree
+    // line for line rather than summarising it differently.
+    ledger: [
+      ...o.lines.map(l => ({
+        label: `${l.qty} × ${l.name}`,
+        value: money(l.unitPriceCents * l.qty)
+      })),
+      { label: 'Subtotal', value: money(o.subtotalCents) },
+      ...(o.taxCents > 0 ? [{ label: 'Tax', value: money(o.taxCents) }] : []),
+      { label: 'Paid', value: money(o.totalCents) }
     ],
     cta: { label: 'Open the order', url: `${brand.origin}/console/orders` },
     footerLines: [`Order ${o.orderNo}.`]
@@ -961,9 +976,31 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
     lines: [`Thank you — your order is confirmed.`],
     panel: [
       { label: 'Order', value: o.orderNo },
-      { label: 'Items', value: o.lines.map(l => `${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`).join('\n') },
-      { label: 'Paid', value: `${money(o.totalCents)} (incl. ${money(o.taxCents)} tax)` },
-      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Going to', value: nextPanel }
+      {
+        label: o.fulfilment === 'pickup' ? 'Collection' : 'Going to',
+        value: nextPanel,
+        // Only when it IS an address. Gmail and iOS linkify one into blue
+        // underlined navigation otherwise; "we will be in touch" needs no
+        // such protection and should not become a map link.
+        asAddress: o.fulfilment !== 'pickup' && Boolean(o.shipTo)
+      }
+    ],
+    /**
+     * The money as a ledger rather than a sentence.
+     *
+     * These used to be two panel rows — an items list joined with newlines,
+     * and a "Paid" line with the tax in brackets — which rendered as prose
+     * and gave the total nowhere to stand out. A receipt should let somebody
+     * check the arithmetic at a glance.
+     */
+    ledger: [
+      ...o.lines.map(l => ({
+        label: `${l.qty} × ${l.name}`,
+        value: money(l.unitPriceCents * l.qty)
+      })),
+      { label: 'Subtotal', value: money(o.subtotalCents) },
+      ...(o.taxCents > 0 ? [{ label: 'Tax', value: money(o.taxCents) }] : []),
+      { label: 'Paid', value: money(o.totalCents) }
     ],
     footerLines: [`Reply to this email if anything looks wrong.`]
   });
@@ -1044,7 +1081,7 @@ export async function sendOrderShipped(o: OrderShippedEmail): Promise<NotifyResu
       { label: 'Order', value: o.orderNo },
       ...(o.carrier ? [{ label: 'Carrier', value: o.carrier }] : []),
       ...(o.trackingCode ? [{ label: 'Tracking', value: o.trackingCode }] : []),
-      ...(o.shipTo ? [{ label: 'Going to', value: o.shipTo }] : [])
+      ...(o.shipTo ? [{ label: "Going to", value: o.shipTo, asAddress: true }] : [])
     ],
     footerLines: ['Reply to this email if anything looks wrong.']
   });

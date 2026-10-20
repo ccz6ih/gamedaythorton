@@ -90,7 +90,25 @@ export type EmailContent = {
   /** Paragraphs, in order. */
   lines?: (string | null)[];
   /** The highlighted block: what, when, where. */
-  panel?: { label: string; value: string }[] | null;
+  panel?: {
+    label: string;
+    value: string;
+    /**
+     * Stops the mail client turning this into a link.
+     *
+     * Gmail on desktop and iOS both detect anything that looks like a postal
+     * address and wrap it in their OWN anchor — blue, underlined, pointing at
+     * a map. A shipping address rendered that way looks like broken
+     * navigation, which is exactly how the first order confirmation read.
+     *
+     * CSS cannot win that fight: the anchor is injected after the styles
+     * resolve and carries the client's own colour. The reliable answer is to
+     * get there first — text already inside an anchor is not linkified again,
+     * so the value is wrapped in one that is styled to look like the text
+     * around it and points somewhere honest.
+     */
+    asAddress?: boolean;
+  }[] | null;
   /**
    * How the panel reads.
    *
@@ -103,6 +121,16 @@ export type EmailContent = {
    * looking like a total.
    */
   panelLayout?: 'stack' | 'ledger';
+  /**
+   * Money, under the panel, ruled off with the total last.
+   *
+   * Separate from `panel` because they are different things rendered
+   * differently: a panel row labels a fact, a ledger row is an amount that has
+   * to line up with the amounts above it. Cramming an itemised list into one
+   * panel value produced "1 x Green Envee Refine Polishing Facial Scrub —
+   * $45.50" as a single run of text, which is a sentence, not an invoice.
+   */
+  ledger?: { label: string; value: string }[] | null;
   /** A single action. More than one button in an email is none. */
   cta?: { label: string; url: string } | null;
   /** A quieter aside under the action, e.g. a consent notice. */
@@ -123,6 +151,26 @@ export function esc(value: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+/**
+ * A value the mail client must not linkify.
+ *
+ * Wrapped in an anchor that is styled to look like the surrounding text.
+ * Clients do not detect an address inside an existing link, so getting there
+ * first is the only thing that reliably holds — inline CSS loses, because the
+ * client's anchor is injected after styles resolve and brings its own colour.
+ *
+ * The href is a map search for the address itself, which is the one
+ * destination that is actually useful if somebody does tap it. Checking the
+ * address they typed is a reasonable thing to want from a confirmation.
+ */
+function addressSafe(value: unknown, colour: string): string {
+  const text = String(value ?? '');
+  const parts = text.split(/\r?\n/).filter(Boolean);
+  const href = 'https://maps.google.com/?q=' + encodeURIComponent(parts.join(', '));
+  const shown = parts.map(esc).join('<br />');
+  return `<a href="${esc(href)}" style="color:${colour};text-decoration:none;border:0;">${shown}</a>`;
 }
 
 /** Line breaks a person typed, preserved without letting markup through. */
@@ -227,13 +275,49 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
                  <tr>
                    <td style="font-family:${bodyFont};font-size:16px;line-height:1.5;color:${ink};
                               font-weight:600;padding:0 0 14px;">
-                     ${escMultiline(row.value)}
+                     ${row.asAddress ? addressSafe(row.value, ink) : escMultiline(row.value)}
                    </td>
                  </tr>
                </table>`;
              }).join('')}
            </td>
          </tr>
+       </table>`
+    : '';
+
+  /**
+   * The money, ruled, with the total last and heavier.
+   *
+   * A panel row labels a fact; a ledger row is an amount that has to line up
+   * with the amounts above it. Before this, an itemised order was crammed into
+   * one panel value and came out as a sentence — "1 x Green Envee Refine
+   * Polishing Facial Scrub — $45.50" — which reads as prose rather than as a
+   * receipt, and gives the total nowhere to stand out.
+   *
+   * The accent rule above the total is the only place a practice's own colour
+   * appears in the body. One line, on the number that matters.
+   */
+  const ledger = content.ledger?.length
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+              style="margin:4px 0 24px;border-collapse:collapse;">
+         ${content.ledger.map((row, i, all) => {
+           const isTotal = i === all.length - 1 && all.length > 1;
+           const pad = isTotal ? '12px 0 0' : '0 0 9px';
+           const weight = isTotal ? '700' : '400';
+           const size = isTotal ? '17px' : '15px';
+           const rule = isTotal ? `border-top:2px solid ${accent};` : '';
+           return `<tr>
+             <td style="font-family:${bodyFont};font-size:${size};line-height:1.45;color:${ink};
+                        font-weight:${weight};padding:${pad};${rule}">
+               ${escMultiline(row.label)}
+             </td>
+             <td align="right" style="font-family:${bodyFont};font-size:${size};line-height:1.45;
+                        color:${ink};font-weight:${weight};white-space:nowrap;
+                        padding:${pad};padding-left:14px;${rule}">
+               ${esc(row.value)}
+             </td>
+           </tr>`;
+         }).join('')}
        </table>`
     : '';
 
@@ -346,6 +430,7 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
 
             ${paragraphs}
             ${panel}
+            ${ledger}
             ${cta}
 
             ${content.note
