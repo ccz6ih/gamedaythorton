@@ -98,17 +98,27 @@ const clinic = {
      * band, where the brand marks are small by area but unmistakable at h70
      * s22% l72%.
      *
-     * WHY IT IS NOT THAT VALUE EXACTLY. Her live brand kit already sets muted
-     * body text to #C3C9BD, which is the same sage at half the chroma. Using
-     * the sampled colour would have made every eyebrow on the site the same
-     * colour as the paragraph under it — a label that does not label. This
-     * keeps her hue and her lightness and raises the saturation until it
-     * separates: dE 20.5 from the muted text rather than 10.1.
+     * WHY IT IS NOT THAT VALUE, AND WHY IT IS NOT THE FIRST CORRECTION EITHER.
      *
-     * 11.35:1 on her ground, the highest of the candidates tested, so it is
-     * safe for the small letterspaced caps it mostly sets.
+     * The sampled sage was too close to the muted body text, so the first
+     * attempt raised the chroma until it separated from THAT — dE 20.5, which
+     * looked like enough on paper.
+     *
+     * It was not, because the muted text is not what it sits beside. On the
+     * page the eye compares it with the near-white heading and the very
+     * saturated gold, and against those it measured dE 27 where the gold
+     * measures 66. Less than half the separation, so it read as a tint of the
+     * text rather than as a colour, and the owner's reaction on seeing it
+     * live was that nothing had changed. He was right.
+     *
+     * This value is dE 49 from the heading and 35 from the gold: far enough
+     * to be a second accent rather than a shade of the first. 9.2:1 on her
+     * ground, so still comfortably past AA for the small caps it sets.
+     *
+     * The lesson worth keeping: validate a colour against what will actually
+     * be next to it, not against the nearest thing in the palette file.
      */
-    accent2: '#c7d19e',
+    accent2: '#a6c268',
     accentInk: '#1a1513',
     radius: 14,
     font: '"Cal Sans", "Montserrat", sans-serif',

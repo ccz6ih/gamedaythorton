@@ -280,10 +280,33 @@
   margin: 0;
   white-space: nowrap;
 }
-.sf-menu-cat .rule { flex: 1; height: 1px; background: var(--gd-border); }
+/*
+  STRUCTURE IN THE SECOND ACCENT, and this is where it earns its place.
+
+  The first version of the two-accent system moved five small label classes
+  and nothing else, which on this page amounted to ONE 12px eyebrow — while
+  the gold did the navigation, every price, every button and these numerals.
+  One accent was doing every job and the other had nothing to do, so there
+  was no system to see.
+
+  A category rule and its count are the most structural furniture on the
+  menu: they divide it and they number it. That is precisely the job the
+  second accent is for, and they are large enough and repeated enough to
+  read as a decision rather than an accident.
+
+  The rule is held at a fraction of the colour. A full-strength hairline
+  across the page would compete with the headings it separates; the point is
+  to tint the structure, not to draw attention to it.
+*/
+.sf-menu-cat .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--gd-accent-2-line);
+}
 .sf-menu-cat .count {
   font-size: var(--gd-step--2);
-  color: var(--gd-text-dim);
+  color: var(--gd-accent-2);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -739,10 +762,18 @@
   text-transform: uppercase;
   padding: .18em .55em;
   border-radius: var(--gd-r-sm);
-  border: 1px solid var(--gd-border-strong);
-  color: var(--gd-text-dim);
+  /*
+    The filter row reads as part of the brand rather than as grey browser
+    furniture. These are navigation you look at before you look at anything
+    else on the menu, and in plain --gd-border-strong they were the least
+    branded thing on the page.
+  */
+  border: 1px solid var(--gd-accent-2-line);
+  color: var(--gd-accent-2);
   white-space: nowrap;
 }
+/* `.accent` stays the PRIMARY: it marks a chip that is doing something, and
+   a thing you act on belongs to the colour everything else actionable uses. */
 .sf-chip.accent { border-color: var(--gd-accent-line); color: var(--gd-accent); }
 
 /* ------------------------------------------------------- what happens ---- */
@@ -5882,7 +5913,15 @@
   font-size: var(--gd-step-3);
   font-weight: 400;
   line-height: 1;
-  color: var(--gd-text);
+  /*
+    The big figures — wavelengths, durations, session counts — in the second
+    accent. This is the closest thing on the site to her own carousels, where
+    a large numeral in sage over a photograph is the signature element.
+
+    They were --gd-text, which made them the same colour as the headline and
+    left the gold carrying every piece of emphasis on the page by itself.
+  */
+  color: var(--gd-accent-2);
   font-variant-numeric: tabular-nums;
 }
 .sf-matrix-stat .lbl {
