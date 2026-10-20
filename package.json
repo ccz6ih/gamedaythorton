@@ -49,7 +49,8 @@
     "icons": "node scripts/make-pwa-icons.cjs",
     "calendar:preview": "node scripts/calendar-preview.cjs",
     "test:classes": "node scripts/class-collision-test.cjs",
-    "test:where": "node scripts/where-test.cjs"
+    "test:where": "node scripts/where-test.cjs",
+    "test:nav": "node scripts/nav-test.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
