@@ -90,13 +90,63 @@ export async function startCheckout(
 
   // The practice, for the money guard and the connected account. Read before
   // the order is created so a refusal costs nothing.
-  const { data: clinicRow } = await supabase
+  /**
+   * ONLY THE COLUMNS anon IS ACTUALLY GRANTED.
+   *
+   * This read used to ask for `name, stripe_account_id` and that one extra
+   * column broke every checkout this shop has ever taken. `stripe_account_id`
+   * is deliberately not granted to anon — it is the one clinic column held
+   * back — and PostgREST answers a column denial by failing the WHOLE
+   * select with 42501, not by returning the rest. `clinicRow` came back null,
+   * the next line blamed the slug, and a customer with a basket and a card
+   * was told "No such practice."
+   *
+   * Which is the trap CLAUDE.md records five times: a column-level denial is
+   * indistinguishable from an empty row at the call site. It hid here longer
+   * than anywhere else because the message names the one thing that was
+   * definitely fine — 21 orders exist, 0 were ever paid.
+   *
+   * The column was being read to hand to Connect. Connect is off, so it was
+   * fetched and then discarded on every single attempt.
+   */
+  const connect = process.env.STRIPE_CONNECT === 'true';
+
+  const { data: clinicRow, error: clinicError } = await supabase
     .from('clinic')
-    .select('name, stripe_account_id')
+    .select('name')
     .eq('slug', slug)
     .maybeSingle();
 
+  if (clinicError) {
+    // Never again silently become "no such practice". A read that FAILED and
+    // a practice that does not exist are different problems with different
+    // fixes, and only one of them is the customer's slug.
+    console.error('[shop] could not read the practice', clinicError.message);
+    return {
+      ok: false,
+      error: 'We could not start checkout just now. Your basket is safe — please try again in a moment.'
+    };
+  }
+
   if (!clinicRow) return { ok: false, error: 'No such practice.' };
+
+  /**
+   * If Connect is ever switched on, it needs the account id — and anon cannot
+   * read it, by design. So that path needs a security-definer route to the
+   * value before it can work, and until somebody builds one, turning the flag
+   * on must stop here with a reason rather than silently charging into the
+   * practice's own account as if it were a platform.
+   */
+  if (connect) {
+    console.error(
+      '[shop] STRIPE_CONNECT is on, but stripe_account_id is not readable by anon. ' +
+      'Connect needs a security-definer read before it can be enabled.'
+    );
+    return {
+      ok: false,
+      error: 'Online payment is not switched on yet. Please get in touch and we will sort it out directly.'
+    };
+  }
 
   // pilot_mode is deliberately not readable by anon (migration 0014), so the
   // per-clinic guard here can only check what the deployment knows. The
@@ -178,11 +228,12 @@ export async function startCheckout(
       email: contact.email,
       successUrl: `${origin}${base}/shop/thanks?order=${encodeURIComponent(order.order_no)}`,
       cancelUrl: `${origin}${base}/cart?cancelled=1`,
-      // Connect is opt-in. With the practice's OWN secret key configured — the
-      // single-practice case and the one running today — passing its account id
-      // here would be wrong: you cannot act on behalf of yourself.
-      stripeAccount:
-        process.env.STRIPE_CONNECT === 'true' ? clinicRow.stripe_account_id : null
+      // Connect is opt-in and off. With the practice's OWN secret key
+      // configured — the single-practice case and the one running today —
+      // passing its account id here would be wrong: you cannot act on behalf
+      // of yourself. The `connect` branch above returns before reaching this,
+      // so there is nothing to pass and nothing to read.
+      stripeAccount: null
     });
   } catch (err) {
     console.error('[shop] Stripe session failed', err instanceof Error ? err.message : err);
