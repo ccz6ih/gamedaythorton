@@ -18,7 +18,7 @@ import type Stripe from 'stripe';
 import { verifyWebhook, isPilotMode } from '@/lib/stripe';
 import { serviceClient, serviceRoleConfigured } from '@/lib/supabase/service';
 import { scrubForLog } from '@/lib/phi';
-import { sendOrderNotice, sendOrderConfirmation } from '@/lib/notify';
+import { sendOrderEmails, type OrderDb } from '@/lib/order-notify';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';        // needs the raw body; not edge-safe
@@ -213,7 +213,13 @@ async function settleShopOrder(event: Stripe.Event, session: Stripe.Checkout.Ses
      * an email bounced would make it retry a payment that is already recorded.
      */
     try {
-      await notifyPracticeOfOrder(session.id);
+      const r = await sendOrderEmails(serviceClient() as unknown as OrderDb, {
+        column: 'stripe_checkout_session_id',
+        value: session.id
+      });
+      if (!r.ok || r.reason) {
+        console.error('[shop] order emails', scrubForLog({ reason: r.reason ?? 'unknown' }));
+      }
     } catch (err) {
       console.error('[shop] order notice failed', err instanceof Error ? err.message : err);
     }
@@ -242,114 +248,4 @@ async function failShopOrder(session: Stripe.Checkout.Session, status: 'failed' 
     console.warn('[shop] mark_failed failed', scrubForLog({ session: session.id, message: error.message }));
   }
   return NextResponse.json({ received: true, applied: !error });
-}
-
-/**
- * Read a settled order back and email the practice about it.
- *
- * Separated from the handler so the happy path there stays readable, and so
- * every failure in here is contained — see the call site for why this must
- * never be able to fail the webhook.
- */
-async function notifyPracticeOfOrder(sessionId: string): Promise<void> {
-  const db = serviceClient();
-
-  const { data: raw, error } = await db
-    .from('shop_order')
-    .select(
-      'id, clinic_id, order_no, contact_name, contact_email, contact_phone, note, ' +
-      'subtotal_cents, tax_cents, total_cents, fulfilment, synthetic, ' +
-      'ship_name, ship_line1, ship_line2, ship_city, ship_state, ship_postal'
-    )
-    .eq('stripe_checkout_session_id', sessionId)
-    .maybeSingle();
-
-  // Stated rather than inferred: the generated types do not cover a select
-  // this wide, and the inferred union collapses to an error shape.
-  const order = raw as unknown as {
-    id: string; clinic_id: string; order_no: string;
-    contact_name: string; contact_email: string; contact_phone: string | null;
-    note: string | null;
-    subtotal_cents: number; tax_cents: number; total_cents: number;
-    fulfilment: string | null; synthetic: boolean;
-    ship_name: string | null; ship_line1: string | null; ship_line2: string | null;
-    ship_city: string | null; ship_state: string | null; ship_postal: string | null;
-  } | null;
-
-  if (error || !order) {
-    console.error('[shop] could not read the order to notify', error?.message ?? 'not found');
-    return;
-  }
-
-  const [{ data: items }, { data: clinic }] = await Promise.all([
-    db.from('shop_order_item')
-      .select('name, qty, unit_price_cents')
-      .eq('order_id', order.id),
-    db.from('clinic')
-      .select('name, lead_email, email')
-      .eq('id', order.clinic_id)
-      .maybeSingle()
-  ]);
-
-  /**
-   * The practice's inbox, read with the SERVICE role on purpose.
-   *
-   * `lead_email` is not granted to anon — reading it from a public path is
-   * what once made the booking notice vanish in silence, because a
-   * column-level denial takes out the whole select. Here the service role can
-   * see it, and falling back to the practice's general address means a missing
-   * lead_email still reaches somebody.
-   */
-  const inbox = (clinic?.lead_email as string | null) ?? (clinic?.email as string | null) ?? null;
-
-  const shipTo = [
-    order.ship_name,
-    order.ship_line1,
-    order.ship_line2,
-    [order.ship_city, order.ship_state, order.ship_postal].filter(Boolean).join(' ')
-  ].filter(v => v && String(v).trim()).join('\n') || null;
-
-  const payload = {
-    clinicId: order.clinic_id,
-    clinicName: clinic?.name ?? 'the practice',
-    practiceInbox: inbox,
-    orderNo: order.order_no,
-    customerName: order.contact_name,
-    customerEmail: String(order.contact_email),
-    customerPhone: order.contact_phone,
-    note: order.note,
-    lines: (items ?? []).map(i => ({
-      name: i.name,
-      qty: i.qty,
-      unitPriceCents: i.unit_price_cents
-    })),
-    subtotalCents: order.subtotal_cents,
-    taxCents: order.tax_cents,
-    totalCents: order.total_cents,
-    fulfilment: order.fulfilment ?? 'ship',
-    shipTo,
-    synthetic: order.synthetic === true
-  };
-
-  /**
-   * Both halves, and neither may stop the other.
-   *
-   * The practice needs to know to post something; the customer needs to know
-   * it is coming. Before this, the first real order through the shop produced
-   * neither — and /shop/thanks had already promised the customer a receipt.
-   *
-   * Promise.allSettled rather than await-in-sequence, because a bounced
-   * practice address must not cost the customer their confirmation, and vice
-   * versa. Each logs its own outcome to automation_run.
-   */
-  const [notice, confirmation] = await Promise.allSettled([
-    sendOrderNotice(payload),
-    sendOrderConfirmation(payload)
-  ]);
-
-  for (const [who, r] of [['notice', notice], ['confirmation', confirmation]] as const) {
-    if (r.status === 'rejected') {
-      console.error(`[shop] order ${who} threw`, r.reason instanceof Error ? r.reason.message : r.reason);
-    }
-  }
 }

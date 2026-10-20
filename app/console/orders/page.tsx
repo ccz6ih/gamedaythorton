@@ -17,6 +17,7 @@ import { getClinic } from '@/lib/db/queries';
 import { serverClient } from '@/lib/supabase/server';
 import { money, dateLabel, titleCase } from '@/lib/format';
 import { CollectButton } from '@/components/CollectButton';
+import { ResendOrderButton } from '@/components/ResendOrderButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -186,6 +187,9 @@ export default async function OrdersPage() {
                 {/* Recorded with who and when, because "did that go out?" is the
                     question this screen exists to answer. */}
                 <CollectButton orderId={o.id} orderNo={o.order_no} />
+                {/* Next to it rather than hidden, because "they say they never
+                    got it" arrives on the phone while this screen is open. */}
+                <ResendOrderButton orderId={o.id} orderNo={o.order_no} />
               </footer>
             </article>
           ))}
