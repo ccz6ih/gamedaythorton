@@ -301,7 +301,13 @@
 .sf-menu-cat .rule {
   flex: 1;
   height: 1px;
-  background: var(--gd-accent-2-line);
+  /*
+    Stronger than --gd-accent-2-line (38%), which is tuned for a border box
+    and disappears entirely as a one-pixel line on a dark ground — sampled at
+    the composite it was indistinguishable from the background. A divider
+    should still be quiet, so this stops well short of the full colour.
+  */
+  background: color-mix(in srgb, var(--gd-accent-2) 55%, transparent);
 }
 .sf-menu-cat .count {
   font-size: var(--gd-step--2);
@@ -673,17 +679,27 @@
   align-items: center;
   gap: .45em;
   padding: .4rem .8rem;
-  border: 1px solid var(--gd-border-strong);
+  /*
+    THE FILTER ROW, which is the one somebody actually looks at.
+    .sf-chip was styled for this first and was the wrong target — it is the
+    little "membership" badge on an item and hardly ever renders. These pills
+    are the category navigation sitting under the lede, the most looked-at
+    furniture on the menu, and they were plain grey outlines.
+  */
+  border: 1px solid var(--gd-accent-2-line);
   border-radius: var(--gd-r-full);
   font-size: var(--gd-step--1);
   text-decoration: none;
-  color: var(--gd-text-muted);
+  color: var(--gd-accent-2);
   transition: color var(--gd-fast) var(--gd-ease), border-color var(--gd-fast) var(--gd-ease);
 }
+/* Hover moves to the PRIMARY, because hovering is the moment it becomes
+   something you are about to act on. */
 .sf-jump-link:hover { color: var(--gd-accent); border-color: var(--gd-accent); }
 .sf-jump-link .n {
   font-size: var(--gd-step--2);
-  color: var(--gd-text-dim);
+  color: var(--gd-accent-2);
+  opacity: .75;
   font-variant-numeric: tabular-nums;
 }
 
