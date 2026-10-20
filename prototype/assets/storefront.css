@@ -1892,36 +1892,14 @@
    would mean a failed script leaves a site with no navigation at all.
    ========================================================================== */
 
-.sf-burger { display: none; }
+/* .sf-burger was the old three-bar control. It is now .sf-nav-trigger,
+   which says "Menu" beside the bars; the dead rules are removed rather
+   than left to be read as live by whoever edits this next. */
 
 @media (max-width: 780px) {
   .sf-nav-inner { gap: var(--gd-3); flex-wrap: nowrap; }
 
-  .sf-burger {
-    display: grid;
-    gap: 4px;
-    margin-left: auto;
-    padding: .55rem;
-    background: none;
-    border: 1px solid var(--gd-border-strong);
-    border-radius: var(--gd-r-sm);
-    cursor: pointer;
-    /* 44px, the smallest reliable touch target. */
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    place-content: center;
-  }
-  .sf-burger span {
-    display: block;
-    width: 1.15rem;
-    height: 1.5px;
-    background: var(--gd-text);
-    transition: transform var(--gd-fast) var(--gd-ease), opacity var(--gd-fast) var(--gd-ease);
-  }
   /* Becomes a cross while open, so the same control visibly closes it. */
-  .sf-nav.is-open .sf-burger span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-  .sf-nav.is-open .sf-burger span:nth-child(2) { opacity: 0; }
-  .sf-nav.is-open .sf-burger span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
 
   .sf-nav.is-enhanced .sf-nav-links {
     display: none;
@@ -1936,7 +1914,15 @@
     border-bottom: 1px solid var(--gd-border);
     padding: var(--gd-3) var(--sf-gutter) var(--gd-6);
   }
-  .sf-nav.is-enhanced.is-open .sf-nav-links { display: flex; }
+  /*
+    The old dropdown is gone: the burger now opens the full-screen sheet,
+    and leaving this rule in place meant BOTH opened at once — a panel
+    hanging under the bar, behind a sheet covering the page.
+
+    The display:none above stays, because that is what hides the bar links
+    on a phone. It is still gated on .is-enhanced so a failed script leaves
+    them visible rather than leaving the site with no navigation.
+  */
 
   /* Full-width rows at a readable size, not a column of 13px links. */
   .sf-nav.is-enhanced .sf-nav-links .sf-link {
@@ -6348,42 +6334,6 @@ details[open] > .sf-faq-question .sf-faq-arrow {
    --------------------------------------------------------------------------- */
 
 .sf-nav-links .sf-link,
-.sf-burger,
-.sf-btn,
-.sf-eyebrow,
-.sf-chip,
-.sf-jump-link,
-.sf-item-reserve,
-.sf-item-price,
-.sf-card-price,
-.sf-card-brand,
-.sf-product-price,
-.sf-product-spec,
-.sf-finder-pill,
-.sf-matcher-pill,
-.sf-matcher-eyebrow,
-.sf-matcher-section-title,
-.sf-finder-eyebrow,
-.sf-hero-crumbs,
-.sf-breadcrumb,
-.sf-matrix-stat .lbl,
-.sf-matrix-table thead th,
-.sf-aftercare-step-num,
-.sf-pillar-num,
-.sf-compare-tag,
-.sf-timeline-badge,
-.sf-editorial-tag,
-.sf-cta-actions,
-.sf-finder-card-foot,
-.sf-product-routine-tag,
-.sf-step-pill,
-.sf label,
-.sf input,
-.sf select,
-.sf textarea,
-.sf button {
-  font-family: var(--brand-ui-font);
-}
 
 /*
  * Numbers that sit in a column line up.
@@ -6705,3 +6655,239 @@ details[open] > .sf-faq-question .sf-faq-arrow {
   border-bottom: 1px solid var(--gd-border);
 }
 .sf-quiz-band .sf-section-head { margin-bottom: var(--gd-5); }
+
+
+/* ==========================================================================
+   THE MENU SHEET
+   --------------------------------------------------------------------------
+   Opens over the page from the bar's Menu button, at every width.
+
+   The bar keeps its links on desktop — see components/StorefrontNav.tsx for
+   why hiding them behind a button is a regression rather than a style — so
+   this is an ADDITION there and the whole navigation on a phone.
+
+   Everything here is a full-width row. A menu is the one screen where a
+   target being obvious matters more than it being elegant, and the people
+   using this site are not all twenty-five.
+   ========================================================================== */
+
+.sf-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin-left: var(--gd-4);
+  padding: .5rem .9rem;
+  background: none;
+  border: 1px solid var(--gd-accent-2-line);
+  border-radius: var(--gd-r-full);
+  color: var(--gd-text);
+  font: inherit;
+  font-size: var(--gd-step--1);
+  letter-spacing: .04em;
+  cursor: pointer;
+  /* 44px, the smallest reliable touch target. */
+  min-height: 2.75rem;
+  transition: border-color var(--gd-fast) var(--gd-ease), color var(--gd-fast) var(--gd-ease);
+}
+.sf-nav-trigger:hover { border-color: var(--gd-accent); color: var(--gd-accent); }
+.sf-nav-trigger:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+
+.sf-nav-trigger-bars { display: grid; gap: 3.5px; }
+.sf-nav-trigger-bars span {
+  display: block;
+  width: 1.05rem;
+  height: 1.5px;
+  background: var(--gd-accent-2);
+  transition: transform var(--gd-fast) var(--gd-ease), opacity var(--gd-fast) var(--gd-ease);
+}
+/* The same control visibly becomes a cross, so it is obvious it closes. */
+.sf-nav-trigger[aria-expanded="true"] .sf-nav-trigger-bars span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.sf-nav-trigger[aria-expanded="true"] .sf-nav-trigger-bars span:nth-child(2) { opacity: 0; }
+.sf-nav-trigger[aria-expanded="true"] .sf-nav-trigger-bars span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+
+.sf-nav-trigger-word { font-weight: 600; }
+
+/* --------------------------------------------------------------- sheet -- */
+/*
+  Without the script this is an ordinary block at the end of the header: a
+  second, visible list of the same links. Redundant, and better than a site
+  whose navigation depends on JavaScript having run.
+*/
+.sf-sheet { padding: 0 var(--sf-gutter) var(--gd-8); }
+
+.sf-sheet.is-enhanced {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--gd-bg);
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /*
+    visibility, not display, so the transition can run and so focus cannot
+    land inside a closed sheet. The delay holds it visible until the fade is
+    done, then takes it out of the tab order.
+  */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-1.25rem);
+  transition:
+    opacity .34s var(--gd-ease),
+    transform .42s var(--gd-ease),
+    visibility 0s linear .42s;
+}
+.sf-sheet.is-enhanced.is-open {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity .28s var(--gd-ease),
+    transform .42s var(--gd-ease),
+    visibility 0s linear 0s;
+}
+
+.sf-sheet-inner {
+  max-width: var(--sf-max);
+  margin: 0 auto;
+  padding: var(--gd-5) var(--sf-gutter) var(--gd-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gd-6);
+  min-height: 100%;
+}
+
+.sf-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gd-4);
+  padding-bottom: var(--gd-4);
+  border-bottom: 1px solid var(--gd-accent-2-line);
+}
+
+.sf-sheet-label {
+  display: block;
+  font-size: var(--gd-step--2);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-weight: 500;
+  color: var(--gd-accent-2);
+  margin-bottom: var(--gd-3);
+}
+.sf-sheet-head .sf-sheet-label { margin-bottom: 0; }
+
+/* A word, not a cross. The cross is a convention; the word is a label. */
+.sf-sheet-close {
+  background: none;
+  border: 1px solid var(--gd-border-strong);
+  border-radius: var(--gd-r-full);
+  color: var(--gd-text);
+  font: inherit;
+  font-size: var(--gd-step--1);
+  letter-spacing: .04em;
+  padding: .55rem 1.1rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  transition: border-color var(--gd-fast) var(--gd-ease), color var(--gd-fast) var(--gd-ease);
+}
+.sf-sheet-close:hover { border-color: var(--gd-accent); color: var(--gd-accent); }
+.sf-sheet-close:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+
+.sf-sheet-nav { list-style: none; margin: 0; padding: 0; }
+.sf-sheet-nav li { border-bottom: 1px solid var(--gd-border); }
+
+.sf-sheet-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gd-4);
+  /* The whole row, so nobody has to hit the words. */
+  padding: var(--gd-4) 0;
+  font-family: var(--brand-display-font);
+  font-size: var(--gd-step-2);
+  letter-spacing: -.015em;
+  line-height: 1.15;
+  color: var(--gd-text);
+  text-decoration: none;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-sheet-link:hover { color: var(--gd-accent); }
+.sf-sheet-link:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 3px; }
+.sf-sheet-link[aria-current="page"] { color: var(--gd-accent-2); }
+
+.sf-sheet-arrow {
+  color: var(--gd-accent-2);
+  font-size: var(--gd-step-0);
+  opacity: 0;
+  transform: translateX(-.4rem);
+  transition: opacity var(--gd-med) var(--gd-ease), transform var(--gd-med) var(--gd-ease);
+}
+.sf-sheet-link:hover .sf-sheet-arrow,
+.sf-sheet-link:focus-visible .sf-sheet-arrow { opacity: 1; transform: translateX(0); }
+
+/*
+  The rows arrive one after another. Small and quick — this is a menu
+  somebody is trying to use, not a title sequence, and anything slower than
+  about a third of a second in total turns navigation into waiting.
+*/
+.sf-sheet.is-enhanced .sf-sheet-nav li {
+  opacity: 0;
+  transform: translateY(.5rem);
+  transition: opacity .3s var(--gd-ease), transform .3s var(--gd-ease);
+}
+.sf-sheet.is-enhanced.is-open .sf-sheet-nav li {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(90ms + var(--i, 0) * 32ms);
+}
+
+.sf-sheet-aside {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--gd-6);
+  padding-top: var(--gd-4);
+  margin-top: auto;
+}
+.sf-sheet-rooms { list-style: none; margin: 0; padding: 0; }
+.sf-sheet-room {
+  display: inline-block;
+  padding: .35rem 0;
+  font-size: var(--gd-step-0);
+  color: var(--gd-text-muted);
+  text-decoration: none;
+  transition: color var(--gd-fast) var(--gd-ease);
+}
+.sf-sheet-room:hover { color: var(--gd-accent); }
+.sf-sheet-room:focus-visible { outline: 2px solid var(--gd-accent); outline-offset: 2px; }
+
+.sf-sheet-cta {
+  justify-content: center;
+  padding-block: var(--gd-4);
+  font-size: var(--gd-step-0);
+}
+
+@media (min-width: 781px) {
+  /* Narrower on desktop, where it is an addition rather than the whole
+     navigation and should not read as the main event. */
+  .sf-sheet-inner { max-width: 44rem; }
+}
+
+/*
+  Movement removed, function kept. Somebody who has asked their machine to
+  stop animating things has asked once, for everything, and a menu is not an
+  exception worth making.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .sf-sheet.is-enhanced,
+  .sf-sheet.is-enhanced.is-open,
+  .sf-sheet.is-enhanced .sf-sheet-nav li,
+  .sf-sheet.is-enhanced.is-open .sf-sheet-nav li,
+  .sf-nav-trigger-bars span,
+  .sf-sheet-arrow {
+    transition: none;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .sf-sheet.is-enhanced { visibility: hidden; }
+  .sf-sheet.is-enhanced.is-open { visibility: visible; }
+}

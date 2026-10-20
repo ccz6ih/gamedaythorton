@@ -308,6 +308,15 @@ export default async function StorefrontLayout({ children, params }: Props) {
         bookHref={links.book}
         logoUrl={brand.logoUrl}
         name={clinic.name}
+        /**
+         * The sheet holds what the bar cannot. Both of these are already
+         * loaded for the footer, so the richer menu costs no extra query —
+         * which is the only reason it is worth putting there at all on a
+         * layout that renders on every page.
+         */
+        rooms={rooms.map(r => ({ slug: r.slug, city: r.city, state: r.state }))}
+        locationsHref={rooms.length ? `${links.base}/locations` : null}
+        email={clinic.email}
       >
         <CartBadge slug={slug} href={links.cart} />
       </StorefrontNav>
