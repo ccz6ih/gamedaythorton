@@ -18,7 +18,7 @@ import type Stripe from 'stripe';
 import { verifyWebhook, isPilotMode } from '@/lib/stripe';
 import { serviceClient, serviceRoleConfigured } from '@/lib/supabase/service';
 import { scrubForLog } from '@/lib/phi';
-import { sendOrderNotice } from '@/lib/notify';
+import { sendOrderNotice, sendOrderConfirmation } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';        // needs the raw body; not edge-safe
@@ -309,7 +309,7 @@ async function notifyPracticeOfOrder(sessionId: string): Promise<void> {
     [order.ship_city, order.ship_state, order.ship_postal].filter(Boolean).join(' ')
   ].filter(v => v && String(v).trim()).join('\n') || null;
 
-  await sendOrderNotice({
+  const payload = {
     clinicId: order.clinic_id,
     clinicName: clinic?.name ?? 'the practice',
     practiceInbox: inbox,
@@ -329,5 +329,27 @@ async function notifyPracticeOfOrder(sessionId: string): Promise<void> {
     fulfilment: order.fulfilment ?? 'ship',
     shipTo,
     synthetic: order.synthetic === true
-  });
+  };
+
+  /**
+   * Both halves, and neither may stop the other.
+   *
+   * The practice needs to know to post something; the customer needs to know
+   * it is coming. Before this, the first real order through the shop produced
+   * neither — and /shop/thanks had already promised the customer a receipt.
+   *
+   * Promise.allSettled rather than await-in-sequence, because a bounced
+   * practice address must not cost the customer their confirmation, and vice
+   * versa. Each logs its own outcome to automation_run.
+   */
+  const [notice, confirmation] = await Promise.allSettled([
+    sendOrderNotice(payload),
+    sendOrderConfirmation(payload)
+  ]);
+
+  for (const [who, r] of [['notice', notice], ['confirmation', confirmation]] as const) {
+    if (r.status === 'rejected') {
+      console.error(`[shop] order ${who} threw`, r.reason instanceof Error ? r.reason.message : r.reason);
+    }
+  }
 }

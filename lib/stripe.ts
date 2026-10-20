@@ -348,8 +348,25 @@ export async function createShopCheckoutSession(input: ShopCheckoutInput) {
      * already posts product carousels. A code in the caption is the shortest
      * path from a post to a sale, and the booking_complete event means it can
      * finally be measured.
+     *
+     * ---------------------------------------------------------------------
+     * OFF UNTIL SETTLEMENT CAN SURVIVE A DISCOUNT. Turning this on by itself
+     * is actively worse than not having it.
+     *
+     * app.shop_order_mark_paid compares what Stripe charged against the total
+     * we recorded and marks the order FAILED on any mismatch — which is
+     * exactly right while every price is ours, and exactly wrong the moment a
+     * code subtracts from it. The first customer to use one would be charged,
+     * and then have their order filed as failed, with the stock never
+     * released and nobody told the truth about it.
+     *
+     * The fix belongs in that function, not here: accept an amount BELOW the
+     * recorded total, record the difference in discount_cents, and keep
+     * refusing anything above it, which is the direction that actually
+     * signals something wrong. Once that ships, this flag goes back on.
+     * ---------------------------------------------------------------------
      */
-    allow_promotion_codes: true,
+    // allow_promotion_codes: true,
     // Ours, not Stripe's. The webhook looks the order up by session id and by
     // this, and trusts neither as a price — only as a pointer into our own
     // database, which is where the price lives.

@@ -897,3 +897,79 @@ export async function sendOrderNotice(o: OrderNoticeEmail): Promise<NotifyResult
 
   return { logged: true, delivered: sent.ok, reason: sent.reason };
 }
+
+/**
+ * The customer's own copy of what they just bought.
+ *
+ * THE PAGE WAS ALREADY PROMISING THIS. /shop/thanks says "A receipt is on its
+ * way to the email address you used at checkout" — unconditionally, and
+ * nothing sent one. Stripe's own receipt is a dashboard toggle rather than
+ * anything this code controls, so on a practice that has not switched it on,
+ * somebody pays and hears nothing at all. The first real order placed through
+ * this shop went exactly that way.
+ *
+ * Deliberately an ORDER CONFIRMATION rather than a payment receipt. Stripe's
+ * receipt is the authoritative record of the card transaction and should stay
+ * switched on for that; this one answers the different question a customer
+ * actually has, which is what is coming and where it is going.
+ *
+ * Reuses the same branded renderer as every other email here, so a receipt
+ * does not arrive looking like it came from somewhere else.
+ */
+export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<NotifyResult> {
+  const brand = await emailBrand(o.clinicId, o.clinicName);
+
+  const itemLines = o.lines.map(l => `  ${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`);
+
+  const next = o.fulfilment === 'pickup'
+    ? `You are collecting this one. ${o.clinicName} will be in touch when it is ready.`
+    : o.shipTo
+      ? `It is going to:\n${o.shipTo}`
+      : `${o.clinicName} will be in touch to confirm delivery.`;
+
+  const body = [
+    `Hi ${o.customerName.split(' ')[0]},`,
+    '',
+    `Thank you — your order is confirmed.`,
+    '',
+    ...itemLines,
+    '',
+    `  Subtotal ${money(o.subtotalCents)}`,
+    `  Tax      ${money(o.taxCents)}`,
+    `  Paid     ${money(o.totalCents)}`,
+    '',
+    next,
+    '',
+    `Your order number is ${o.orderNo}. Reply to this email if anything looks wrong.`
+  ].join('\n');
+
+  const html = renderEmail(brand, {
+    // Neutral on a lock screen: an order number, not a shopping list.
+    preheader: `Your order ${o.orderNo} is confirmed.`,
+    lines: [`Thank you — your order is confirmed.`],
+    panel: [
+      { label: 'Order', value: o.orderNo },
+      { label: 'Items', value: o.lines.map(l => `${l.qty} x ${l.name} — ${money(l.unitPriceCents * l.qty)}`).join('\n') },
+      { label: 'Paid', value: `${money(o.totalCents)} (incl. ${money(o.taxCents)} tax)` },
+      { label: o.fulfilment === 'pickup' ? 'Collection' : 'Going to', value: next }
+    ],
+    footerLines: [`Reply to this email if anything looks wrong.`]
+  });
+
+  const sent = await deliver(
+    o.customerEmail,
+    `Your order ${o.orderNo} — ${o.clinicName}`,
+    body,
+    html
+  );
+
+  await logRun({
+    clinicId: o.clinicId,
+    ruleKey: 'order_confirmation',
+    clinicName: o.clinicName,
+    synthetic: o.synthetic,
+    sent
+  });
+
+  return { logged: true, delivered: sent.ok, reason: sent.reason };
+}
