@@ -22,6 +22,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { slotsFor, book, type BookingResult } from '@/app/c/[slug]/book/actions';
+import { track } from '@/lib/track';
 
 export type BookService = {
   id: string;
@@ -294,13 +295,25 @@ export function BookingFlow({
             e.preventDefault();
             setResult(null);
             startTransition(async () => {
-              setResult(await book({
+              const outcome = await book({
                 slug, serviceId: service.id, date, time,
                 first, last, email,
                 phone: phone || undefined,
                 note: note || undefined,
                 smsConsent: sms
-              }));
+              });
+              setResult(outcome);
+              /**
+               * The conversion. GA4 had no key event at all, so every number
+               * on that dashboard was traffic and none of it was outcome —
+               * there was no way to tell whether any of this works.
+               *
+               * Only on success: a failed booking is not a conversion, and
+               * counting it as one would make a broken funnel look healthy.
+               *
+               * Nothing about WHO or WHAT is sent. See lib/track.ts.
+               */
+              if (outcome.ok) track('booking_complete', { channel: 'online' });
             });
           }}
         >

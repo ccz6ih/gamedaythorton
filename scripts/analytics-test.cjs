@@ -61,6 +61,16 @@ const TRACKERS = [
   };
   walk(path.join(ROOT, 'app'));
   walk(path.join(ROOT, 'components'));
+  /**
+   * lib/ TOO, and leaving it out was a hole in the control.
+   *
+   * The snippet check below scans whatever this walk collects. It covered the
+   * two directories where a tag would obviously be pasted and not the third,
+   * so a complete Google Analytics snippet sitting in lib/ would have passed
+   * this suite silently — which is the exact shape of failure the suite exists
+   * to prevent, just one directory to the left.
+   */
+  walk(path.join(ROOT, 'lib'));
 
   const ALLOWED_IMPORTERS = ['app/c/[slug]/layout.tsx'];
 
@@ -78,10 +88,26 @@ const TRACKERS = [
         `also imported by: ${unexpected.join(', ')}`);
   }
 
-  // And nobody has pasted a raw snippet somewhere instead of importing it.
+  /**
+   * And nobody has pasted a raw snippet somewhere instead of importing it.
+   *
+   * Two files may mention a tracker, for different reasons:
+   *
+   *   components/Analytics.tsx — IS the tag. It renders the script.
+   *   lib/track.ts             — the only sanctioned caller of gtag(), and the
+   *                              reason it exists is to stop event payloads
+   *                              being assembled ad hoc next to a client's
+   *                              name. It loads nothing and adds no tag; it
+   *                              calls a function that is either already on
+   *                              the page or is not, and allowlists the
+   *                              parameters that may go with it.
+   *
+   * Anything else naming a tracker is the mistake this is looking for.
+   */
+  const SANCTIONED = ['components/Analytics.tsx', 'lib/track.ts'];
   const rawSnippet = files
     .map(f => path.relative(ROOT, f).split(path.sep).join('/'))
-    .filter(rel => rel !== 'components/Analytics.tsx')
+    .filter(rel => !SANCTIONED.includes(rel))
     .filter(rel => {
       const src = fs.readFileSync(path.join(ROOT, rel), 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')

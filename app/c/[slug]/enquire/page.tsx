@@ -27,6 +27,7 @@ import { createServerClient } from '@supabase/ssr';
 import { getStorefront, getStorefrontServices } from '@/lib/db/storefront';
 import { storefrontBase, storefrontLinks } from '@/lib/storefront-links';
 import { sendEnquiryEmail } from '@/lib/notify';
+import { TrackOnce } from '@/components/TrackOnce';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Book & Enquire' };
@@ -181,11 +182,33 @@ export default async function Enquire({
               The practice will be in touch to confirm a time. Nothing is booked
               until they do.
             </p>
-            <div className="sf-note ok" style={{ marginBottom: 'var(--gd-6)' }}>
-              <b>This is a preview.</b> No message was actually sent and the
-              request was stored as demonstration data. On the live site this is
-              where the practice would be notified.
-            </div>
+            {/*
+              ONLY ON A PREVIEW SITE, and this was unconditional.
+
+              The Med Bar has been site_live for weeks. Every real client who
+              used this form was told, on the confirmation screen, that no
+              message had actually been sent and their request was stored as
+              demonstration data. Both halves untrue, and the sentence is close
+              to the worst thing this page could say: somebody who believes it
+              either gives up or rings to ask whether anything arrived.
+
+              It survived because it reads as correct in the only place anybody
+              looks at it — a pilot tenant's storefront — and nothing fails
+              when a clinic goes live. The site simply starts lying politely.
+            */}
+            {!clinic.live && (
+              <div className="sf-note ok" style={{ marginBottom: 'var(--gd-6)' }}>
+                <b>This is a preview.</b> No message was actually sent and the
+                request was stored as demonstration data. On the live site this is
+                where the practice would be notified.
+              </div>
+            )}
+            {/*
+              The conversion, reported from the browser because the submission
+              happened in a server action that cannot reach gtag. Fires once
+              per session — see TrackOnce for why that needs saying.
+            */}
+            <TrackOnce event="enquiry_sent" />
             <div className="sf-actions">
               <Link href={links.home} className="sf-btn ghost">Back to {clinic.name}</Link>
             </div>
