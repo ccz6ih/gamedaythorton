@@ -89,7 +89,26 @@ export default async function ScoreboardPage() {
             hero
             delta={revenueDelta !== null ? `${revenueDelta}% of the month before` : undefined}
             deltaTone={revenueDelta === null ? 'flat' : revenueDelta >= 100 ? 'up' : 'down'}
-            note={`${board.failedPayments} declined payment${board.failedPayments === 1 ? '' : 's'}`}
+            /**
+             * Where the money came from, not just how much.
+             *
+             * "$0 collected" sat above an activity feed naming a $48.55
+             * order, because this counted the payment table alone and a shop
+             * order is deliberately not a payment row. Now that both are in
+             * the figure, saying how it splits is what stops the next person
+             * wondering whether it is counting what they think.
+             *
+             * The declined count stays — it is the one thing on this tile
+             * that is an action rather than a number.
+             */
+            note={[
+              board.revenue30OrderCount > 0
+                ? `${money(board.revenue30ShopCents, { compact: true })} from ${board.revenue30OrderCount} order${board.revenue30OrderCount === 1 ? '' : 's'}`
+                : null,
+              board.failedPayments > 0
+                ? `${board.failedPayments} declined payment${board.failedPayments === 1 ? '' : 's'}`
+                : null
+            ].filter(Boolean).join(' · ') || '0 declined payments'}
           />
 
           {isMembership ? (

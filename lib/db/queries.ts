@@ -66,6 +66,10 @@ export type Scoreboard = {
   unreadMessages: number;
   failedPayments: number;
   revenue30Cents: number;
+  /** Of that, what came through the shop or an invoice rather than a visit. */
+  revenue30ShopCents: number;
+  /** How many paid orders made it up, so the figure can be checked. */
+  revenue30OrderCount: number;
   revenuePrev30Cents: number;
   packageLiabilityCents: number;
   adverseEvents: number;
@@ -106,7 +110,8 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
    */
   const realOnly: Record<string, unknown> = live ? { synthetic: false } : {};
 
-  const [memberships, appts, ahead, tasks, threads, payments, purchases, redemptions, treatments] =
+  const [memberships, appts, ahead, tasks, threads, payments, purchases, redemptions, treatments,
+         orders] =
     await Promise.all([
       supabase.from('membership').select('status, mrr_cents, started_at, cancelled_at').match(realOnly),
       supabase.from('appointment').select('id, starts_at, status, intake_complete').match(realOnly)
@@ -129,7 +134,15 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
       supabase.from('payment').select('amount_cents, status, created_at').match(realOnly),
       supabase.from('package_purchase').select('id, sessions_total, price_paid_cents, status').match(realOnly),
       supabase.from('package_redemption').select('purchase_id, sessions').match(realOnly),
-      supabase.from('treatment_record').select('id').eq('adverse_event', true).match(realOnly)
+      supabase.from('treatment_record').select('id').eq('adverse_event', true).match(realOnly),
+      /**
+       * Money that came in through the shop or an invoice.
+       *
+       * Separate from `payment` by design — see the revenue note below — so
+       * it has to be fetched separately to be counted at all.
+       */
+      supabase.from('shop_order')
+        .select('total_cents, paid_at, status, kind').match(realOnly)
     ]);
 
   const m = memberships.data ?? [];
@@ -146,12 +159,45 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
     ? Math.round((spans.reduce((a, b) => a + b, 0) / spans.length) * 10) / 10
     : 0;
 
+  /**
+   * MONEY RECEIVED, FROM BOTH PLACES IT CAN ARRIVE.
+   *
+   * This counted the `payment` table alone, and a shop order is deliberately
+   * NOT a payment row — `payment` means money from a patient, and a stranger
+   * buying cleanser has no patient record and must never be given one. That
+   * separation is right and stays.
+   *
+   * But it made the headline figure wrong about money. The practice took a
+   * real $48.55 through the shop and the dashboard said $0 collected, while
+   * the activity feed underneath it named the order and the amount. One
+   * screen, two answers, and the confident one was the wrong one.
+   *
+   * So both are summed here. `shop_order` covers retail AND the invoices
+   * raised from Take a payment, because a custom charge is a shop_order with
+   * kind 'charge' — which means an invoice Jamie sends for a treatment now
+   * lands in takings too, where before it also vanished.
+   *
+   * Dated by `paid_at` rather than `created_at`: an order sits pending from
+   * the moment the basket is submitted, and counting it from then would put
+   * revenue in the window before anybody had paid.
+   */
   const paid = (payments.data ?? []).filter(p => p.status === 'succeeded');
-  const inWindow = (from: number, to: number) =>
-    paid.filter(p => {
-      const days = (Date.now() - new Date(p.created_at).getTime()) / 864e5;
-      return days >= from && days < to;
-    }).reduce((s, p) => s + p.amount_cents, 0);
+  const paidOrders = (orders.data ?? [])
+    .filter(o => o.paid_at && (o.status === 'paid' || o.status === 'collected'));
+
+  const daysAgo = (iso: string) => (Date.now() - new Date(iso).getTime()) / 864e5;
+
+  const paymentsIn = (from: number, to: number) =>
+    paid
+      .filter(p => { const d = daysAgo(String(p.created_at)); return d >= from && d < to; })
+      .reduce((s, p) => s + p.amount_cents, 0);
+
+  const ordersIn = (from: number, to: number) =>
+    paidOrders
+      .filter(o => { const d = daysAgo(String(o.paid_at)); return d >= from && d < to; })
+      .reduce((s, o) => s + (o.total_cents ?? 0), 0);
+
+  const inWindow = (from: number, to: number) => paymentsIn(from, to) + ordersIn(from, to);
 
   // Outstanding package liability: money taken for sessions not yet delivered.
   // Not a vanity metric — it is a real obligation on the practice's books and it
@@ -189,6 +235,9 @@ export async function getScoreboard(clinic: Clinic): Promise<Scoreboard> {
     unreadMessages: (threads.data ?? []).reduce((s, t) => s + (t.unread_staff ?? 0), 0),
     failedPayments: (payments.data ?? []).filter(p => p.status === 'failed').length,
     revenue30Cents: inWindow(0, 35),
+    revenue30ShopCents: ordersIn(0, 35),
+    revenue30OrderCount: paidOrders
+      .filter(o => { const d = daysAgo(String(o.paid_at)); return d >= 0 && d < 35; }).length,
     revenuePrev30Cents: inWindow(35, 70),
     packageLiabilityCents: liability,
     adverseEvents: (treatments.data ?? []).length

@@ -412,15 +412,51 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600"
              style="width:100%;max-width:600px;border-collapse:separate;">
 
+        ${logoBackdrop ? '' : `
         <tr>
           <td align="left" style="padding:0 0 22px;">
             ${header}
           </td>
-        </tr>
+        </tr>`}
+
+        ${logoBackdrop ? `
+        <!--
+          A MASTHEAD, NOT A STICKER.
+
+          The logo used to sit in its own row above the card: a small dark
+          square, left-aligned, floating on the paper and touching nothing.
+          It read as something pasted on rather than part of the design, which
+          is exactly what the practice said when she saw it.
+
+          Full width, flush on top of the card, square-cornered where it meets
+          the body. Email clients are unreliable about border-radius on a cell
+          that abuts another, so the top corners are the only ones rounded and
+          the join is left hard.
+        -->
+        <tr>
+          <td align="left" bgcolor="${logoBackdrop}"
+              style="background:${logoBackdrop};padding:18px 32px;
+                     border:1px solid ${logoBackdrop};border-bottom:0;
+                     border-radius:${radius} ${radius} 0 0;">
+            ${/*
+              Smaller here than it would be floating on its own. A stacked
+              wordmark is nearly as tall as it is wide, so 150px of width
+              bought about 150px of black — a band deeper than the greeting
+              under it. 112px keeps it legible and keeps the masthead a
+              masthead.
+            */''}
+            ${brand.logoUrl
+              ? `<img src="${esc(brand.logoUrl)}" alt="${esc(brand.clinicName)}" width="112"
+                      style="display:block;width:112px;max-width:45%;height:auto;border:0;outline:none;text-decoration:none;" />`
+              : `<div style="font-family:${displayFont};font-size:20px;line-height:1.3;color:#ffffff;">${esc(brand.clinicName)}</div>`}
+          </td>
+        </tr>` : ''}
 
         <tr>
           <td class="gd-card"
-              style="background:${card};border:1px solid ${border};border-radius:${radius};padding:34px 32px;">
+              style="background:${card};border:1px solid ${border};${logoBackdrop
+                ? `border-top:0;border-radius:0 0 ${radius} ${radius};`
+                : `border-radius:${radius};`}padding:34px 32px;">
 
             ${content.greeting
               ? `<p style="margin:0 0 14px;font-family:${bodyFont};font-size:16px;line-height:1.6;color:${ink};">
@@ -447,7 +483,7 @@ export function renderEmail(brand: EmailBrand, content: EmailContent): string {
             ${footer}
             ${contactLine
               ? `<p style="margin:10px 0 0;font-family:${bodyFont};font-size:12px;line-height:1.6;color:${inkMuted};">
-                   ${esc(brand.clinicName)} · ${esc(contactLine)}
+                   ${esc(brand.clinicName)} · ${addressSafe(contactLine, inkMuted)}
                  </p>`
               : `<p style="margin:10px 0 0;font-family:${bodyFont};font-size:12px;line-height:1.6;color:${inkMuted};">
                    ${esc(brand.clinicName)}
