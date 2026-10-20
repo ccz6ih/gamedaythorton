@@ -13,7 +13,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getClinic, getChart, hasModule } from '@/lib/db/queries';
 import { vocab } from '@/components/Brand';
-import { dateLabel, relative, money, num, titleCase, phone, initials, daysUntil } from '@/lib/format';
+import { dateLabel, relative, money, num, titleCase, phone, initials, daysUntil, timeLabel, priceLabel } from '@/lib/format';
+import { whereShort, type Modality } from '@/lib/appointment-where';
 import { serverClient } from '@/lib/supabase/server';
 import { signedPhotoUrls } from '@/lib/client-media';
 import { ClientNotes, type NoteRow } from '@/components/ClientNotes';
@@ -53,13 +54,66 @@ export default async function ChartPage({
   /* ------------------------------------------------------------ timeline -- */
   const events: TimelineEvent[] = [];
 
-  chart.appointments.forEach((a: Record<string, unknown>) => {
-    const service = a.service as { name?: string } | null;
+  // Stated rather than inferred: the widened select is beyond what the
+  // generated types cover, and the inferred union collapses to an error shape.
+  // Same trap as the webhook's order read.
+  (chart.appointments as unknown as Record<string, unknown>[]).forEach(a => {
+    const service = a.service as {
+      name?: string; price_cents?: number | null; price_mode?: string | null;
+      price_from_cents?: number | null; unit_label?: string | null;
+    } | null;
+    const location = a.location as { name?: string; is_default?: boolean } | null;
+    const status = String(a.status);
+    const upcoming = new Date(String(a.starts_at)).getTime() > Date.now();
+
+    /**
+     * The line that was missing entirely.
+     *
+     * The chart showed a date and the word "Booked", which is the one thing
+     * somebody opening this page already knows. What they are actually
+     * checking is when, where, how long, what it costs, and whether the form
+     * is in — so those go on the line, in that order, and only when they
+     * exist.
+     */
+    const bits: string[] = [titleCase(status)];
+
+    bits.push(timeLabel(String(a.starts_at)));
+
+    if (a.duration_min) bits.push(`${a.duration_min} min`);
+
+    // Where, said the same short way the Today list says it, so the two
+    // screens cannot describe one appointment differently.
+    bits.push(whereShort({
+      modality: a.modality as Modality | null,
+      clinicName: clinic.name,
+      locationName: location && location.is_default === false ? location.name : null
+    }));
+
+    if (a.room) bits.push(String(a.room));
+
+    if (service) {
+      const price = priceLabel({
+        price_mode: service.price_mode ?? 'fixed',
+        price_cents: service.price_cents ?? null,
+        price_from_cents: service.price_from_cents ?? null,
+        unit_label: service.unit_label ?? null
+      });
+      if (price) bits.push(price);
+    }
+
+    /**
+     * Only worth saying while it still matters. An outstanding form on an
+     * appointment that already happened is history; on tomorrow's it is a
+     * thing to chase this afternoon.
+     */
+    if (upcoming && a.intake_complete === false) bits.push('form not returned');
+
     events.push({
       at: String(a.starts_at),
-      kind: a.status === 'no_show' ? 'flag' : 'visit',
-      what: `${service?.name ?? 'Visit'}${a.status === 'no_show' ? ' — no-show' : ''}`,
-      detail: titleCase(String(a.status))
+      kind: status === 'no_show' ? 'flag' : 'visit',
+      what: `${service?.name ?? 'Visit'}${status === 'no_show' ? ' — no-show' : ''}`,
+      detail: [bits.join(' · '), a.notes ? String(a.notes) : null]
+        .filter(Boolean).join('\n')
     });
   });
 

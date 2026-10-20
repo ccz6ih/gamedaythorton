@@ -306,8 +306,26 @@ export async function getChart(patientId: string) {
     protocolChanges, membership, payments, purchases, redemptions, photos, series, threads] =
     await Promise.all([
       supabase.from('patient').select('*').eq('id', patientId).maybeSingle(),
+      /**
+       * Enough to prepare for the appointment, not just to know it exists.
+       *
+       * This used to fetch the service name and the status, which answered
+       * "is there one" and nothing else — so the chart showed a date with no
+       * TIME on it, no indication of where to be, and no sign of whether the
+       * client had filled their form. All three are things somebody reads
+       * this page specifically to find out.
+       *
+       * modality and meeting_url are the same two columns the confirmation
+       * and the reminder read, so the chart cannot disagree with what the
+       * client was told.
+       */
       supabase.from('appointment')
-        .select('id, starts_at, status, duration_min, reason_code, service:service_id (name, category)')
+        .select(
+          'id, starts_at, status, duration_min, reason_code, room, notes, ' +
+          'modality, meeting_url, intake_complete, ' +
+          'service:service_id (name, category, price_cents, price_mode, price_from_cents, unit_label), ' +
+          'location:location_id (name, address, is_default)'
+        )
         .eq('patient_id', patientId).order('starts_at', { ascending: false }),
       supabase.from('treatment_record').select('*').eq('patient_id', patientId)
         .order('performed_at', { ascending: false }),

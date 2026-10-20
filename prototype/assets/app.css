@@ -473,7 +473,10 @@ tbody tr.clickable:hover { background: var(--gd-surface-raised); }
 .tl-item .when { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
   color: var(--gd-text-dim); font-weight: 700; }
 .tl-item .what { font-weight: 600; font-size: .92rem; margin-top: .15rem; }
-.tl-item .detail { font-size: .82rem; color: var(--gd-text-muted); margin-top: .25rem; line-height: 1.5; }
+/* pre-line, because an appointment's detail is now two things: the facts
+   line, and whatever the client typed when they booked. Joined with a
+   newline, which without this renders as one run-on sentence. */
+.tl-item .detail { font-size: .82rem; color: var(--gd-text-muted); margin-top: .25rem; line-height: 1.5; white-space: pre-line; }
 
 /* --------------------------------------------------------------- calendar -- */
 .cal { display: grid; grid-template-columns: 56px repeat(5, 1fr); gap: 1px;
