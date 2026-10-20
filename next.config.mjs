@@ -230,7 +230,10 @@ const nextConfig = {
      * STOREFRONT_PATHS and matched the rule above it. A wildcard with nothing
      * under it is untested by definition.
      */
-    const WILDCARDS = ['/shop', '/prf'];
+    // '/locations' joins these because the rooms under it come from the
+    // database. Without the wildcard, /locations/loveland never reaches
+    // /c/<slug>/locations/loveland and the page cannot be served at all.
+    const WILDCARDS = ['/shop', '/prf', '/locations'];
 
     const forSlug = (slug, host) => [
       ...storefrontPaths.map(p => ({

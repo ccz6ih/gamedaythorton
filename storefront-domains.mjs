@@ -66,7 +66,21 @@ export const STOREFRONT_PATHS = [
   // The basket and the page Stripe returns to. Both must be public: a customer
   // coming back from paying has no session and must not meet a passcode box
   // holding a receipt they have already been charged for.
-  '/cart', '/shop/thanks'
+  '/cart', '/shop/thanks',
+  /**
+   * The location pages, one per published room.
+   *
+   * An index entry here and a wildcard below, the same shape as /shop and
+   * /prf, because which rooms exist is a database question — the point of
+   * migration 0045 is that a third room is a row rather than a deploy, and a
+   * fixed list here would put the deploy straight back.
+   *
+   * Registering it is not optional, and these pages proved it on first deploy
+   * by answering 307 to the sign-in page: the middleware did not recognise
+   * the path as public, so the sitemap was advertising URLs that bounced
+   * every crawler to a passcode box. Exactly what /mens-skin-care did above.
+   */
+  '/locations'
 ];
 
 /**
@@ -93,7 +107,10 @@ export const STOREFRONT_HEADER_SOURCES = [
   // Product pages, which are exactly the ones worth having in search.
   { source: '/shop/:path*', index: true },
   // One PRF treatment per URL, equally worth having in search.
-  { source: '/prf/:path*', index: true }
+  { source: '/prf/:path*', index: true },
+  // One room per URL, and the pages most likely to change what this practice
+  // ranks for at all.
+  { source: '/locations/:path*', index: true }
 ];
 
 /** True when this path is a storefront page on a root-serving domain. */
@@ -103,7 +120,10 @@ export function isStorefrontPath(pathname) {
     // One PRF treatment per URL — /prf/under-eye, /prf/microneedling,
     // /prf/hair-restoration. Same reasoning as /shop/: a fixed list here would
     // drift the moment a fourth PRF treatment or a renamed one shipped.
-    || pathname.startsWith('/prf/');
+    || pathname.startsWith('/prf/')
+    // One room per URL — /locations/loveland, /locations/northglenn. Driven
+    // by what the practice has published, so a prefix rather than a list.
+    || pathname.startsWith('/locations/');
 }
 
 /**

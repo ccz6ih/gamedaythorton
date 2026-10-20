@@ -68,6 +68,14 @@ export async function sitemapFor(slug: string, origin: string): Promise<Metadata
    * is a row with `public` set and not a deploy.
    */
   const locations = await getStorefrontLocations(slug);
+  if (locations.length) {
+    pages.push({
+      url: `${base}/locations`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7
+    });
+  }
   for (const l of locations) {
     pages.push({
       url: `${base}/locations/${l.slug}`,
