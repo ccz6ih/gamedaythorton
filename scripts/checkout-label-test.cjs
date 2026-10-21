@@ -103,6 +103,43 @@ const sync = fs.readFileSync(path.join(ROOT, 'scripts', 'stripe-catalog-sync.cjs
   ? bad('the sync creates no Stripe Price objects', 'a Price holds an amount — that is a second copy of every price')
   : ok('the sync creates no Stripe Price objects');
 
+/* ---------------------------------------------------- session expiry ----- *
+ * Stripe accepts expires_at between 30 minutes and 24 hours after creation.
+ * Outside that it rejects the call, the session is never made, and the caller
+ * gets an exception rather than a payment page.
+ *
+ * The invoice path asked for SEVEN DAYS, so every custom charge this practice
+ * ever raised was saved as a pending order with no link attached — seven
+ * attempts in ten minutes for one client before anyone worked out why. The
+ * shop's session was already at exactly 24 hours, which is why retail
+ * checkout worked throughout and invoices never did.
+ *
+ * Checked by arithmetic rather than by reading the number, so `60 * 60 * 25`
+ * and `90000` both fail the same way.
+ * ------------------------------------------------------------------------- */
+const MAX_EXPIRY = 60 * 60 * 24;
+const MIN_EXPIRY = 60 * 30;
+
+const expiries = [...stripeSrc.matchAll(/expires_at:\s*Math\.floor\(Date\.now\(\)\s*\/\s*1000\)\s*\+\s*([0-9*\s]+)/g)]
+  .map(m => ({ raw: m[1].trim(), seconds: Function(`"use strict";return (${m[1]})`)() }));
+
+if (!expiries.length) {
+  bad('a checkout session sets expires_at', 'none found — has the shape changed?');
+} else {
+  ok(`found ${expiries.length} expires_at value(s)`);
+  for (const e of expiries) {
+    if (e.seconds > MAX_EXPIRY) {
+      bad(`expires_at ${e.raw} is within Stripe's window`,
+          `${Math.round(e.seconds / 3600)}h exceeds the 24h maximum — Stripe refuses the call and no link is ever made`);
+    } else if (e.seconds < MIN_EXPIRY) {
+      bad(`expires_at ${e.raw} is within Stripe's window`,
+          `${Math.round(e.seconds / 60)}min is under the 30 minute minimum`);
+    } else {
+      ok(`expires_at ${e.raw} is within Stripe's window`, `${Math.round(e.seconds / 3600)}h`);
+    }
+  }
+}
+
 /* ------------------------------------------------------------------------- */
 
 console.log(`\n${pass} passed, ${failures.length} failed\n`);

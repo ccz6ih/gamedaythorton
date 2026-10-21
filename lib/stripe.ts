@@ -481,7 +481,25 @@ export async function createCustomChargeSession(input: CustomChargeInput) {
         input.practiceName.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 22).trim() || undefined,
       metadata: { order_id: input.orderId, kind: 'shop_order' }
     },
-    expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7
+    /**
+     * 24 HOURS, BECAUSE STRIPE REFUSES ANYTHING LONGER.
+     *
+     * This asked for seven days. Stripe allows expires_at to be between 30
+     * minutes and 24 hours after creation, so the API rejected the call,
+     * createCustomChargeSession threw, and no invoice this practice has ever
+     * raised got a payment link — seven attempts in ten minutes for one
+     * client, every one saved as a pending order with no session attached.
+     *
+     * The intent behind seven days was sound: an invoice for a treatment
+     * already given should stay payable longer than an abandoned basket. That
+     * is not something expires_at can express, so it is not expressed here —
+     * when a link lapses, raising the charge again issues a new one, and the
+     * order is still on the Never paid list to raise it from.
+     *
+     * The shop session was already at exactly 24 hours, which is why retail
+     * checkout worked throughout and invoices never did.
+     */
+    expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24
   };
 
   if (input.discountCents > 0) {
