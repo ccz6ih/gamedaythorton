@@ -53,6 +53,7 @@ type OrderRow = {
   note: string | null;
   subtotal_cents: number; tax_cents: number; total_cents: number;
   fulfilment: string | null; synthetic: boolean;
+  kind: string | null; discount_cents: number | null;
   ship_name: string | null; ship_line1: string | null; ship_line2: string | null;
   ship_city: string | null; ship_state: string | null; ship_postal: string | null;
   /**
@@ -73,7 +74,7 @@ type OrderRow = {
 };
 
 const SELECT =
-  'id, clinic_id, order_no, contact_name, contact_email, contact_phone, note, ' +
+  'id, clinic_id, order_no, contact_name, contact_email, contact_phone, note, kind, discount_cents, ' +
   'subtotal_cents, tax_cents, total_cents, fulfilment, synthetic, ' +
   'ship_name, ship_line1, ship_line2, ship_city, ship_state, ship_postal, ' +
   'shop_order_item(name_snapshot, brand_snapshot, qty, unit_price_cents)';
@@ -149,6 +150,10 @@ export async function sendOrderEmails(
     taxCents: order.tax_cents,
     totalCents: order.total_cents,
     fulfilment: order.fulfilment ?? 'ship',
+    // 'custom' is an invoice the practice raised; anything else came from the
+    // shop. It decides whether delivery is mentioned at all.
+    kind: order.kind ?? 'shop',
+    discountCents: order.discount_cents ?? 0,
     shipTo,
     synthetic: order.synthetic === true
   };

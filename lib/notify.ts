@@ -231,7 +231,10 @@ async function logRun(row: {
 }) {
   try {
     const supabase = await serverClient();
-    await supabase.from('automation_run').insert({
+    // Captured, not discarded: Supabase returns a refused insert as an error
+    // VALUE rather than throwing, so ignoring the result is how this failed
+    // silently for every webhook-sent email.
+    const { error } = await supabase.from('automation_run').insert({
       clinic_id: row.clinicId,
       rule_key: row.ruleKey,
       channel: 'email',
@@ -244,8 +247,28 @@ async function logRun(row: {
       ...(row.sent.ok ? { sent_at: new Date().toISOString() } : {}),
       ...(row.sent.ok ? {} : { suppressed_reason: row.suppressed ?? row.sent.reason })
     });
-  } catch {
-    // A booking must not fail because its audit line did not write.
+    if (error) throw new Error(error.message);
+  } catch (err) {
+    /**
+     * A booking must not fail because its audit line did not write — but it
+     * must not write NOTHING either, which is what used to happen.
+     *
+     * logRun goes through serverClient(), a session-scoped client. The Stripe
+     * webhook has no session, so RLS refuses the insert, and the silent catch
+     * meant two order emails were genuinely sent and left no trace at all.
+     * Looking at automation_run afterwards, I concluded the emails had not
+     * fired and said so — the log being empty looked exactly like the work
+     * not happening.
+     *
+     * Still swallowed, because an audit line is not worth a payment. Now
+     * loud, so the next person reading the logs can tell "did not send" from
+     * "sent, could not record".
+     */
+    console.error('[notify] could not record the run', {
+      rule: row.ruleKey,
+      delivered: row.sent.ok,
+      reason: err instanceof Error ? err.message : String(err)
+    });
   }
 }
 
@@ -799,6 +822,26 @@ export type OrderNoticeEmail = {
   fulfilment: string;
   /** Already formatted, one line per part. Null for a collection. */
   shipTo: string | null;
+  /**
+   * 'custom' for an invoice the practice raised, anything else for a basket
+   * somebody bought from the shop.
+   *
+   * It decides whether delivery is mentioned AT ALL. An invoice for a lash
+   * set that has already been done has nothing to post and nothing to
+   * collect, and the notice told the practitioner "Collection — they are
+   * picking this up, do not post it" about an appointment the client had
+   * already sat through. Shop language on a service invoice.
+   */
+  kind: string;
+  /**
+   * The practice's own reduction, which the ledger has to show.
+   *
+   * Line totals are GROSS and the subtotal is NET, so an invoice with $35 off
+   * read "1 × UV Classic Lashes $175.00" then "Subtotal $140.00" with
+   * nothing between them to explain where $35 went. Arithmetic a client
+   * cannot follow on a receipt is worse than no receipt.
+   */
+  discountCents: number;
   synthetic: boolean;
 };
 
@@ -870,13 +913,20 @@ export async function sendOrderNotice(o: OrderNoticeEmail): Promise<NotifyResult
     preheader: `Order ${o.orderNo} has been paid.`,
     lines: [`${o.customerName} ordered and has paid.`],
     panel: [
-      {
+      /*
+        Delivery, only when there is something to deliver.
+        An invoice the practice raised for a treatment already given has
+        nothing to post and nothing to collect, and saying "Collection — they
+        are picking this up" about a finished lash appointment is shop
+        language on a service receipt.
+      */
+      ...(o.kind === 'custom' ? [] : [{
         label: o.fulfilment === 'pickup' ? 'Collection' : 'Post to',
         value: how,
         // Only the posting case is an address worth protecting from the mail
         // client's own linkifier. The collection line is a sentence.
         asAddress: o.fulfilment !== 'pickup' && Boolean(o.shipTo)
-      },
+      }]),
       { label: 'Contact', value: `${o.customerEmail}${o.customerPhone ? `\n${o.customerPhone}` : ''}` },
       ...(o.note ? [{ label: 'They said', value: o.note }] : [])
     ],
@@ -887,6 +937,14 @@ export async function sendOrderNotice(o: OrderNoticeEmail): Promise<NotifyResult
         label: `${l.qty} × ${l.name}`,
         value: money(l.unitPriceCents * l.qty)
       })),
+      /*
+        The reduction, spelled out. Line totals above are GROSS and the
+        subtotal is NET, so without this row an invoice with money off reads
+        as arithmetic that does not add up.
+      */
+      ...(o.discountCents > 0
+        ? [{ label: 'Discount', value: `-${money(o.discountCents)}` }]
+        : []),
       { label: 'Subtotal', value: money(o.subtotalCents) },
       ...(o.taxCents > 0 ? [{ label: 'Tax', value: money(o.taxCents) }] : []),
       { label: 'Paid', value: money(o.totalCents) }
@@ -998,6 +1056,14 @@ export async function sendOrderConfirmation(o: OrderNoticeEmail): Promise<Notify
         label: `${l.qty} × ${l.name}`,
         value: money(l.unitPriceCents * l.qty)
       })),
+      /*
+        The reduction, spelled out. Line totals above are GROSS and the
+        subtotal is NET, so without this row an invoice with money off reads
+        as arithmetic that does not add up.
+      */
+      ...(o.discountCents > 0
+        ? [{ label: 'Discount', value: `-${money(o.discountCents)}` }]
+        : []),
       { label: 'Subtotal', value: money(o.subtotalCents) },
       ...(o.taxCents > 0 ? [{ label: 'Tax', value: money(o.taxCents) }] : []),
       { label: 'Paid', value: money(o.totalCents) }
