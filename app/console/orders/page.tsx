@@ -13,6 +13,7 @@
  * saying "I tried to order and it did not work" can be found.
  */
 
+import Link from 'next/link';
 import { getClinic } from '@/lib/db/queries';
 import { serverClient } from '@/lib/supabase/server';
 import { money, dateLabel, titleCase } from '@/lib/format';
@@ -32,6 +33,13 @@ type OrderRow = {
   contact_email: string;
   contact_phone: string | null;
   note: string | null;
+  /**
+   * 'shop' is a basket of products. 'custom' is an invoice the practice raised
+   * for something it did — a treatment, a top-up, a no-show fee. Both are
+   * shop_order rows because both are a Stripe Checkout session we settle, and
+   * that sharing is right. Confusing them on this screen was not.
+   */
+  kind: string | null;
   subtotal_cents: number;
   tax_cents: number;
   total_cents: number;
@@ -63,19 +71,68 @@ export default async function OrdersPage() {
   if (!clinic) return <div className="view"><p>No clinic visible.</p></div>;
 
   const supabase = await serverClient();
+
+  /**
+   * A LIVE PRACTICE MUST NOT BE SHOWN TEST DATA — including ours.
+   *
+   * This screen had no synthetic filter, which the dashboard and the Payments
+   * screen both have, and the omission was not theoretical. Twenty-two probe
+   * baskets from the broken-checkout investigation sat in "Never paid" under
+   * a line promising they were kept so a customer who rings up can be found.
+   * They were addressed to shop-test@example.com and probe@example.invalid.
+   * Nobody is going to ring up.
+   *
+   * Worse, they were indistinguishable from the real thing, so the one row in
+   * that list that IS worth finding would have been buried in twenty-two that
+   * are not.
+   *
+   * The rule is the same one getPayments and getScoreboard use, deliberately
+   * so: once a practice is live, synthetic rows are hidden; a pilot tenant
+   * keeps seeing them, because for Gameday they are the only data there is
+   * and filtering would empty the screen. `pilot_mode` is read directly
+   * because clinic_public omits it on purpose.
+   */
+  const { data: flags } = await supabase
+    .from('clinic').select('pilot_mode').eq('id', clinic.id).maybeSingle();
+  const live = flags?.pilot_mode === false;
+  const realOnly: Record<string, unknown> = live ? { synthetic: false } : {};
+
   const { data } = await supabase
     .from('shop_order')
     .select(
       'id, order_no, created_at, paid_at, status, contact_name, contact_email, ' +
-      'contact_phone, note, subtotal_cents, tax_cents, total_cents, ' +
+      'contact_phone, note, kind, subtotal_cents, tax_cents, total_cents, ' +
       'ship_name, ship_line1, ship_line2, ship_city, ship_state, ship_postal, ' +
       'failure_reason, shop_order_item(id, name_snapshot, brand_snapshot, qty, ' +
       'unit_price_cents, line_total_cents)'
     )
+    .match(realOnly)
     .order('created_at', { ascending: false })
     .limit(200);
 
-  const orders = (data as unknown as OrderRow[]) ?? [];
+  const all = (data as unknown as OrderRow[]) ?? [];
+
+  /**
+   * AN INVOICE IS NOT A PARCEL.
+   *
+   * This page's whole premise is "what has been paid for that I have not sent
+   * yet" — and an invoice the practice raised for a treatment it already
+   * performed has nothing to send. It arrived here because invoices and shop
+   * baskets share the shop_order table, and this screen never read `kind`.
+   *
+   * The effect on the live console: a $149.38 invoice for a treatment done in
+   * the room sat in "To send", offering Collect and Post buttons, with a
+   * "1 to send" badge in the masthead that could not be cleared by doing
+   * anything correct. The only way to make it go away was to mark a treatment
+   * as having been put in a box.
+   *
+   * So the queue, and every figure above it, is shop baskets only. Invoices
+   * are still listed — they are orders and somebody will look for one by
+   * number — but in their own section, where no figure claims they are
+   * awaiting dispatch.
+   */
+  const orders = all.filter(o => o.kind !== 'custom');
+  const invoices = all.filter(o => o.kind === 'custom');
 
   const toSend = orders.filter(o => o.status === 'paid');
   const done = orders.filter(o => o.status === 'collected');
@@ -123,13 +180,21 @@ export default async function OrdersPage() {
             <div className="lab">Waiting to be sent</div>
             <div className="stat-val">{toSend.length}</div>
           </div>
+          {/* "Shop", not "Paid" — invoices are money too, and they are
+              counted on the Payments screen rather than here. A tile called
+              "Paid" on a page that now deliberately excludes half of what was
+              paid would be the same kind of wrong this page just stopped
+              being. The shop has only ever existed inside this system, so
+              "all time" is honest about the shop in a way it is not about
+              the practice. */}
           <div className="stat">
-            <div className="lab">Paid, last 30 days</div>
+            <div className="lab">Shop, last 30 days</div>
             <div className="stat-val">{money(last30, { compact: true })}</div>
           </div>
           <div className="stat">
-            <div className="lab">Paid, all time</div>
+            <div className="lab">Shop, all time</div>
             <div className="stat-val">{money(paidTotal, { compact: true })}</div>
+            <div className="note">Invoices are on Payments</div>
           </div>
           <div className="stat">
             <div className="lab">Never paid</div>
@@ -280,6 +345,55 @@ export default async function OrdersPage() {
                 ))}
               </tbody>
             </table>
+            </div>
+          </section>
+        )}
+
+        {/* ------------------------------------------------------ invoices -- */}
+        {/*
+          Listed, but not as a queue and not as dispatch.
+
+          Somebody will come looking for one of these by number — "she says
+          she paid, what happened to 261021-0094" — and a screen that simply
+          dropped them would answer that question with silence. What it must
+          not do is imply there is anything to post.
+        */}
+        {invoices.length > 0 && (
+          <section style={{ marginTop: 'var(--gd-8)' }}>
+            <h2>Invoices raised</h2>
+            <p className="muted">
+              Charges for things done in the room, not products to send. Nothing
+              here needs posting. The money itself is on{' '}
+              <Link href="/console/payments">Payments</Link>.
+            </p>
+            <div className="table-scroll">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Order</th><th>Client</th>
+                    <th className="num">Amount</th><th>Status</th><th>Raised</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.map(o => (
+                    <tr key={o.id}>
+                      <td>{o.order_no}</td>
+                      <td>{o.contact_name}</td>
+                      <td className="num">{money(o.total_cents)}</td>
+                      <td>
+                        {o.status === 'paid'
+                          ? <span className="pill" data-tone="ok"><i className="dot" />Paid</span>
+                          : <>{titleCase(o.status)}
+                              {o.failure_reason && (
+                                <><br /><span className="muted">{o.failure_reason}</span></>
+                              )}
+                            </>}
+                      </td>
+                      <td>{dateLabel(o.paid_at ?? o.created_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
         )}

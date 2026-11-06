@@ -61,9 +61,26 @@ export default async function PaymentsPage() {
             <div className="lab">Collected, last 30 days</div>
             <div className="stat-val">{money(last30, { compact: true })}</div>
           </div>
+          {/*
+            "Collected here", not "all time".
+
+            This practice took money for years before this system existed, and
+            the GlossGenius export it was migrated from carries clients and
+            appointments but no payment history — so there is nothing to import
+            and this figure can only ever mean "what has been collected through
+            this software". "All time" claimed to know the whole business and
+            was out by everything that came before October.
+
+            That was not a cosmetic problem. The tile previously read ~$8.9k
+            because the seed dataset's seventeen test_pi_mb_* rows were being
+            counted, and when those stopped being counted the owner reasonably
+            read the drop as her migrated history having been lost. A tile that
+            overstates its own scope turns every correct change into an alarm.
+          */}
           <div className="stat">
-            <div className="lab">Collected, all time</div>
+            <div className="lab">Collected here</div>
             <div className="stat-val">{money(collected, { compact: true })}</div>
+            <div className="note">Through this system — not the whole business</div>
           </div>
           <div className="stat" style={failed.length ? { borderColor: 'var(--gd-below)' } : undefined}>
             <div className="lab">Declined</div>
