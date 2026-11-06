@@ -21,16 +21,14 @@ export default async function PaymentsPage() {
   const payments = await getPayments();
 
   const collected = payments
-    .filter((p: Record<string, unknown>) => p.status === 'succeeded')
-    .reduce((sum: number, p: Record<string, unknown>) => sum + Number(p.amount_cents), 0);
-  const failed = payments.filter((p: Record<string, unknown>) => p.status === 'failed');
-  const refunded = payments.reduce(
-    (sum: number, p: Record<string, unknown>) => sum + Number(p.refunded_cents ?? 0), 0);
+    .filter(p => p.status === 'succeeded')
+    .reduce((sum, p) => sum + p.amountCents, 0);
+  const failed = payments.filter(p => p.status === 'failed');
 
-  const last30 = payments.filter((p: Record<string, unknown>) => {
-    const days = (Date.now() - new Date(String(p.created_at)).getTime()) / 864e5;
-    return days < 35 && p.status === 'succeeded';
-  }).reduce((sum: number, p: Record<string, unknown>) => sum + Number(p.amount_cents), 0);
+  const last30 = payments
+    .filter(p => p.status === 'succeeded'
+      && (Date.now() - new Date(p.at).getTime()) / 864e5 < 35)
+    .reduce((sum, p) => sum + p.amountCents, 0);
 
   return (
     <>
@@ -72,10 +70,18 @@ export default async function PaymentsPage() {
             <div className="stat-val">{failed.length}</div>
             {failed.length > 0 && <div className="note">Involuntary churn if nobody calls</div>}
           </div>
-          <div className="stat">
-            <div className="lab">Refunded</div>
-            <div className="stat-val">{money(refunded, { compact: true })}</div>
-          </div>
+          {/*
+            Refunds are not shown rather than shown as zero.
+
+            The figure came from payment.refunded_cents, and the money this
+            practice actually takes does not pass through that table — so the
+            tile could only ever have read $0, which on a money screen is a
+            claim rather than an absence. A refund issued in Stripe today
+            would not move it.
+
+            It comes back when charge.refunded is handled, which is listed in
+            the webhook and deliberately not implemented yet.
+          */}
         </div>
 
         {failed.length > 0 && (
@@ -91,28 +97,19 @@ export default async function PaymentsPage() {
               </div>
             </div>
             <div className="list">
-              {failed.map((p: Record<string, unknown>) => {
-                const who = p.patient as { id: string; first_name: string; last_name: string } | null;
-                return (
-                  <div className="item" data-tone="warn" key={String(p.id)}>
-                    <span className="body">
-                      <span className="ttl">
-                        {who ? `${who.first_name} ${who.last_name}` : 'Unknown'} —{' '}
-                        {money(Number(p.amount_cents))}
-                      </span>
-                      <span className="sub">
-                        {dateLabel(String(p.created_at), 'long')}
-                        {p.failure_message ? ` · ${String(p.failure_message)}` : ''}
-                      </span>
+              {failed.map(p => (
+                <div className="item" data-tone="warn" key={p.id}>
+                  <span className="body">
+                    <span className="ttl">{p.who} — {money(p.amountCents)}</span>
+                    <span className="sub">{dateLabel(p.at, 'long')}</span>
+                  </span>
+                  {p.patientId && (
+                    <span className="side">
+                      <Link className="btn sm" href={`/console/clients/${p.patientId}`}>Open</Link>
                     </span>
-                    {who && (
-                      <span className="side">
-                        <Link className="btn sm" href={`/console/clients/${who.id}`}>Open</Link>
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
+                  )}
+                </div>
+              ))}
             </div>
           </section>
         )}
@@ -131,37 +128,42 @@ export default async function PaymentsPage() {
                   <th>Date</th>
                   <th>Client</th>
                   <th className="num">Amount</th>
-                  <th>Type</th>
-                  <th>Statement descriptor</th>
+                  <th>Where from</th>
+                  <th>Reference</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p: Record<string, unknown>) => {
-                  const who = p.patient as { id: string; first_name: string; last_name: string } | null;
-                  const status = String(p.status);
-                  return (
-                    <tr key={String(p.id)}>
-                      <td className="num">{dateLabel(String(p.created_at))}</td>
-                      <td>
-                        {who
-                          ? <Link href={`/console/clients/${who.id}`}>{who.first_name} {who.last_name}</Link>
-                          : <span className="dim">—</span>}
-                      </td>
-                      <td className="num"><b>{money(Number(p.amount_cents))}</b></td>
-                      <td className="dim">{titleCase(String(p.type))}</td>
-                      <td className="dim mono" style={{ fontSize: '.74rem' }}>{String(p.descriptor ?? '—')}</td>
-                      <td>
-                        <span
-                          className="pill"
-                          data-tone={status === 'succeeded' ? 'ok' : status === 'failed' ? 'critical' : 'warn'}
-                        >
-                          <i className="dot" />{titleCase(status)}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {payments.map(p => (
+                  <tr key={p.id}>
+                    <td className="num">{dateLabel(p.at)}</td>
+                    <td>
+                      {p.patientId
+                        ? <Link href={`/console/clients/${p.patientId}`}>{p.who}</Link>
+                        : p.who}
+                    </td>
+                    <td className="num"><b>{money(p.amountCents)}</b></td>
+                    {/*
+                      Where it came from, rather than a payment "type" only the
+                      clinical rows ever carried. Reading this screen, the
+                      question is whether it was the shop, an invoice she
+                      raised, or a visit — and until now two of those three
+                      could not appear here at all.
+                    */}
+                    <td className="dim">
+                      {p.source === 'shop' ? 'Shop' : p.source === 'invoice' ? 'Invoice' : 'Visit'}
+                    </td>
+                    <td className="dim mono" style={{ fontSize: '.74rem' }}>{p.reference ?? '—'}</td>
+                    <td>
+                      <span
+                        className="pill"
+                        data-tone={p.status === 'succeeded' ? 'ok' : p.status === 'failed' ? 'critical' : 'warn'}
+                      >
+                        <i className="dot" />{titleCase(p.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

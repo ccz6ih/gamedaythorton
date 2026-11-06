@@ -658,14 +658,99 @@ export async function getPackageLedger() {
 
 /* --------------------------------------------------------------- payments */
 
-export async function getPayments(limit = 200) {
+export type MoneyRow = {
+  id: string;
+  at: string;
+  amountCents: number;
+  status: string;
+  who: string;
+  /** Where it came from, so one list can hold two kinds of money. */
+  source: 'shop' | 'invoice' | 'clinical';
+  reference: string | null;
+  patientId: string | null;
+};
+
+/**
+ * EVERY WAY MONEY ARRIVES, IN ONE LIST.
+ *
+ * This read the `payment` table alone and nothing else, which made the screen
+ * called Payments the least accurate one in the console:
+ *
+ *   It showed DEMO DATA to a live practice. There was no synthetic filter, so
+ *   all seventeen seed rows — $8,926 of invented revenue dated from last
+ *   November — were presented to the owner as her payment history.
+ *
+ *   And it showed NONE of her real money. Every penny this practice has
+ *   actually taken came through the shop or an invoice, and a shop order is
+ *   deliberately not a payment row: `payment` means money from a patient, and
+ *   a stranger buying cleanser has no patient record and must never be given
+ *   one. That separation is right and stays. Reading only one side of it on a
+ *   screen named Payments was not.
+ *
+ * So both are read and merged. The rule for which rows show is the same one
+ * the dashboard uses: once a practice is live, synthetic rows are hidden; a
+ * pilot tenant keeps seeing them, because for Gameday they are the only data
+ * there is and filtering would empty the screen.
+ */
+export async function getPayments(limit = 200): Promise<MoneyRow[]> {
   const supabase = await serverClient();
-  const { data } = await supabase
-    .from('payment')
-    .select('*, patient:patient_id ( id, first_name, last_name )')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  return data ?? [];
+
+  const { data: clinic } = await supabase
+    .from('clinic').select('id, pilot_mode').limit(1).maybeSingle();
+  const live = clinic?.pilot_mode === false;
+  const realOnly: Record<string, unknown> = live ? { synthetic: false } : {};
+
+  const [payments, orders] = await Promise.all([
+    supabase
+      .from('payment')
+      .select('id, created_at, amount_cents, status, patient:patient_id ( id, first_name, last_name )')
+      .match(realOnly)
+      .order('created_at', { ascending: false })
+      .limit(limit),
+    supabase
+      .from('shop_order')
+      .select('id, order_no, kind, status, total_cents, paid_at, contact_name, patient_id')
+      .match(realOnly)
+      .in('status', ['paid', 'collected'])
+      .order('paid_at', { ascending: false })
+      .limit(limit)
+  ]);
+
+  const rows: MoneyRow[] = [];
+
+  for (const p of (payments.data ?? []) as unknown as Record<string, unknown>[]) {
+    const who = p.patient as { id: string; first_name: string; last_name: string } | null;
+    rows.push({
+      id: String(p.id),
+      at: String(p.created_at),
+      amountCents: Number(p.amount_cents ?? 0),
+      status: String(p.status ?? ''),
+      who: who ? `${who.first_name} ${who.last_name}` : 'Unknown',
+      source: 'clinical',
+      reference: null,
+      patientId: who?.id ?? null
+    });
+  }
+
+  for (const o of (orders.data ?? []) as unknown as Record<string, unknown>[]) {
+    rows.push({
+      id: String(o.id),
+      // paid_at, not created_at: an order exists from the moment a basket is
+      // submitted, and dating money from then puts it in the wrong week.
+      at: String(o.paid_at ?? ''),
+      amountCents: Number(o.total_cents ?? 0),
+      status: 'succeeded',
+      who: String(o.contact_name ?? 'Unknown'),
+      source: o.kind === 'custom' ? 'invoice' : 'shop',
+      reference: String(o.order_no ?? ''),
+      patientId: o.patient_id ? String(o.patient_id) : null
+    });
+  }
+
+  return rows
+    .filter(r => r.at)
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, limit);
 }
 
 /* ----------------------------------------------------------- safety queue */
