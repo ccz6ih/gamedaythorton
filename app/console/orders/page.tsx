@@ -79,7 +79,23 @@ export default async function OrdersPage() {
 
   const toSend = orders.filter(o => o.status === 'paid');
   const done = orders.filter(o => o.status === 'collected');
-  const unpaid = orders.filter(o => o.status !== 'paid' && o.status !== 'collected');
+  /**
+   * Baskets still genuinely in the air — not everything that is merely unpaid.
+   *
+   * This was "not paid and not collected", which swept up anything written
+   * off as well. Seven dead rows from one broken afternoon sat on the list
+   * looking like customers who might still ring up.
+   *
+   * `expired` is the written-off state: a link that lapsed, or an attempt
+   * somebody voided on purpose. Those rows stay in the database with a
+   * failure_reason saying what happened — they are a record, and deleting
+   * them would be tidying away the evidence — but they are not a queue, and
+   * a queue is what this list is.
+   */
+  const unpaid = orders.filter(
+    o => o.status !== 'paid' && o.status !== 'collected' && o.status !== 'expired'
+  );
+  const writtenOff = orders.filter(o => o.status === 'expired').length;
 
   const paidTotal = [...toSend, ...done].reduce((s, o) => s + o.total_cents, 0);
   const last30 = [...toSend, ...done]
@@ -118,6 +134,12 @@ export default async function OrdersPage() {
           <div className="stat">
             <div className="lab">Never paid</div>
             <div className="stat-val">{unpaid.length}</div>
+            {/* Said, not hidden. Rows written off are still in the database
+                and still findable; they are simply not a queue. Reporting the
+                count means nothing disappears quietly. */}
+            {writtenOff > 0 && (
+              <div className="note">{writtenOff} written off, not shown</div>
+            )}
           </div>
         </div>
 
